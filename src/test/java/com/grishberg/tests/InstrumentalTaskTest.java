@@ -2,6 +2,7 @@ package com.grishberg.tests;
 
 import org.gradle.api.Project;
 import org.gradle.api.logging.LogLevel;
+import org.gradle.internal.logging.sink.OutputEventRenderer;
 import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLogger;
 import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLoggerContext;
 import org.gradle.testfixtures.ProjectBuilder;
@@ -19,7 +20,8 @@ public class InstrumentalTaskTest {
     private void initLogger() {
         OutputEventListenerBackedLoggerContext loggerFactory = (OutputEventListenerBackedLoggerContext) LoggerFactory.getILoggerFactory();
         loggerFactory.setLevel(LogLevel.INFO);
-        OutputEventListenerBackedLogger logger = (OutputEventListenerBackedLogger) loggerFactory.getLogger("org.gradle.internal.nativeintegration.services.NativeServices");
+        OutputEventRenderer outputEventListener = (OutputEventRenderer) loggerFactory.getOutputEventListener();
+        outputEventListener.configure(LogLevel.INFO);
     }
 
     @Test(expected = RuntimeException.class)
