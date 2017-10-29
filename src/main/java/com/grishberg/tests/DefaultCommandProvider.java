@@ -32,7 +32,7 @@ public class DefaultCommandProvider implements DeviceCommandProvider {
         List<DeviceCommand> commands = new ArrayList<>();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
 
-        Set<TestPlan> planSet = testPlanProvider.provideTestPlan(device);
+        Set<TestPlan> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
         for (TestPlan currentPlan : planSet) {
 
             for (DeviceCommand additionalCommand : processAnnotations(currentPlan.getAnnotations())) {

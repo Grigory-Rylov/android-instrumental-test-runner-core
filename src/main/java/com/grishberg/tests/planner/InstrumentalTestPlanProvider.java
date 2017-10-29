@@ -1,6 +1,7 @@
 package com.grishberg.tests.planner;
 
 import com.grishberg.tests.DeviceWrapper;
+import com.grishberg.tests.InstrumentationArgsProvider;
 import com.grishberg.tests.InstrumentationInfo;
 import com.grishberg.tests.planner.parser.InstrumentTestLogParser;
 import com.grishberg.tests.planner.parser.TestPlan;
@@ -16,26 +17,26 @@ import java.util.concurrent.TimeUnit;
  */
 public class InstrumentalTestPlanProvider {
     private final InstrumentationInfo instrumentationInfo;
-    private final Map<String, String> instrumentalArgs;
     private final Project project;
 
     public InstrumentalTestPlanProvider(Project project,
-                                        InstrumentationInfo instrumentationInfo,
-                                        Map<String, String> instrumentalArgs) {
+                                        InstrumentationInfo instrumentationInfo) {
         this.project = project;
         this.instrumentationInfo = instrumentationInfo;
-        this.instrumentalArgs = new HashMap<>(instrumentalArgs);
-        this.instrumentalArgs.put("log", "true");
     }
 
-    public Set<TestPlan> provideTestPlan(DeviceWrapper device) {
+    public Set<TestPlan> provideTestPlan(DeviceWrapper device,
+                                         Map<String, String> instrumentalArgs) {
+        HashMap<String, String> args = new HashMap<>(instrumentalArgs);
+        args.put("log", "true");
+
         InstrumentTestLogParser receiver = new InstrumentTestLogParser();
         StringBuilder command = new StringBuilder("am instrument -r -w");
 
-        instrumentalArgs.put("listener",
+        args.put("listener",
                 "com.github.grishberg.annotationprinter.AnnotationsTestPrinter");
 
-        for (Map.Entry<String, String> arg : instrumentalArgs.entrySet()) {
+        for (Map.Entry<String, String> arg : args.entrySet()) {
             command.append(" -e ");
             command.append(arg.getKey());
             command.append(" ");

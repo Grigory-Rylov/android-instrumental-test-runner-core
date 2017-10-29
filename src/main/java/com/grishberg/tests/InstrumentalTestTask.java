@@ -33,7 +33,8 @@ public class InstrumentalTestTask extends DefaultTask {
             AndroidDebugBridge adb = AndroidDebugBridge.createBridge();
             waitForAdb();
 
-            InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(getProject(), instrumentationInfo, instrumentationArgsProvider.provideInstrumentationArgs());
+            InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
+                    getProject(), instrumentationInfo);
             DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider, getLogger());
             runner.runCommands(provideDevices(adb));
         } finally {
