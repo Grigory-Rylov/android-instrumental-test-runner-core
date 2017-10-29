@@ -3,6 +3,7 @@ package com.grishberg.tests;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
 import com.grishberg.tests.commands.DeviceCommandProvider;
+import com.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -32,7 +33,8 @@ public class InstrumentalTestTask extends DefaultTask {
             AndroidDebugBridge adb = AndroidDebugBridge.createBridge();
             waitForAdb();
 
-            DeviceCommandsRunner runner = new DeviceCommandsRunner(commandProvider, getLogger());
+            InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(getProject(), instrumentationInfo, instrumentationArgsProvider.provideInstrumentationArgs());
+            DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider, getLogger());
             runner.runCommands(provideDevices(adb));
         } finally {
             terminate();
@@ -53,7 +55,7 @@ public class InstrumentalTestTask extends DefaultTask {
     }
 
     private void init() {
-        AndroidDebugBridge.init(false);
+        AndroidDebugBridge.initIfNeeded(false);
         if (instrumentationInfo == null) {
             throw new RuntimeException("Need to set InstrumentationInfo");
         }

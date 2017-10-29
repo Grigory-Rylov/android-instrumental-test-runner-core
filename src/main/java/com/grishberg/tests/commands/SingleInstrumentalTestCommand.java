@@ -6,24 +6,28 @@ import com.android.ddmlib.testrunner.TestRunResult;
 import com.grishberg.tests.DeviceWrapper;
 import com.grishberg.tests.InstrumentationInfo;
 import com.grishberg.tests.RunTestLogger;
+import com.grishberg.tests.planner.parser.TestPlan;
 import org.gradle.api.Project;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Executes instrumental tests on connected device.
+ * Created by grishberg on 29.10.17.
  */
-public class InstrumentalTestCommand implements DeviceCommand {
+public class SingleInstrumentalTestCommand implements DeviceCommand {
     private final Project project;
     private final InstrumentationInfo instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
 
-    public InstrumentalTestCommand(Project project,
-                                   InstrumentationInfo instrumentalInfo,
-                                   Map<String, String> instrumentalArgs) {
+    public SingleInstrumentalTestCommand(Project project,
+                                         InstrumentationInfo instrumentalInfo,
+                                         Map<String, String> instrumentalArgs, TestPlan currentPlan) {
         this.project = project;
         this.instrumentationInfo = instrumentalInfo;
-        this.instrumentationArgs = instrumentalArgs;
+        this.instrumentationArgs = new HashMap<>(instrumentalArgs);
+        instrumentationArgs.put("class",
+                String.format("%s#%s", currentPlan.getClassName(), currentPlan.getName()));
     }
 
     @Override

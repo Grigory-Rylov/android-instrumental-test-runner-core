@@ -10,7 +10,7 @@ public class DefaultInstrumentationArgsProvider implements InstrumentationArgsPr
     @Override
     public Map<String, String> provideInstrumentationArgs(DeviceWrapper targetDevice) {
         HashMap<String, String> args = new HashMap<>();
-        //args.put("annotation", "com.grishberg.gpsexample.ClearData");
+        args.put("listener", "com.github.grishberg.annotationprinter.AnnotationsTestPrinter");
         return args;
     }
 }

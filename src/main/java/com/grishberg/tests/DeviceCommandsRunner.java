@@ -2,6 +2,7 @@ package com.grishberg.tests;
 
 import com.grishberg.tests.commands.DeviceCommand;
 import com.grishberg.tests.commands.DeviceCommandProvider;
+import com.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.gradle.api.logging.Logger;
 
 import java.util.concurrent.CountDownLatch;
@@ -10,10 +11,13 @@ import java.util.concurrent.CountDownLatch;
  * Created by grishberg on 26.10.17.
  */
 public class DeviceCommandsRunner {
+    private final InstrumentalTestPlanProvider testPlanProvider;
     private final DeviceCommandProvider commandProvider;
     private final Logger logger;
 
-    public DeviceCommandsRunner(DeviceCommandProvider commandProvider, Logger logger) {
+    public DeviceCommandsRunner(InstrumentalTestPlanProvider testPlanProvider,
+                                DeviceCommandProvider commandProvider, Logger logger) {
+        this.testPlanProvider = testPlanProvider;
         this.commandProvider = commandProvider;
         this.logger = logger;
     }
@@ -22,7 +26,8 @@ public class DeviceCommandsRunner {
         CountDownLatch deviceCounter = new CountDownLatch(devices.length);
         for (DeviceWrapper device : devices) {
             try {
-                for (DeviceCommand command : commandProvider.provideDeviceCommands(device)) {
+                DeviceCommand[] commands = commandProvider.provideDeviceCommands(device, testPlanProvider);
+                for (DeviceCommand command : commands) {
                     command.execute(device);
                 }
             } catch (Exception e) {

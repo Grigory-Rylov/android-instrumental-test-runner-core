@@ -1,48 +1,39 @@
-package com.grishberg.tests.commands;
+package com.grishberg.tests.planner;
 
-import com.android.ddmlib.MultiLineReceiver;
 import com.grishberg.tests.DeviceWrapper;
 import com.grishberg.tests.InstrumentationInfo;
+import com.grishberg.tests.planner.parser.InstrumentTestLogParser;
+import com.grishberg.tests.planner.parser.TestPlan;
 import org.gradle.api.Project;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Logs test result.
+ * Provides set of {@link TestPlan} for instrumental tests.
  */
-public class InstrumentationLogCommand implements DeviceCommand {
+public class InstrumentalTestPlanProvider {
     private final InstrumentationInfo instrumentationInfo;
     private final Map<String, String> instrumentalArgs;
     private final Project project;
 
-    public InstrumentationLogCommand(Project project,
-                                     InstrumentationInfo instrumentationInfo,
-                                     Map<String, String> instrumentalArgs) {
+    public InstrumentalTestPlanProvider(Project project,
+                                        InstrumentationInfo instrumentationInfo,
+                                        Map<String, String> instrumentalArgs) {
         this.project = project;
         this.instrumentationInfo = instrumentationInfo;
         this.instrumentalArgs = new HashMap<>(instrumentalArgs);
         this.instrumentalArgs.put("log", "true");
     }
 
-    @Override
-    public DeviceCommandResult execute(DeviceWrapper device) {
-        DeviceCommandResult result = new DeviceCommandResult();
-        MultiLineReceiver receiver = new MultiLineReceiver() {
-            @Override
-            public void processNewLines(String[] lines) {
-                for (String word : lines) {
-                    System.out.println(word);
-                }
-            }
-
-            @Override
-            public boolean isCancelled() {
-                return false;
-            }
-        };
+    public Set<TestPlan> provideTestPlan(DeviceWrapper device) {
+        InstrumentTestLogParser receiver = new InstrumentTestLogParser();
         StringBuilder command = new StringBuilder("am instrument -r -w");
+
+        instrumentalArgs.put("listener",
+                "com.github.grishberg.annotationprinter.AnnotationsTestPrinter");
 
         for (Map.Entry<String, String> arg : instrumentalArgs.entrySet()) {
             command.append(" -e ");
@@ -59,8 +50,8 @@ public class InstrumentationLogCommand implements DeviceCommand {
             device.executeShellCommand(command.toString(), receiver,
                     0, TimeUnit.SECONDS);
         } catch (Exception e) {
-            project.getLogger().error("InstrumentationLogCommand.execute error:", e);
+            project.getLogger().error("InstrumentalTestPlanProvider.execute error:", e);
         }
-        return result;
+        return receiver.getTestInstances();
     }
 }

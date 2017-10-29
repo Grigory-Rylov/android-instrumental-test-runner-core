@@ -1,14 +1,14 @@
 package com.grishberg.tests;
 
-import com.grishberg.tests.commands.DeviceCommand;
-import com.grishberg.tests.commands.DeviceCommandProvider;
-import com.grishberg.tests.commands.InstrumentalTestCommand;
-import com.grishberg.tests.commands.InstrumentationLogCommand;
+import com.grishberg.tests.commands.*;
+import com.grishberg.tests.planner.InstrumentalTestPlanProvider;
+import com.grishberg.tests.planner.parser.TestPlan;
 import org.gradle.api.Project;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides commands for device.
@@ -27,14 +27,35 @@ public class DefaultCommandProvider implements DeviceCommandProvider {
     }
 
     @Override
-    public DeviceCommand[] provideDeviceCommands(DeviceWrapper device) {
+    public DeviceCommand[] provideDeviceCommands(DeviceWrapper device,
+                                                 InstrumentalTestPlanProvider testPlanProvider) {
         List<DeviceCommand> commands = new ArrayList<>();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
 
-        commands.add(new InstrumentationLogCommand(project, instrumentationInfo, instrumentalArgs));
+        Set<TestPlan> planSet = testPlanProvider.provideTestPlan(device);
+        for (TestPlan currentPlan : planSet) {
+
+            for (DeviceCommand additionalCommand : processAnnotations(currentPlan.getAnnotations())) {
+                commands.add(additionalCommand);
+            }
+            commands.add(new SingleInstrumentalTestCommand(project,
+                    instrumentationInfo,
+                    instrumentalArgs,
+                    currentPlan));
+        }
 
         commands.add(new InstrumentalTestCommand(project, instrumentationInfo, instrumentalArgs));
 
         return commands.toArray(new DeviceCommand[commands.size()]);
+    }
+
+    private List<DeviceCommand> processAnnotations(String[] annotations) {
+        ArrayList<DeviceCommand> commands = new ArrayList<>();
+        for (String annotation : annotations) {
+            if ("ClearData".equals(annotation)) {
+                commands.add(new ClearCommand(project, instrumentationInfo));
+            }
+        }
+        return commands;
     }
 }
