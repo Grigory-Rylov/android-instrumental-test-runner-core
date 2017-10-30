@@ -3,7 +3,6 @@ package com.grishberg.tests;
 import org.gradle.api.Project;
 import org.gradle.api.logging.LogLevel;
 import org.gradle.internal.logging.sink.OutputEventRenderer;
-import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLogger;
 import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLoggerContext;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.Test;
@@ -43,8 +42,6 @@ public class InstrumentalTaskTest {
 
     private InstrumentalTestTask provideTask() {
         Project project = ProjectBuilder.builder().build();
-        OutputEventListenerBackedLogger logger = (OutputEventListenerBackedLogger) project.getLogger();
-
         project.getPluginManager().apply(com.grishberg.tests.InstrumentalTestPlugin.class);
         return (InstrumentalTestTask) project.getTasks().getByName(InstrumentalTestTask.TASK_NAME);
     }

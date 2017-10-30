@@ -3,30 +3,31 @@ package com.grishberg.tests.commands;
 import com.android.ddmlib.MultiLineReceiver;
 import com.grishberg.tests.DeviceWrapper;
 import com.grishberg.tests.InstrumentationInfo;
-import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by grishberg on 29.10.17.
+ * Cleans app data.
  */
 public class ClearCommand implements DeviceCommand {
-    private final Project project;
+    private final Logger logger;
     private final InstrumentationInfo instrumentationInfo;
 
-    public ClearCommand(Project project,
+    public ClearCommand(Logger logger,
                         InstrumentationInfo instrumentalInfo) {
-        this.project = project;
+        this.logger = logger;
         this.instrumentationInfo = instrumentalInfo;
     }
 
     @Override
     public DeviceCommandResult execute(DeviceWrapper device) {
+        logger.info("ClearCommand for package " + instrumentationInfo.getApplicationId());
         MultiLineReceiver receiver = new MultiLineReceiver() {
             @Override
             public void processNewLines(String[] lines) {
                 for (String line : lines) {
-                    project.getLogger().info(line);
+                    logger.info(line);
                 }
             }
 
@@ -42,7 +43,7 @@ public class ClearCommand implements DeviceCommand {
             device.executeShellCommand(command.toString(), receiver,
                     0, TimeUnit.SECONDS);
         } catch (Exception e) {
-            project.getLogger().error("ClearCommand.execute error:", e);
+            logger.error("ClearCommand.execute error:", e);
         }
         return new DeviceCommandResult();
     }

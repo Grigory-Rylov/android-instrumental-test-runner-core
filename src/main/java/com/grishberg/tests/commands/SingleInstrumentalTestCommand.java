@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by grishberg on 29.10.17.
+ * Executes instrumentation test for single test method.
  */
 public class SingleInstrumentalTestCommand implements DeviceCommand {
     private final Project project;
@@ -22,7 +22,8 @@ public class SingleInstrumentalTestCommand implements DeviceCommand {
 
     public SingleInstrumentalTestCommand(Project project,
                                          InstrumentationInfo instrumentalInfo,
-                                         Map<String, String> instrumentalArgs, TestPlan currentPlan) {
+                                         Map<String, String> instrumentalArgs,
+                                         TestPlan currentPlan) {
         this.project = project;
         this.instrumentationInfo = instrumentalInfo;
         this.instrumentationArgs = new HashMap<>(instrumentalArgs);

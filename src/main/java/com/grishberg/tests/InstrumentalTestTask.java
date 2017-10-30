@@ -20,6 +20,7 @@ public class InstrumentalTestTask extends DefaultTask {
     private DeviceCommandProvider commandProvider;
     private InstrumentationArgsProvider instrumentationArgsProvider;
     private InstrumentationInfo instrumentationInfo;
+    private CommandsForAnnotationProvider commandsForAnnotationProvider;
 
     public InstrumentalTestTask() {
     }
@@ -60,15 +61,21 @@ public class InstrumentalTestTask extends DefaultTask {
         if (instrumentationInfo == null) {
             throw new RuntimeException("Need to set InstrumentationInfo");
         }
+        if (commandsForAnnotationProvider == null) {
+            commandsForAnnotationProvider = new DefaultCommandsForAnnotationProvider(getLogger(),
+                    instrumentationInfo);
+            getLogger().info("init: commandsForAnnotationProvider is empty, use DefaultCommandsForAnnotationProvider");
+        }
         if (instrumentationArgsProvider == null) {
             instrumentationArgsProvider = new DefaultInstrumentationArgsProvider();
+            getLogger().info("init: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
         }
         if (commandProvider == null) {
             getProject().getLogger()
-                    .info("command provider not set, use DefaultCommandProvider");
+                    .info("command provider is empty, use DefaultCommandProvider");
             commandProvider = new DefaultCommandProvider(getProject(),
                     instrumentationInfo,
-                    instrumentationArgsProvider);
+                    instrumentationArgsProvider, commandsForAnnotationProvider);
         }
     }
 
@@ -86,5 +93,9 @@ public class InstrumentalTestTask extends DefaultTask {
 
     public void setInstrumentationArgsProvider(InstrumentationArgsProvider argsProvider) {
         this.instrumentationArgsProvider = argsProvider;
+    }
+
+    public void setCommandsForAnnotationProvider(CommandsForAnnotationProvider commandsProvider) {
+        this.commandsForAnnotationProvider = commandsProvider;
     }
 }

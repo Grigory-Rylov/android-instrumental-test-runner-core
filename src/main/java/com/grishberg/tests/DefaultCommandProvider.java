@@ -1,6 +1,9 @@
 package com.grishberg.tests;
 
-import com.grishberg.tests.commands.*;
+import com.grishberg.tests.commands.DeviceCommand;
+import com.grishberg.tests.commands.DeviceCommandProvider;
+import com.grishberg.tests.commands.InstrumentalTestCommand;
+import com.grishberg.tests.commands.SingleInstrumentalTestCommand;
 import com.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import com.grishberg.tests.planner.parser.TestPlan;
 import org.gradle.api.Project;
@@ -17,13 +20,16 @@ public class DefaultCommandProvider implements DeviceCommandProvider {
     private final Project project;
     private final InstrumentationInfo instrumentationInfo;
     private final InstrumentationArgsProvider argsProvider;
+    private final CommandsForAnnotationProvider commandsForAnnotationProvider;
 
     public DefaultCommandProvider(Project project,
                                   InstrumentationInfo instrumentalInfo,
-                                  InstrumentationArgsProvider argsProvider) {
+                                  InstrumentationArgsProvider argsProvider,
+                                  CommandsForAnnotationProvider commandsForAnnotationProvider) {
         this.project = project;
         this.instrumentationInfo = instrumentalInfo;
         this.argsProvider = argsProvider;
+        this.commandsForAnnotationProvider = commandsForAnnotationProvider;
     }
 
     @Override
@@ -35,9 +41,9 @@ public class DefaultCommandProvider implements DeviceCommandProvider {
         Set<TestPlan> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
         for (TestPlan currentPlan : planSet) {
 
-            for (DeviceCommand additionalCommand : processAnnotations(currentPlan.getAnnotations())) {
-                commands.add(additionalCommand);
-            }
+            List<DeviceCommand> commandsForAnnotations = commandsForAnnotationProvider
+                    .provideCommand(currentPlan.getAnnotations());
+            commands.addAll(commandsForAnnotations);
             commands.add(new SingleInstrumentalTestCommand(project,
                     instrumentationInfo,
                     instrumentalArgs,
@@ -47,15 +53,5 @@ public class DefaultCommandProvider implements DeviceCommandProvider {
         commands.add(new InstrumentalTestCommand(project, instrumentationInfo, instrumentalArgs));
 
         return commands.toArray(new DeviceCommand[commands.size()]);
-    }
-
-    private List<DeviceCommand> processAnnotations(String[] annotations) {
-        ArrayList<DeviceCommand> commands = new ArrayList<>();
-        for (String annotation : annotations) {
-            if ("ClearData".equals(annotation)) {
-                commands.add(new ClearCommand(project, instrumentationInfo));
-            }
-        }
-        return commands;
     }
 }
