@@ -50,8 +50,6 @@ public class DefaultCommandProvider implements DeviceCommandProvider {
                     currentPlan));
         }
 
-        //TODO: group tests by classes without annotations
-
         return commands.toArray(new DeviceCommand[commands.size()]);
     }
 }

@@ -11,7 +11,7 @@ class InstrumentalTestPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.logger.info("InstrumentalTestPlugin applied")
         def task = project.tasks.create(InstrumentalTestTask.TASK_NAME, InstrumentalTestTask) {}
-        task.group = "myGroup"
-        task.description = "some description"
+        task.group = "verification"
+        task.description = "Plugin for running instrumental tests on multiple devices"
     }
 }

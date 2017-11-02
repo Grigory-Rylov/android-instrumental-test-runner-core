@@ -3,7 +3,7 @@ package com.github.grishberg.tests.planner.parser;
 import java.util.Arrays;
 
 /**
- * Created by grishberg on 29.10.17.
+ * Test plan for running single test.
  */
 public class TestPlan {
     private final String testId;
@@ -18,7 +18,7 @@ public class TestPlan {
     }
 
     public void setAnnotations(String[] annotations) {
-        this.annotations = annotations;
+        this.annotations = annotations.clone();
     }
 
     public String getName() {
@@ -30,7 +30,7 @@ public class TestPlan {
     }
 
     public String[] getAnnotations() {
-        return annotations;
+        return annotations.clone();
     }
 
     @Override
