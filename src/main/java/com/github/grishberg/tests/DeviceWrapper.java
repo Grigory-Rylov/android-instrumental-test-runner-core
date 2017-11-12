@@ -7,7 +7,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by grishberg on 19.10.17.
+ * Wraps {@link IDevice} interface.
  */
 public class DeviceWrapper implements IShellEnabledDevice {
     private final IDevice device;
