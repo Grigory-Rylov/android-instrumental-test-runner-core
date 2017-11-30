@@ -9,7 +9,7 @@ addons:
       secure: iP5Peg0Axb4iCZYHBWq3qWYa/0idj2IjtZPYL9aO2npGSyJuTx5/BxQsXPmCItT4VIZcqhWEsqOzX/EjtLgLEiPF51fw5ZLiGrdXmp2nmmslhfQnp+9QXl0/hyyGskfM8fdTOGxbaEZBSycwpTKab5uMHRlK8WoQxp/Rt3UvTagsQTMh0v1NF5cAJiIDcV6CQHEKhbi/Ein/hYhl+2zzpCixQoOrq/IB8KCmSno8NNBHi4KnstCllwss1oTU39v8kXwvLpIieaAmXxdER0ESDhviqI0AE4Qg5+iR4eSQ0bd36pNA7M4ObSEJn1r7rv3VIskcfa+mILKhZpvBjHfnFS/5CWJ/H7ooO5maLWbdnRgYUuvE0RwyDzPBfiVNabjYbGNqxYqjmcTF665Cb0Y1tXQjiZq6vsgU0vuEQgghTuZM9Rkvzrs+6cExgzEVwM6LQPWZmp3ubnYnqgl4tfLRhUGzDG+aNXmToTQB6hXN2LPEqMMnnFtre9tE2gvNpDSe3s+CrfxQglBplcgSHF4yyJI4TGDOdCDBaFxj434XwN7isXFHYnw2urhhF0CdEqyfmTmjhHTke5uaXDGSNBOvrqBdW+bqiEVZCxALAgEkXiSSgJBC/zv9duIQpOfScvMRGQPvgb6lAFMmEMxKU/inQfDtlIc5R3ROcoYHaivNFxc= # encrypted value of your token
     branches:
           - master
-          - .*_sonar
+          - .*
 script:
   # other script steps might be done before running the actual analysis
   - ./gradlew sonarqube
