@@ -1,6 +1,7 @@
 def sonarKey = "com.github.grishberg:android-instrumental-test-runner"
 sonarqube {
     properties {
+        property "sonar.organization", "grigory-rylov-github"
         property "sonar.projectKey", sonarKey
         property "sonar.projectName", "android-instrumental-test-runner"
         property "sonar.projectVersion", "${project.version}"
