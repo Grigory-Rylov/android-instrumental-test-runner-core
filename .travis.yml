@@ -1,0 +1,18 @@
+language: java
+env:
+  global:
+    secure: hPCf+SswG/kQZlit4xEEossCUHMb00uRgm4tFrC/13LtEHGyQHVwq0XSCSgPboEDJnHvUj2SudQ4LhXNGQoWdhhvjrq69kb3bby6KG7wkgkUTBInEC0pQmkJdp2frpDBMlqf2iFotYU5kOg+ztGkUxRtlyIEPtFN0cJixWW1UNECUUBp7yiiAgsiohfXRRgv8mLDR9gQlRMfdp7lSB3Vc3jsuMkrBUi4UWnXWyvZpFzNNn7UkuXyR2Qr9m8ZrS7E0u/XG8lkpgaDXRxh3KcgP6UOaks+FsdJsLDjUAtG4+Ja29id+XuLAqyu871WYg0wVL/XxDdBB8g8YP3C3ruwJef+y8waobfQT8VaasAS/l53I6UtaOjeYqGWcKU9wi6S3E6Rm2nnieN+qcPj5eK6XqAF5BGTAcF0M2FxRq7+UibjIW+u7S31gUm7bw9eJm/S+BzPFKUMy8SIM2QvS4gs3uVqkS7h87vzIspCSY4vSTZxw12G0OXuMtFDSdyH+L3xwjCWxtI0/tA1hXR0ETOZRyRgykb2gTBC0rURWDDbsHlxYJS84dOS+ryQ6YJZdv2qEjBAD7yGr3lxdTM94gEqjDrBhhrLoUcKslSuOjsPSVbH2D4rCMK34IiWkYmqCb91bo6KDBchTsMyLw3vLXFLbjGQS40zxZ7Y52Wq93k8GCQ=
+addons:
+  sonarcloud:
+    organization: "grigory-rylov-github" # the key of the org you chose at step #3
+    token:
+      secure: iP5Peg0Axb4iCZYHBWq3qWYa/0idj2IjtZPYL9aO2npGSyJuTx5/BxQsXPmCItT4VIZcqhWEsqOzX/EjtLgLEiPF51fw5ZLiGrdXmp2nmmslhfQnp+9QXl0/hyyGskfM8fdTOGxbaEZBSycwpTKab5uMHRlK8WoQxp/Rt3UvTagsQTMh0v1NF5cAJiIDcV6CQHEKhbi/Ein/hYhl+2zzpCixQoOrq/IB8KCmSno8NNBHi4KnstCllwss1oTU39v8kXwvLpIieaAmXxdER0ESDhviqI0AE4Qg5+iR4eSQ0bd36pNA7M4ObSEJn1r7rv3VIskcfa+mILKhZpvBjHfnFS/5CWJ/H7ooO5maLWbdnRgYUuvE0RwyDzPBfiVNabjYbGNqxYqjmcTF665Cb0Y1tXQjiZq6vsgU0vuEQgghTuZM9Rkvzrs+6cExgzEVwM6LQPWZmp3ubnYnqgl4tfLRhUGzDG+aNXmToTQB6hXN2LPEqMMnnFtre9tE2gvNpDSe3s+CrfxQglBplcgSHF4yyJI4TGDOdCDBaFxj434XwN7isXFHYnw2urhhF0CdEqyfmTmjhHTke5uaXDGSNBOvrqBdW+bqiEVZCxALAgEkXiSSgJBC/zv9duIQpOfScvMRGQPvgb6lAFMmEMxKU/inQfDtlIc5R3ROcoYHaivNFxc= # encrypted value of your token
+    branches:
+          - master
+          - .*_sonar
+script:
+  # other script steps might be done before running the actual analysis
+  - ./gradlew sonarqube
+
+after_success:
+  - mvn clean test jacoco:report coveralls:jacoco
