@@ -10,10 +10,13 @@ import org.gradle.api.tasks.TaskAction;
 import java.io.File;
 
 /**
- * Created by grishberg on 14.10.17.
+ * Main task for running instrumental tests.
  */
 public class InstrumentalTestTask extends DefaultTask {
     public static final String TASK_NAME = "instrumentalTests";
+    private static final int ADB_TIMEOUT = 10;
+    private static final int ONE_SECOND = 1000;
+
     private File coverageFilesDir;
     private File testResultsDir;
     private File reportsDir;
@@ -32,7 +35,7 @@ public class InstrumentalTestTask extends DefaultTask {
             init();
 
             AndroidDebugBridge adb = AndroidDebugBridge.createBridge();
-            waitForAdb();
+            waitForAdb(adb);
 
             InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
                     getProject(), instrumentationInfo);
@@ -79,11 +82,12 @@ public class InstrumentalTestTask extends DefaultTask {
         }
     }
 
-    private static void waitForAdb() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    private void waitForAdb(AndroidDebugBridge adb) throws InterruptedException {
+        for (int counter = 0; counter < ADB_TIMEOUT; counter++) {
+            if (adb.isConnected()) {
+                break;
+            }
+            Thread.sleep(ONE_SECOND);
         }
     }
 
