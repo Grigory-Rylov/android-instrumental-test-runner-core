@@ -32,20 +32,19 @@ public class SingleInstrumentalTestCommand implements DeviceCommand {
     }
 
     @Override
-    public DeviceCommandResult execute(DeviceWrapper device) {
+    public DeviceCommandResult execute(DeviceWrapper deviceWrapper) {
         DeviceCommandResult result = new DeviceCommandResult();
 
         RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(
                 instrumentationInfo.getInstrumentalPackage(),
                 instrumentationInfo.getInstrumentalRunner(),
-                device);
+                deviceWrapper.getDevice());
 
-        instrumentationArgs.put("log", "true");
         for (Map.Entry<String, String> arg : instrumentationArgs.entrySet()) {
             runner.addInstrumentationArg(arg.getKey(), arg.getValue());
         }
 
-        CustomTestRunListener testRunListener = new CustomTestRunListener(device.getName(),
+        CustomTestRunListener testRunListener = new CustomTestRunListener(deviceWrapper.getName(),
                 project.getName(),
                 instrumentationInfo.getFlavorName(),
                 new RunTestLogger(project.getLogger())

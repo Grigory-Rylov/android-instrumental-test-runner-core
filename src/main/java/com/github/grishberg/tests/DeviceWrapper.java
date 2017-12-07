@@ -38,4 +38,8 @@ public class DeviceWrapper implements IShellEnabledDevice {
         }
         return name;
     }
+
+    public IDevice getDevice() {
+        return device;
+    }
 }

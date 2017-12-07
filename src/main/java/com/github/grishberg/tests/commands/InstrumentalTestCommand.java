@@ -33,9 +33,8 @@ public class InstrumentalTestCommand implements DeviceCommand {
         RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(
                 instrumentationInfo.getInstrumentalPackage(),
                 instrumentationInfo.getInstrumentalRunner(),
-                device);
+                device.getDevice());
 
-        instrumentationArgs.put("log", "true");
         for (Map.Entry<String, String> arg : instrumentationArgs.entrySet()) {
             runner.addInstrumentationArg(arg.getKey(), arg.getValue());
         }
