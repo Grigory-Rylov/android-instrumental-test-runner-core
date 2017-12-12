@@ -2,14 +2,15 @@ plugins {
     id "org.sonarqube" version "2.6"
     id 'java'
     id 'jacoco'
+    id "com.jfrog.bintray" version "1.7.3"
 }
 
 group 'com.grishberg'
-version '0.1.7'
+version '0.1.8'
 
 ext {
     PUBLISH_GROUP_ID = 'com.github.grishberg'
-    PUBLISH_ARTIFACT_ID = 'AndroidInstrumentalTestRunner'
+    PUBLISH_ARTIFACT_ID = 'android-instrumental-test-runner'
     PUBLISH_VERSION = version
 }
 
