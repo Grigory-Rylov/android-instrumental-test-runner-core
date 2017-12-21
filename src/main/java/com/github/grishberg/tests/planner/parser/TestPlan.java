@@ -15,6 +15,7 @@ public class TestPlan {
         this.testId = testId;
         this.name = name;
         this.className = className;
+        this.annotations = new String[0];
     }
 
     public void setAnnotations(String[] annotations) {
