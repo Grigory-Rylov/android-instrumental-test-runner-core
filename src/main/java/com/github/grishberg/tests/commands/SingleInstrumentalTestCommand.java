@@ -59,4 +59,9 @@ public class SingleInstrumentalTestCommand implements DeviceCommand {
         }
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "SingleInstrumentalTestCommand{}";
+    }
 }

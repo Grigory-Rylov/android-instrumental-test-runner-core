@@ -42,4 +42,13 @@ public class DeviceWrapper implements IShellEnabledDevice {
     public IDevice getDevice() {
         return device;
     }
+
+    @Override
+    public String toString() {
+        return "DeviceWrapper{" +
+                "sn=" + device.getSerialNumber() +
+                ", isOnline=" + device.isOnline() +
+                ", name='" + getName() + '\'' +
+                '}';
+    }
 }

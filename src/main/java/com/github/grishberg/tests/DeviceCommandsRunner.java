@@ -23,18 +23,29 @@ public class DeviceCommandsRunner {
     }
 
     public boolean runCommands(DeviceWrapper[] devices) throws InterruptedException {
-        CountDownLatch deviceCounter = new CountDownLatch(devices.length);
+        final CountDownLatch deviceCounter = new CountDownLatch(devices.length);
+
         for (DeviceWrapper device : devices) {
-            try {
-                DeviceCommand[] commands = commandProvider.provideDeviceCommands(device, testPlanProvider);
-                for (DeviceCommand command : commands) {
-                    command.execute(device);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        DeviceCommand[] commands = commandProvider.provideDeviceCommands(device,
+                                testPlanProvider);
+                        for (DeviceCommand command : commands) {
+                            logger.debug("[AITR] Before executing device = {} command ={}",
+                                    device.toString(), command.toString());
+                            command.execute(device);
+                            logger.debug("[AITR] After executing device = {} command ={}",
+                                    device.toString(), command.toString());
+                        }
+                    } catch (Exception e) {
+                        logger.error("Some Exception", e);
+                    } finally {
+                        deviceCounter.countDown();
+                    }
                 }
-            } catch (Exception e) {
-                logger.error("Some Exception", e);
-            } finally {
-                deviceCounter.countDown();
-            }
+            }).start();
         }
         deviceCounter.await();
         return true;

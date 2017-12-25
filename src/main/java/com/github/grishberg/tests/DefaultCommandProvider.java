@@ -36,7 +36,8 @@ public class DefaultCommandProvider implements DeviceCommandProvider {
                                                  InstrumentalTestPlanProvider testPlanProvider) {
         List<DeviceCommand> commands = new ArrayList<>();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
-
+        project.getLogger().debug("[AITR] device={}, args={}",
+                device.toString(), instrumentalArgs);
         Set<TestPlan> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
 
         for (TestPlan currentPlan : planSet) {
