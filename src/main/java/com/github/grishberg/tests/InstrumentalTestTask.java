@@ -1,22 +1,28 @@
 package com.github.grishberg.tests;
 
+import com.android.build.gradle.internal.test.report.ReportType;
+import com.android.build.gradle.internal.test.report.TestReport;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
+import com.android.utils.FileUtils;
 import com.github.grishberg.tests.commands.DeviceCommandProvider;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.GradleException;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.internal.logging.ConsoleRenderer;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Main task for running instrumental tests.
  */
 public class InstrumentalTestTask extends DefaultTask {
-    public static final String TASK_NAME = "instrumentalTests";
+    public static final String NAME = "instrumentalTests";
     private static final int ADB_TIMEOUT = 10;
     private static final int ONE_SECOND = 1000;
-
     private File coverageFilesDir;
     private File testResultsDir;
     private File reportsDir;
@@ -29,7 +35,7 @@ public class InstrumentalTestTask extends DefaultTask {
     }
 
     @TaskAction
-    public void runTask() throws InterruptedException {
+    public void runTask() throws InterruptedException, IOException {
         getProject().getLogger().debug("InstrumentalTestTask.runTask");
         try {
             init();
@@ -40,9 +46,23 @@ public class InstrumentalTestTask extends DefaultTask {
             InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
                     getProject(), instrumentationInfo);
             DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider, getLogger());
-            runner.runCommands(provideDevices(adb));
+            ;
+            generateHtmlReport(runner.runCommands(provideDevices(adb)));
         } finally {
             terminate();
+        }
+    }
+
+    private void generateHtmlReport(boolean success) throws IOException {
+        FileUtils.cleanOutputDir(reportsDir);
+        TestReport report = new TestReport(ReportType.SINGLE_FLAVOR, getTestResultsDir(), reportsDir);
+        report.generateReport();
+        if (!success) {
+            String reportUrl = (new ConsoleRenderer())
+                    .asClickableFileUrl(new File(reportsDir, "index.html"));
+            String message = String.format("There were failing tests. See the report at: %s",
+                    reportUrl);
+            throw new GradleException(message);
         }
     }
 
@@ -91,15 +111,47 @@ public class InstrumentalTestTask extends DefaultTask {
         }
     }
 
+    @Input
     public void setInstrumentationInfo(InstrumentationInfo instrumentationInfo) {
         this.instrumentationInfo = instrumentationInfo;
     }
 
+    @Input
     public void setInstrumentationArgsProvider(InstrumentationArgsProvider argsProvider) {
         this.instrumentationArgsProvider = argsProvider;
     }
 
+    @Input
     public void setCommandsForAnnotationProvider(CommandsForAnnotationProvider commandsProvider) {
         this.commandsForAnnotationProvider = commandsProvider;
+    }
+
+    @Input
+    public void setCommandProvider(DeviceCommandProvider commandProvider) {
+        this.commandProvider = commandProvider;
+    }
+
+    public File getCoverageFilesDir() {
+        return coverageFilesDir;
+    }
+
+    public File getTestResultsDir() {
+        return testResultsDir;
+    }
+
+    public File getReportsDir() {
+        return reportsDir;
+    }
+
+    public void setCoverageFilesDir(File coverageFilesDir) {
+        this.coverageFilesDir = coverageFilesDir;
+    }
+
+    public void setTestResultsDir(File testResultsDir) {
+        this.testResultsDir = testResultsDir;
+    }
+
+    public void setReportsDir(File reportsDir) {
+        this.reportsDir = reportsDir;
     }
 }

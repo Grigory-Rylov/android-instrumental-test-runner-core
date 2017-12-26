@@ -14,6 +14,7 @@ import java.util.Map;
  * Executes instrumental tests on connected device.
  */
 public class InstrumentalTestCommand implements DeviceCommand {
+    private static final String COVERAGE_FILE_NAME = "coverage.ec";
     private final Project project;
     private final InstrumentationInfo instrumentationInfo;
     private final Map<String, String> instrumentationArgs;

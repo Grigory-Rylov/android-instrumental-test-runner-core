@@ -2,6 +2,7 @@ package com.github.grishberg.tests;
 
 import com.github.grishberg.tests.commands.DeviceCommand;
 import com.github.grishberg.tests.commands.DeviceCommandProvider;
+import com.github.grishberg.tests.commands.DeviceCommandResult;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.gradle.api.logging.Logger;
 
@@ -14,6 +15,7 @@ public class DeviceCommandsRunner {
     private final InstrumentalTestPlanProvider testPlanProvider;
     private final DeviceCommandProvider commandProvider;
     private final Logger logger;
+    private boolean hasFailedTests;
 
     public DeviceCommandsRunner(InstrumentalTestPlanProvider testPlanProvider,
                                 DeviceCommandProvider commandProvider, Logger logger) {
@@ -35,9 +37,12 @@ public class DeviceCommandsRunner {
                         for (DeviceCommand command : commands) {
                             logger.debug("[AITR] Before executing device = {} command ={}",
                                     device.toString(), command.toString());
-                            command.execute(device);
+                            DeviceCommandResult result = command.execute(device);
                             logger.debug("[AITR] After executing device = {} command ={}",
                                     device.toString(), command.toString());
+                            if (result.isFailed()) {
+                                hasFailedTests = true;
+                            }
                         }
                     } catch (Exception e) {
                         logger.error("Some Exception", e);
@@ -48,6 +53,6 @@ public class DeviceCommandsRunner {
             }).start();
         }
         deviceCounter.await();
-        return true;
+        return !hasFailedTests;
     }
 }
