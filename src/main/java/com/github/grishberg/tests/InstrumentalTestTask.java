@@ -102,4 +102,8 @@ public class InstrumentalTestTask extends DefaultTask {
     public void setCommandsForAnnotationProvider(CommandsForAnnotationProvider commandsProvider) {
         this.commandsForAnnotationProvider = commandsProvider;
     }
+    
+    public void setCommandProvider(DeviceCommandProvider commandProvider) {
+        this.commandProvider = commandProvider;
+    }
 }
