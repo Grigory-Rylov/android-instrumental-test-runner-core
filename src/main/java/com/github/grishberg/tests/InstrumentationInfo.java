@@ -8,6 +8,7 @@ public class InstrumentationInfo {
     private final String instrumentalPackage;
     private final String instrumentalRunner;
     private String flavorName = "";
+    private boolean coverageEnabled;
 
     public InstrumentationInfo(String applicationId,
                                String instrumentalPackage,
@@ -33,6 +34,10 @@ public class InstrumentationInfo {
         return flavorName;
     }
 
+    public boolean isCoverageEnabled() {
+        return coverageEnabled;
+    }
+
     public static class Builder {
         private InstrumentationInfo info;
 
@@ -46,6 +51,11 @@ public class InstrumentationInfo {
 
         public Builder setFlavorName(String flavorName) {
             info.flavorName = flavorName;
+            return this;
+        }
+
+        public Builder enableCoverage(boolean enabled) {
+            info.coverageEnabled = enabled;
             return this;
         }
 
