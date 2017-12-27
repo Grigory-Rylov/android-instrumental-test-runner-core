@@ -10,6 +10,7 @@ import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.internal.logging.ConsoleRenderer;
 
@@ -150,14 +151,17 @@ public class InstrumentalTestTask extends DefaultTask {
         this.reportsDir = reportsDir;
     }
 
+    @OutputDirectory
     public File getCoverageFilesDir() {
         return coverageFilesDir;
     }
 
+    @OutputDirectory
     public File getTestResultsDir() {
         return testResultsDir;
     }
 
+    @OutputDirectory
     public File getReportsDir() {
         return reportsDir;
     }
