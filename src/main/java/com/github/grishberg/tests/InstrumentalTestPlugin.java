@@ -12,7 +12,7 @@ public class InstrumentalTestPlugin implements Plugin<Project> {
     public void apply(Project project) {
         project.getLogger().info("InstrumentalTestPlugin applied");
         Task task = project.getTasks()
-                .create(InstrumentalTestTask.TASK_NAME, InstrumentalTestTask.class);
+                .create(InstrumentalTestTask.NAME, InstrumentalTestTask.class);
         task.setGroup("verification");
         task.setDescription("Plugin for running instrumental tests on multiple devices");
     }
