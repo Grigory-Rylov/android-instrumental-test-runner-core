@@ -46,7 +46,7 @@ public class InstrumentalTestTask extends DefaultTask {
             InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
                     getProject(), instrumentationInfo);
             DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider, getLogger());
-            ;
+
             generateHtmlReport(runner.runCommands(provideDevices(adb)));
         } finally {
             terminate();
@@ -114,6 +114,10 @@ public class InstrumentalTestTask extends DefaultTask {
     @Input
     public void setInstrumentationInfo(InstrumentationInfo instrumentationInfo) {
         this.instrumentationInfo = instrumentationInfo;
+        coverageFilesDir = new File(getProject().getBuildDir(),
+                String.format("output/androidTest/coverage/%s", instrumentationInfo.getFlavorName()));
+        reportsDir = new File(getProject().getBuildDir(),
+                String.format("output/reports/androidTest/%s", instrumentationInfo.getFlavorName()));
     }
 
     @Input
@@ -131,6 +135,21 @@ public class InstrumentalTestTask extends DefaultTask {
         this.commandProvider = commandProvider;
     }
 
+    @Input
+    public void setCoverageFilesDir(File coverageFilesDir) {
+        this.coverageFilesDir = coverageFilesDir;
+    }
+
+    @Input
+    public void setTestResultsDir(File testResultsDir) {
+        this.testResultsDir = testResultsDir;
+    }
+
+    @Input
+    public void setReportsDir(File reportsDir) {
+        this.reportsDir = reportsDir;
+    }
+
     public File getCoverageFilesDir() {
         return coverageFilesDir;
     }
@@ -141,17 +160,5 @@ public class InstrumentalTestTask extends DefaultTask {
 
     public File getReportsDir() {
         return reportsDir;
-    }
-
-    public void setCoverageFilesDir(File coverageFilesDir) {
-        this.coverageFilesDir = coverageFilesDir;
-    }
-
-    public void setTestResultsDir(File testResultsDir) {
-        this.testResultsDir = testResultsDir;
-    }
-
-    public void setReportsDir(File reportsDir) {
-        this.reportsDir = reportsDir;
     }
 }

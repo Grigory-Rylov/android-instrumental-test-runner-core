@@ -5,11 +5,11 @@ plugins {
     id "com.jfrog.bintray" version "1.7.3"
 }
 
-group 'com.grishberg'
-version '0.1.14'
+group 'com.github.grishberg'
+version '0.1.15'
 
 ext {
-    PUBLISH_GROUP_ID = 'com.github.grishberg'
+    PUBLISH_GROUP_ID = group
     PUBLISH_ARTIFACT_ID = 'android-instrumental-test-runner'
     PUBLISH_VERSION = version
 }
@@ -69,6 +69,16 @@ test {
 
 apply from: 'sonar.gradle'
 
-//need to call  ./gradlew clean build generateRelease
+// need to call  ./gradlew clean build generateRelease
 apply from: 'publish.gradle'
+
+apply plugin: 'maven-publish'
+// ./gradlew publishToMavenLocal
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
 
