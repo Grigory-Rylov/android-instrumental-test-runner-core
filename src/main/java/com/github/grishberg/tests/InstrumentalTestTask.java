@@ -37,20 +37,42 @@ public class InstrumentalTestTask extends DefaultTask {
 
     @TaskAction
     public void runTask() throws InterruptedException, IOException {
-        getProject().getLogger().debug("InstrumentalTestTask.runTask");
+        getProject().getLogger().info("InstrumentalTestTask.runTask");
         try {
             init();
 
-            AndroidDebugBridge adb = AndroidDebugBridge.createBridge();
+            prepareOutputFolders();
+
+            AndroidDebugBridge adb = AndroidDebugBridge.createBridge(
+                    System.getenv("ANDROID_HOME") + "/platform-tools/adb", false);
             waitForAdb(adb);
 
             InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
                     getProject(), instrumentationInfo);
-            DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider, getLogger());
+
+            getLogger().info("testResultsDir = {}", testResultsDir);
+            getLogger().info("reportsDir = {}", reportsDir);
+            getLogger().info("coverageFilesDir = {}", coverageFilesDir);
+            DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider,
+                    coverageFilesDir, testResultsDir,
+                    getLogger());
 
             generateHtmlReport(runner.runCommands(provideDevices(adb)));
         } finally {
             terminate();
+        }
+    }
+
+    private void prepareOutputFolders() throws IOException {
+        cleanFolder(reportsDir);
+        cleanFolder(testResultsDir);
+        cleanFolder(coverageFilesDir);
+    }
+
+    private static void cleanFolder(File dir) throws IOException {
+        org.apache.commons.io.FileUtils.deleteQuietly(dir);
+        if (!dir.mkdirs()) {
+            throw new IOException("Cant create folder " + dir.getAbsolutePath());
         }
     }
 
@@ -116,9 +138,11 @@ public class InstrumentalTestTask extends DefaultTask {
     public void setInstrumentationInfo(InstrumentationInfo instrumentationInfo) {
         this.instrumentationInfo = instrumentationInfo;
         coverageFilesDir = new File(getProject().getBuildDir(),
-                String.format("output/androidTest/coverage/%s", instrumentationInfo.getFlavorName()));
+                String.format("outputs/androidTest/coverage/%s", instrumentationInfo.getFlavorName()));
         reportsDir = new File(getProject().getBuildDir(),
-                String.format("output/reports/androidTest/%s", instrumentationInfo.getFlavorName()));
+                String.format("outputs/reports/androidTest/%s", instrumentationInfo.getFlavorName()));
+        testResultsDir = new File(getProject().getBuildDir(),
+                String.format("outputs/androidTest/%s", instrumentationInfo.getFlavorName()));
     }
 
     @Input
@@ -151,12 +175,10 @@ public class InstrumentalTestTask extends DefaultTask {
         this.reportsDir = reportsDir;
     }
 
-    @OutputDirectory
     public File getCoverageFilesDir() {
         return coverageFilesDir;
     }
 
-    @OutputDirectory
     public File getTestResultsDir() {
         return testResultsDir;
     }

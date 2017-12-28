@@ -8,6 +8,7 @@ import com.github.grishberg.tests.InstrumentationInfo;
 import com.github.grishberg.tests.RunTestLogger;
 import org.gradle.api.Project;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -18,13 +19,19 @@ public class InstrumentalTestCommand implements DeviceCommand {
     private final Project project;
     private final InstrumentationInfo instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
+    private File coverageFilesDir;
+    private File reportsDir;
 
     public InstrumentalTestCommand(Project project,
                                    InstrumentationInfo instrumentalInfo,
-                                   Map<String, String> instrumentalArgs) {
+                                   Map<String, String> instrumentalArgs,
+                                   File coverageFilesDir,
+                                   File reportsDir) {
         this.project = project;
         this.instrumentationInfo = instrumentalInfo;
         this.instrumentationArgs = instrumentalArgs;
+        this.coverageFilesDir = coverageFilesDir;
+        this.reportsDir = reportsDir;
     }
 
     @Override
@@ -45,6 +52,7 @@ public class InstrumentalTestCommand implements DeviceCommand {
                 instrumentationInfo.getFlavorName(),
                 new RunTestLogger(project.getLogger())
         );
+        testRunListener.setReportDir(reportsDir);
 
         try {
             runner.run(testRunListener);
