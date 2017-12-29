@@ -9,6 +9,7 @@ import com.github.grishberg.tests.commands.DeviceCommandProvider;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
@@ -24,6 +25,7 @@ public class InstrumentalTestTask extends DefaultTask {
     public static final String NAME = "instrumentalTests";
     private static final int ADB_TIMEOUT = 10;
     private static final int ONE_SECOND = 1000;
+    String androidSdkPath;
     private File coverageFilesDir;
     private File testResultsDir;
     private File reportsDir;
@@ -31,31 +33,29 @@ public class InstrumentalTestTask extends DefaultTask {
     private InstrumentationArgsProvider instrumentationArgsProvider;
     private InstrumentationInfo instrumentationInfo;
     private CommandsForAnnotationProvider commandsForAnnotationProvider;
+    private Logger logger;
 
     public InstrumentalTestTask() {
+        logger = getLogger();
     }
 
     @TaskAction
     public void runTask() throws InterruptedException, IOException {
-        getProject().getLogger().info("InstrumentalTestTask.runTask");
+        logger.info("InstrumentalTestTask.runTask");
         try {
             init();
 
             prepareOutputFolders();
 
-            AndroidDebugBridge adb = AndroidDebugBridge.createBridge(
-                    System.getenv("ANDROID_HOME") + "/platform-tools/adb", false);
+            AndroidDebugBridge adb = AndroidDebugBridge
+                    .createBridge(androidSdkPath + "/platform-tools/adb", false);
             waitForAdb(adb);
 
             InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
                     getProject(), instrumentationInfo);
 
-            getLogger().info("testResultsDir = {}", testResultsDir);
-            getLogger().info("reportsDir = {}", reportsDir);
-            getLogger().info("coverageFilesDir = {}", coverageFilesDir);
             DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider,
-                    coverageFilesDir, testResultsDir,
-                    getLogger());
+                    coverageFilesDir, testResultsDir, logger);
 
             generateHtmlReport(runner.runCommands(provideDevices(adb)));
         } finally {
@@ -104,21 +104,26 @@ public class InstrumentalTestTask extends DefaultTask {
 
     private void init() {
         AndroidDebugBridge.initIfNeeded(false);
+        if (androidSdkPath == null) {
+            logger.info("androidSdkPath is empty, get path from env ANDROID_HOME");
+            androidSdkPath = System.getenv("ANDROID_HOME");
+            logger.info("androidSdkPath = {}", androidSdkPath);
+        }
         if (instrumentationInfo == null) {
             throw new RuntimeException("Need to set InstrumentationInfo");
         }
         if (commandsForAnnotationProvider == null) {
             commandsForAnnotationProvider = new DefaultCommandsForAnnotationProvider(getLogger(),
                     instrumentationInfo);
-            getLogger().info("init: commandsForAnnotationProvider is empty, use DefaultCommandsForAnnotationProvider");
+
+            logger.info("Init: commandsForAnnotationProvider is empty, use DefaultCommandsForAnnotationProvider");
         }
         if (instrumentationArgsProvider == null) {
             instrumentationArgsProvider = new DefaultInstrumentationArgsProvider();
-            getLogger().info("init: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
+            logger.info("init: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
         }
         if (commandProvider == null) {
-            getProject().getLogger()
-                    .info("command provider is empty, use DefaultCommandProvider");
+            logger.info("command provider is empty, use DefaultCommandProvider");
             commandProvider = new DefaultCommandProvider(getProject(),
                     instrumentationInfo,
                     instrumentationArgsProvider, commandsForAnnotationProvider);
