@@ -4,7 +4,7 @@ import com.android.builder.internal.testing.CustomTestRunListener;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.DeviceWrapper;
-import com.github.grishberg.tests.InstrumentationInfo;
+import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.planner.parser.TestPlan;
 import org.gradle.api.Project;
@@ -17,11 +17,11 @@ import java.util.Map;
  */
 public class SingleInstrumentalTestCommand implements DeviceCommand {
     private final Project project;
-    private final InstrumentationInfo instrumentationInfo;
+    private final InstrumentalPluginExtension instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
 
     public SingleInstrumentalTestCommand(Project project,
-                                         InstrumentationInfo instrumentalInfo,
+                                         InstrumentalPluginExtension instrumentalInfo,
                                          Map<String, String> instrumentalArgs,
                                          TestPlan currentPlan) {
         this.project = project;

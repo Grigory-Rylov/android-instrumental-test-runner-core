@@ -18,12 +18,12 @@ import java.util.Set;
  */
 public class DefaultCommandProvider implements DeviceCommandProvider {
     private final Project project;
-    private final InstrumentationInfo instrumentationInfo;
+    private final InstrumentalPluginExtension instrumentationInfo;
     private final InstrumentationArgsProvider argsProvider;
     private final CommandsForAnnotationProvider commandsForAnnotationProvider;
 
     public DefaultCommandProvider(Project project,
-                                  InstrumentationInfo instrumentalInfo,
+                                  InstrumentalPluginExtension instrumentalInfo,
                                   InstrumentationArgsProvider argsProvider,
                                   CommandsForAnnotationProvider commandsForAnnotationProvider) {
         this.project = project;

@@ -7,16 +7,17 @@ import org.gradle.api.Project
  * Plugin for testing.
  */
 class InstrumentalTestPlugin implements Plugin<Project> {
+
+    public static final String INSTRUMENTAL_PLUGIN_EXTENSION = 'instrumentalPluginConfig'
+
     @Override
     void apply(Project project) {
         project.getLogger().info("InstrumentalTestPlugin apply")
 
-        InstrumentalPluginExtension extension = project.extensions.create(
-                'instrumentalPluginConfig', InstrumentalPluginExtension)
+        project.extensions.create(INSTRUMENTAL_PLUGIN_EXTENSION, InstrumentalPluginExtension)
 
         InstrumentalTestTask task = project.getTasks()
                 .create(InstrumentalTestTask.NAME, InstrumentalTestTask.class)
-        task.androidSdkPath = extension.androidSdkPath
 
         task.setGroup("verification")
         task.setDescription("Plugin for running instrumental tests on multiple devices")

@@ -2,7 +2,7 @@ package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.MultiLineReceiver;
 import com.github.grishberg.tests.DeviceWrapper;
-import com.github.grishberg.tests.InstrumentationInfo;
+import com.github.grishberg.tests.InstrumentalPluginExtension;
 import org.gradle.api.logging.Logger;
 
 import java.util.concurrent.TimeUnit;
@@ -12,10 +12,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class ClearCommand implements DeviceCommand {
     private final Logger logger;
-    private final InstrumentationInfo instrumentationInfo;
+    private final InstrumentalPluginExtension instrumentationInfo;
 
     public ClearCommand(Logger logger,
-                        InstrumentationInfo instrumentalInfo) {
+                        InstrumentalPluginExtension instrumentalInfo) {
         this.logger = logger;
         this.instrumentationInfo = instrumentalInfo;
     }

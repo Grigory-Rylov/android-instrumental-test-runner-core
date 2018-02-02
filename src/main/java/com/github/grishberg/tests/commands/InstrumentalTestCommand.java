@@ -4,7 +4,7 @@ import com.android.builder.internal.testing.CustomTestRunListener;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.DeviceWrapper;
-import com.github.grishberg.tests.InstrumentationInfo;
+import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import org.gradle.api.Project;
 
@@ -17,13 +17,13 @@ import java.util.Map;
 public class InstrumentalTestCommand implements DeviceCommand {
     private static final String COVERAGE_FILE_NAME = "coverage.ec";
     private final Project project;
-    private final InstrumentationInfo instrumentationInfo;
+    private final InstrumentalPluginExtension instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
     private File coverageFilesDir;
     private File reportsDir;
 
     public InstrumentalTestCommand(Project project,
-                                   InstrumentationInfo instrumentalInfo,
+                                   InstrumentalPluginExtension instrumentalInfo,
                                    Map<String, String> instrumentalArgs,
                                    File coverageFilesDir,
                                    File reportsDir) {

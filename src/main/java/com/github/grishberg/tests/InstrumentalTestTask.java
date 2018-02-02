@@ -9,6 +9,7 @@ import com.github.grishberg.tests.commands.DeviceCommandProvider;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
+import org.gradle.api.Nullable;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
@@ -25,13 +26,14 @@ public class InstrumentalTestTask extends DefaultTask {
     public static final String NAME = "instrumentalTests";
     private static final int ADB_TIMEOUT = 10;
     private static final int ONE_SECOND = 1000;
-    String androidSdkPath;
+    @Nullable
+    private String androidSdkPath;
     private File coverageFilesDir;
     private File testResultsDir;
     private File reportsDir;
     private DeviceCommandProvider commandProvider;
     private InstrumentationArgsProvider instrumentationArgsProvider;
-    private InstrumentationInfo instrumentationInfo;
+    private InstrumentalPluginExtension instrumentationInfo;
     private CommandsForAnnotationProvider commandsForAnnotationProvider;
     private Logger logger;
 
@@ -42,6 +44,9 @@ public class InstrumentalTestTask extends DefaultTask {
     @TaskAction
     public void runTask() throws InterruptedException, IOException {
         logger.info("InstrumentalTestTask.runTask");
+        instrumentationInfo = getProject().getExtensions()
+                .findByType(InstrumentalPluginExtension.class);
+        androidSdkPath = instrumentationInfo.getAndroidSdkPath();
         try {
             init();
 
@@ -128,6 +133,12 @@ public class InstrumentalTestTask extends DefaultTask {
                     instrumentationInfo,
                     instrumentationArgsProvider, commandsForAnnotationProvider);
         }
+        coverageFilesDir = new File(getProject().getBuildDir(),
+                String.format("outputs/androidTest/coverage/%s", instrumentationInfo.getFlavorName()));
+        reportsDir = new File(getProject().getBuildDir(),
+                String.format("outputs/reports/androidTest/%s", instrumentationInfo.getFlavorName()));
+        testResultsDir = new File(getProject().getBuildDir(),
+                String.format("outputs/androidTest/%s", instrumentationInfo.getFlavorName()));
     }
 
     private void waitForAdb(AndroidDebugBridge adb) throws InterruptedException {
@@ -140,14 +151,8 @@ public class InstrumentalTestTask extends DefaultTask {
     }
 
     @Input
-    public void setInstrumentationInfo(InstrumentationInfo instrumentationInfo) {
+    public void setInstrumentationInfo(InstrumentalPluginExtension instrumentationInfo) {
         this.instrumentationInfo = instrumentationInfo;
-        coverageFilesDir = new File(getProject().getBuildDir(),
-                String.format("outputs/androidTest/coverage/%s", instrumentationInfo.getFlavorName()));
-        reportsDir = new File(getProject().getBuildDir(),
-                String.format("outputs/reports/androidTest/%s", instrumentationInfo.getFlavorName()));
-        testResultsDir = new File(getProject().getBuildDir(),
-                String.format("outputs/androidTest/%s", instrumentationInfo.getFlavorName()));
     }
 
     @Input

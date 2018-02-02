@@ -1,7 +1,7 @@
 package com.github.grishberg.tests.planner;
 
 import com.github.grishberg.tests.DeviceWrapper;
-import com.github.grishberg.tests.InstrumentationInfo;
+import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.planner.parser.InstrumentTestLogParser;
 import com.github.grishberg.tests.planner.parser.TestPlan;
 import org.gradle.api.Project;
@@ -15,11 +15,11 @@ import java.util.concurrent.TimeUnit;
  * Provides set of {@link TestPlan} for instrumental tests.
  */
 public class InstrumentalTestPlanProvider {
-    private final InstrumentationInfo instrumentationInfo;
+    private final InstrumentalPluginExtension instrumentationInfo;
     private final Project project;
 
     public InstrumentalTestPlanProvider(Project project,
-                                        InstrumentationInfo instrumentationInfo) {
+                                        InstrumentalPluginExtension instrumentationInfo) {
         this.project = project;
         this.instrumentationInfo = instrumentationInfo;
     }

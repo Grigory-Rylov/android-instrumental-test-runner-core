@@ -16,11 +16,11 @@ import java.util.Map;
  */
 public class AllTestsInOneScopeCommandProvider implements DeviceCommandProvider {
     private final Project project;
-    private final InstrumentationInfo instrumentationInfo;
+    private final InstrumentalPluginExtension instrumentationInfo;
     private final InstrumentationArgsProvider argsProvider;
 
     public AllTestsInOneScopeCommandProvider(Project project,
-                                             InstrumentationInfo instrumentalInfo,
+                                             InstrumentalPluginExtension instrumentalInfo,
                                              InstrumentationArgsProvider argsProvider) {
         this.project = project;
         this.instrumentationInfo = instrumentalInfo;

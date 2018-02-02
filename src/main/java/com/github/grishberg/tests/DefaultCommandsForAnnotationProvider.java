@@ -12,10 +12,10 @@ import java.util.List;
  */
 public class DefaultCommandsForAnnotationProvider implements CommandsForAnnotationProvider {
     private final Logger logger;
-    private final InstrumentationInfo instrumentationInfo;
+    private final InstrumentalPluginExtension instrumentationInfo;
 
     public DefaultCommandsForAnnotationProvider(Logger logger,
-                                                InstrumentationInfo instrumentationInfo) {
+                                                InstrumentalPluginExtension instrumentationInfo) {
         this.logger = logger;
         this.instrumentationInfo = instrumentationInfo;
     }
