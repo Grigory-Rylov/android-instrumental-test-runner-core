@@ -15,10 +15,11 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     private static final String CLASS = "class";
     private static final String ANNOTATIONS = "annotations";
     private final HashSet<TestPlan> testInstances = new HashSet<>();
-    private TestPlan lastTestInstance;
     private String testId;
     private String testMethodName;
     private String testClassName;
+    private TestPlan lastAddedTestInstance;
+    private String[] lastAnnotations;
 
     @Override
     public void processNewLines(String[] lines) {
@@ -57,16 +58,29 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
 
         if (testId != null && testMethodName != null && testClassName != null) {
-            lastTestInstance = new TestPlan(testId, testMethodName, testClassName);
-            if (!testInstances.contains(lastTestInstance)) {
-                testInstances.add(lastTestInstance);
+            TestPlan testPlan = new TestPlan(testId, testMethodName, testClassName);
+            if (!testInstances.contains(testPlan)) {
+                lastAddedTestInstance = testPlan;
+                testInstances.add(testPlan);
+
+                if (lastAnnotations != null) {
+                    lastAddedTestInstance.setAnnotations(lastAnnotations);
+                    lastAddedTestInstance = null;
+                    lastAnnotations = null;
+                }
             }
             testId = null;
             testMethodName = null;
             testClassName = null;
         }
         if (ANNOTATIONS.equals(words[0])) {
-            lastTestInstance.setAnnotations(parseAnnotations(words[1]));
+            String[] annotations = parseAnnotations(words[1]);
+            if (lastAddedTestInstance != null) {
+                lastAddedTestInstance.setAnnotations(annotations);
+                lastAddedTestInstance = null;
+            } else {
+                lastAnnotations = annotations;
+            }
         }
     }
 
