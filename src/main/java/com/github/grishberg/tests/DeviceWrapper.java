@@ -51,4 +51,17 @@ public class DeviceWrapper implements IShellEnabledDevice {
                 ", name='" + getName() + '\'' +
                 '}';
     }
+
+    public void pullFile(String temporaryCoverageCopy, String path) throws TimeoutException,
+            AdbCommandRejectedException, SyncException, IOException {
+        device.pullFile(temporaryCoverageCopy, path);
+    }
+
+    public boolean isEmulator() {
+        return device.isEmulator();
+    }
+
+    public String getSerialNumber() {
+        return device.getSerialNumber();
+    }
 }

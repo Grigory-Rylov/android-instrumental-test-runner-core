@@ -28,8 +28,8 @@ public class InstrumentalTestTask extends DefaultTask {
     private static final int ONE_SECOND = 1000;
     @Nullable
     private String androidSdkPath;
-    private File coverageFilesDir;
-    private File testResultsDir;
+    private File coverageDir;
+    private File resultsDir;
     private File reportsDir;
     private DeviceCommandProvider commandProvider;
     private InstrumentationArgsProvider instrumentationArgsProvider;
@@ -39,6 +39,9 @@ public class InstrumentalTestTask extends DefaultTask {
 
     public InstrumentalTestTask() {
         logger = getLogger();
+        coverageDir = new File(getProject().getBuildDir(), "outputs/androidTest/coverage/");
+        reportsDir = new File(getProject().getBuildDir(), "outputs/reports/androidTest/");
+        resultsDir = new File(getProject().getBuildDir(), "outputs/androidTest/");
     }
 
     @TaskAction
@@ -59,8 +62,10 @@ public class InstrumentalTestTask extends DefaultTask {
             InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
                     getProject(), instrumentationInfo);
 
+            DirectoriesProvider directoriesProvider = new DirectoriesProvider(resultsDir,
+                    reportsDir, coverageDir);
             DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider,
-                    coverageFilesDir, testResultsDir, logger);
+                    directoriesProvider, logger);
 
             generateHtmlReport(runner.runCommands(provideDevices(adb)));
         } finally {
@@ -70,8 +75,8 @@ public class InstrumentalTestTask extends DefaultTask {
 
     private void prepareOutputFolders() throws IOException {
         cleanFolder(reportsDir);
-        cleanFolder(testResultsDir);
-        cleanFolder(coverageFilesDir);
+        cleanFolder(resultsDir);
+        cleanFolder(coverageDir);
     }
 
     private static void cleanFolder(File dir) throws IOException {
@@ -83,7 +88,7 @@ public class InstrumentalTestTask extends DefaultTask {
 
     private void generateHtmlReport(boolean success) throws IOException {
         FileUtils.cleanOutputDir(reportsDir);
-        TestReport report = new TestReport(ReportType.SINGLE_FLAVOR, getTestResultsDir(), reportsDir);
+        TestReport report = new TestReport(ReportType.SINGLE_FLAVOR, getResultsDir(), reportsDir);
         report.generateReport();
         if (!success) {
             String reportUrl = (new ConsoleRenderer())
@@ -133,11 +138,11 @@ public class InstrumentalTestTask extends DefaultTask {
                     instrumentationInfo,
                     instrumentationArgsProvider, commandsForAnnotationProvider);
         }
-        coverageFilesDir = new File(getProject().getBuildDir(),
+        coverageDir = new File(getProject().getBuildDir(),
                 String.format("outputs/androidTest/coverage/%s", instrumentationInfo.getFlavorName()));
         reportsDir = new File(getProject().getBuildDir(),
                 String.format("outputs/reports/androidTest/%s", instrumentationInfo.getFlavorName()));
-        testResultsDir = new File(getProject().getBuildDir(),
+        resultsDir = new File(getProject().getBuildDir(),
                 String.format("outputs/androidTest/%s", instrumentationInfo.getFlavorName()));
     }
 
@@ -171,13 +176,13 @@ public class InstrumentalTestTask extends DefaultTask {
     }
 
     @Input
-    public void setCoverageFilesDir(File coverageFilesDir) {
-        this.coverageFilesDir = coverageFilesDir;
+    public void setCoverageDir(File coverageDir) {
+        this.coverageDir = coverageDir;
     }
 
     @Input
-    public void setTestResultsDir(File testResultsDir) {
-        this.testResultsDir = testResultsDir;
+    public void setResultsDir(File resultsDir) {
+        this.resultsDir = resultsDir;
     }
 
     @Input
@@ -185,12 +190,12 @@ public class InstrumentalTestTask extends DefaultTask {
         this.reportsDir = reportsDir;
     }
 
-    public File getCoverageFilesDir() {
-        return coverageFilesDir;
+    public File getCoverageDir() {
+        return coverageDir;
     }
 
-    public File getTestResultsDir() {
-        return testResultsDir;
+    public File getResultsDir() {
+        return resultsDir;
     }
 
     @OutputDirectory

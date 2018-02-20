@@ -1,9 +1,8 @@
 package com.github.grishberg.tests.commands;
 
 import com.github.grishberg.tests.DeviceWrapper;
+import com.github.grishberg.tests.DirectoriesProvider;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
-
-import java.io.File;
 
 /**
  * Provides commands list for current device.
@@ -11,5 +10,5 @@ import java.io.File;
 public interface DeviceCommandProvider {
     DeviceCommand[] provideDeviceCommands(DeviceWrapper device,
                                           InstrumentalTestPlanProvider testPlanProvider,
-                                          File coverageFilesDir, File reportsDir);
+                                          DirectoriesProvider directoriesProvider);
 }
