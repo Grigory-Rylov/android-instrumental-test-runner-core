@@ -10,6 +10,7 @@ public class TestPlan {
     private final String name;
     private final String className;
     private String[] annotations;
+    private String featureParameter;
 
     public TestPlan(String testId, String name, String className) {
         this.testId = testId;
@@ -61,6 +62,14 @@ public class TestPlan {
         result = 31 * result + (className != null ? className.hashCode() : 0);
         result = 31 * result + Arrays.hashCode(annotations);
         return result;
+    }
+
+    public String getFeatureParameter() {
+        return featureParameter;
+    }
+
+    public void setFeatureParameter(String featureParameter) {
+        this.featureParameter = featureParameter;
     }
 
     @Override

@@ -30,6 +30,7 @@ public class InstrumentalTestPlanProvider {
         args.put("log", "true");
 
         InstrumentTestLogParser receiver = new InstrumentTestLogParser();
+        receiver.setLogger(new TestLogParserLogger());
         StringBuilder command = new StringBuilder("am instrument -r -w");
 
         args.put("listener",
@@ -53,5 +54,12 @@ public class InstrumentalTestPlanProvider {
             project.getLogger().error("InstrumentalTestPlanProvider.execute error:", e);
         }
         return receiver.getTestInstances();
+    }
+
+    private class TestLogParserLogger implements InstrumentTestLogParser.ParserLogger {
+        @Override
+        public void logLine(String line) {
+            project.getLogger().info(line);
+        }
     }
 }

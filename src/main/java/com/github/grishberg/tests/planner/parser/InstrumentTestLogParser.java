@@ -1,6 +1,7 @@
 package com.github.grishberg.tests.planner.parser;
 
 import com.android.ddmlib.MultiLineReceiver;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,22 +15,27 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     private static final String TEST = "test";
     private static final String CLASS = "class";
     private static final String ANNOTATIONS = "annotations";
-    private final HashSet<TestPlan> testInstances = new HashSet<>();
-    private String testId;
-    private String testMethodName;
-    private String testClassName;
-    private TestPlan lastAddedTestInstance;
-    private String[] lastAnnotations;
+    private static final String FEATURE = "feature";
+    private ParserLogger logger;
+    private final HashSet<TestPlan> testPlanList = new HashSet<>();
+    private State state = new StartNewObject();
+
+    public void setLogger(ParserLogger logger) {
+        this.logger = logger;
+    }
 
     @Override
     public void processNewLines(String[] lines) {
         for (String word : lines) {
             processLine(word);
         }
+        state.storeValuesIfNeeded();
     }
 
     private void processLine(String word) {
-        System.out.println(word);
+        if (logger != null) {
+            logger.logLine(word);
+        }
 
         int startPos = word.indexOf(INSTRUMENTATION_STATUS);
         if (startPos < 0) {
@@ -37,51 +43,42 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
 
         String payload = word.substring(startPos + INSTRUMENTATION_STATUS.length());
-        String[] words = payload.split("=");
+        String[] words = getSplitArray(payload);
 
         if (words.length != 2) {
             return;
         }
 
         if (ID.equals(words[0])) {
-            testId = words[1];
+            state.storeValuesIfNeeded();
+            state.setTestId(words[1]);
             return;
         }
 
         if (TEST.equals(words[0])) {
-            testMethodName = words[1];
+            state.setTestMethod(words[1]);
             return;
         }
 
         if (CLASS.equals(words[0])) {
-            testClassName = words[1];
+            state.setClassName(words[1]);
+            return;
         }
 
-        if (testId != null && testMethodName != null && testClassName != null) {
-            TestPlan testPlan = new TestPlan(testId, testMethodName, testClassName);
-            if (!testInstances.contains(testPlan)) {
-                lastAddedTestInstance = testPlan;
-                testInstances.add(testPlan);
-
-                if (lastAnnotations != null) {
-                    lastAddedTestInstance.setAnnotations(lastAnnotations);
-                    lastAddedTestInstance = null;
-                    lastAnnotations = null;
-                }
-            }
-            testId = null;
-            testMethodName = null;
-            testClassName = null;
+        if (FEATURE.equals(words[0])) {
+            state.setFeature(words[1]);
+            return;
         }
+
         if (ANNOTATIONS.equals(words[0])) {
             String[] annotations = parseAnnotations(words[1]);
-            if (lastAddedTestInstance != null) {
-                lastAddedTestInstance.setAnnotations(annotations);
-                lastAddedTestInstance = null;
-            } else {
-                lastAnnotations = annotations;
-            }
+            state.setAnnotations(annotations);
         }
+    }
+
+    @NotNull
+    private String[] getSplitArray(String payload) {
+        return payload.split("=", 2);
     }
 
     private String[] parseAnnotations(String annotations) {
@@ -97,6 +94,132 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     }
 
     public Set<TestPlan> getTestInstances() {
-        return testInstances;
+        return testPlanList;
+    }
+
+    private static class State {
+        void storeValuesIfNeeded() {
+        }
+
+        void setAnnotations(String[] annotations) {
+        }
+
+        void setTestId(String testId) {
+        }
+
+        void setTestMethod(String testMethod) {
+        }
+
+        void setClassName(String className) {
+        }
+
+        void setFeature(String feature) {
+        }
+    }
+
+    private class StartNewObject extends State {
+        private String testId;
+        private String testMethodName;
+        private String testClassName;
+        private String feature;
+        private String[] annotations;
+
+        StartNewObject() {
+        }
+
+        @Override
+        void setTestId(String id) {
+            testId = id;
+        }
+
+        @Override
+        void setTestMethod(String testMethod) {
+            testMethodName = testMethod;
+            changeStateIfNeeded();
+        }
+
+        @Override
+        void setClassName(String className) {
+            testClassName = className;
+            changeStateIfNeeded();
+        }
+
+        @Override
+        void setFeature(String feature) {
+            this.feature = feature;
+        }
+
+        @Override
+        void setAnnotations(String[] annotations) {
+            this.annotations = annotations;
+        }
+
+        private void changeStateIfNeeded() {
+            if (testId != null && testMethodName != null && testClassName != null) {
+                state = new ReadyToStoreObject(testId, testMethodName, testClassName);
+                if (feature != null) {
+                    state.setFeature(feature);
+                }
+                if (annotations != null) {
+                    state.setAnnotations(annotations);
+                }
+            }
+        }
+    }
+
+    private class ReadyToStoreObject extends State {
+        private final String testId;
+        private final String testMethodName;
+        private final String testClassName;
+        private TestPlan testPlan;
+        private String[] annotations;
+        private String feature;
+
+        private ReadyToStoreObject(String testId, String testMethodName, String testClassName) {
+            this.testId = testId;
+            this.testMethodName = testMethodName;
+            this.testClassName = testClassName;
+        }
+
+        @Override
+        void setTestId(String testId) {
+            storeValuesIfNeeded();
+            state = new StartNewObject();
+            state.setTestId(testId);
+        }
+
+        @Override
+        void storeValuesIfNeeded() {
+            testPlan = new TestPlan(testId, testMethodName, testClassName);
+
+            if (!testPlanList.contains(testPlan)) {
+                testPlanList.add(testPlan);
+
+                testPlan.setAnnotations(annotations);
+                testPlan.setFeatureParameter(feature);
+            }
+        }
+
+        @Override
+        void setAnnotations(String[] annotations) {
+            if (testPlan != null) {
+                testPlan.setAnnotations(annotations);
+                return;
+            }
+            this.annotations = annotations;
+        }
+
+        @Override
+        void setFeature(String feature) {
+            if (testPlan != null) {
+                testPlan.setFeatureParameter(feature);
+                return;
+            }
+            this.feature = feature;
+        }
+    }
+
+    public interface ParserLogger {
+        void logLine(String line);
     }
 }
