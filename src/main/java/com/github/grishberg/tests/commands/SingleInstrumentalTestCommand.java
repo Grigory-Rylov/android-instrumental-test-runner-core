@@ -32,7 +32,7 @@ public class SingleInstrumentalTestCommand implements DeviceCommand {
     }
 
     @Override
-    public DeviceCommandResult execute(DeviceWrapper deviceWrapper) {
+    public DeviceCommandResult execute(DeviceWrapper deviceWrapper) throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
 
         RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(

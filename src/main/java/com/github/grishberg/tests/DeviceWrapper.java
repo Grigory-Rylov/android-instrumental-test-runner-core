@@ -64,4 +64,9 @@ public class DeviceWrapper implements IShellEnabledDevice {
     public String getSerialNumber() {
         return device.getSerialNumber();
     }
+
+    public void installPackage(String absolutePath, boolean reinstall, String extraArgument)
+            throws InstallException {
+        device.installPackage(absolutePath, reinstall, extraArgument);
+    }
 }

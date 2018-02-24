@@ -21,7 +21,7 @@ public class ClearCommand implements DeviceCommand {
     }
 
     @Override
-    public DeviceCommandResult execute(DeviceWrapper device) {
+    public DeviceCommandResult execute(DeviceWrapper device) throws ExecuteCommandException {
         logger.info("ClearCommand for package " + instrumentationInfo.getApplicationId());
         MultiLineReceiver receiver = new MultiLineReceiver() {
             @Override

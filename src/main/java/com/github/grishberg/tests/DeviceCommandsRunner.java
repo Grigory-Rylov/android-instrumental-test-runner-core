@@ -9,26 +9,26 @@ import org.gradle.api.logging.Logger;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Created by grishberg on 26.10.17.
+ * Executes commands for online devices.
  */
-public class DeviceCommandsRunner {
+class DeviceCommandsRunner {
     private final InstrumentalTestPlanProvider testPlanProvider;
     private final DeviceCommandProvider commandProvider;
     private DirectoriesProvider directoriesProvider;
     private final Logger logger;
     private boolean hasFailedTests;
 
-    public DeviceCommandsRunner(InstrumentalTestPlanProvider testPlanProvider,
-                                DeviceCommandProvider commandProvider,
-                                DirectoriesProvider directoriesProvider,
-                                Logger logger) {
+    DeviceCommandsRunner(InstrumentalTestPlanProvider testPlanProvider,
+                         DeviceCommandProvider commandProvider,
+                         DirectoriesProvider directoriesProvider,
+                         Logger logger) {
         this.testPlanProvider = testPlanProvider;
         this.commandProvider = commandProvider;
         this.directoriesProvider = directoriesProvider;
         this.logger = logger;
     }
 
-    public boolean runCommands(DeviceWrapper[] devices) throws InterruptedException {
+    boolean runCommands(DeviceWrapper[] devices) throws InterruptedException {
         final CountDownLatch deviceCounter = new CountDownLatch(devices.length);
 
         for (DeviceWrapper device : devices) {
@@ -39,10 +39,10 @@ public class DeviceCommandsRunner {
                         DeviceCommand[] commands = commandProvider.provideDeviceCommands(device,
                                 testPlanProvider, directoriesProvider);
                         for (DeviceCommand command : commands) {
-                            logger.info("[AITR] Before executing device = {} command = {}",
+                            logger.info("[DCR] Before executing device = {} command = {}",
                                     device.toString(), command.toString());
                             DeviceCommandResult result = command.execute(device);
-                            logger.info("[AITR] After executing device = {} command = {}",
+                            logger.info("[DCR] After executing device = {} command = {}",
                                     device.toString(), command.toString());
                             if (result.isFailed()) {
                                 hasFailedTests = true;

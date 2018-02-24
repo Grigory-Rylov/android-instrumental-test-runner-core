@@ -41,7 +41,7 @@ public class InstrumentalTestCommand implements DeviceCommand {
     }
 
     @Override
-    public DeviceCommandResult execute(DeviceWrapper targetDevice) {
+    public DeviceCommandResult execute(DeviceWrapper targetDevice) throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
 
         RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(

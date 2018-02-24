@@ -5,6 +5,6 @@ import com.github.grishberg.tests.DeviceWrapper;
 /**
  * Executes some task on device.
  */
-public interface DeviceCommand {
-    DeviceCommandResult execute(DeviceWrapper device);
+public interface DeviceCommand{
+    DeviceCommandResult execute(DeviceWrapper device) throws ExecuteCommandException;
 }
