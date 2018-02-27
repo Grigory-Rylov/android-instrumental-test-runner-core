@@ -20,6 +20,10 @@ public class TestPlan {
     }
 
     public void setAnnotations(String[] annotations) {
+        if (annotations == null) {
+            this.annotations = null;
+            return;
+        }
         this.annotations = annotations.clone();
     }
 
@@ -32,6 +36,9 @@ public class TestPlan {
     }
 
     public String[] getAnnotations() {
+        if (annotations == null) {
+            return null;
+        }
         return annotations.clone();
     }
 
