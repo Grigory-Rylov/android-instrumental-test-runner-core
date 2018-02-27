@@ -1,7 +1,7 @@
 package com.github.grishberg.tests.commands;
 
 import com.github.grishberg.tests.DeviceWrapper;
-import com.github.grishberg.tests.DirectoriesProvider;
+import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 
 /**
@@ -10,5 +10,5 @@ import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 public interface DeviceCommandProvider {
     DeviceCommand[] provideDeviceCommands(DeviceWrapper device,
                                           InstrumentalTestPlanProvider testPlanProvider,
-                                          DirectoriesProvider directoriesProvider);
+                                          Environment environment);
 }

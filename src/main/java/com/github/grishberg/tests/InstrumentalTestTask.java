@@ -62,10 +62,10 @@ public class InstrumentalTestTask extends DefaultTask {
             InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
                     getProject(), instrumentationInfo);
 
-            DirectoriesProvider directoriesProvider = new DirectoriesProvider(resultsDir,
+            Environment environment = new Environment(resultsDir,
                     reportsDir, coverageDir);
             DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider,
-                    directoriesProvider, logger);
+                    environment, logger);
 
             generateHtmlReport(runner.runCommands(provideDevices(adb)));
         } finally {

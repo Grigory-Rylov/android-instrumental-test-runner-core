@@ -5,12 +5,12 @@ import java.io.File;
 /**
  * Provides directories for commands provider.
  */
-public class DirectoriesProvider {
+public class Environment {
     private final File resultsDir;
     private final File reportsDir;
     private final File coverageDir;
 
-    public DirectoriesProvider(File resultsDir, File reportsDir, File coverageDir) {
+    public Environment(File resultsDir, File reportsDir, File coverageDir) {
         this.resultsDir = resultsDir;
         this.reportsDir = reportsDir;
         this.coverageDir = coverageDir;

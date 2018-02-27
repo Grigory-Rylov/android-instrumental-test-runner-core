@@ -34,11 +34,11 @@ public class DefaultCommandProvider implements DeviceCommandProvider {
     @Override
     public DeviceCommand[] provideDeviceCommands(DeviceWrapper device,
                                                  InstrumentalTestPlanProvider testPlanProvider,
-                                                 DirectoriesProvider directoriesProvider) {
+                                                 Environment environment) {
         List<DeviceCommand> commands = new ArrayList<>();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
-        project.getLogger().info("[AITR] device={}, args={}",
-                device.toString(), instrumentalArgs);
+        project.getLogger().info("[DefaultCommandProvider] device={}, args={}",
+                device, instrumentalArgs);
         Set<TestPlan> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
 
         for (TestPlan currentPlan : planSet) {

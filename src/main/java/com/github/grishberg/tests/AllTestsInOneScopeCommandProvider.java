@@ -29,17 +29,17 @@ public class AllTestsInOneScopeCommandProvider implements DeviceCommandProvider 
     @Override
     public DeviceCommand[] provideDeviceCommands(DeviceWrapper device,
                                                  InstrumentalTestPlanProvider testPlanProvider,
-                                                 DirectoriesProvider directoriesProvider) {
+                                                 Environment environment) {
         List<DeviceCommand> commands = new ArrayList<>();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
-        project.getLogger().info("[AITR] device={}, args={}",
-                device.toString(), instrumentalArgs);
+        project.getLogger().info("[AllTestsInOneScopeCommandProvider] device={}, args={}",
+                device, instrumentalArgs);
 
         commands.add(new InstrumentalTestCommand(project,
                 instrumentationInfo,
                 instrumentalArgs,
-                directoriesProvider.getCoverageDir(),
-                directoriesProvider.getReportsDir()));
+                environment.getCoverageDir(),
+                environment.getReportsDir()));
         return commands.toArray(new DeviceCommand[commands.size()]);
     }
 }

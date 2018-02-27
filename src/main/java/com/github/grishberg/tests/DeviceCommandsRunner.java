@@ -14,17 +14,17 @@ import java.util.concurrent.CountDownLatch;
 class DeviceCommandsRunner {
     private final InstrumentalTestPlanProvider testPlanProvider;
     private final DeviceCommandProvider commandProvider;
-    private DirectoriesProvider directoriesProvider;
+    private Environment environment;
     private final Logger logger;
     private boolean hasFailedTests;
 
     DeviceCommandsRunner(InstrumentalTestPlanProvider testPlanProvider,
                          DeviceCommandProvider commandProvider,
-                         DirectoriesProvider directoriesProvider,
+                         Environment directoriesProvider,
                          Logger logger) {
         this.testPlanProvider = testPlanProvider;
         this.commandProvider = commandProvider;
-        this.directoriesProvider = directoriesProvider;
+        this.environment = directoriesProvider;
         this.logger = logger;
     }
 
@@ -37,13 +37,13 @@ class DeviceCommandsRunner {
                 public void run() {
                     try {
                         DeviceCommand[] commands = commandProvider.provideDeviceCommands(device,
-                                testPlanProvider, directoriesProvider);
+                                testPlanProvider, environment);
                         for (DeviceCommand command : commands) {
                             logger.info("[DCR] Before executing device = {} command = {}",
-                                    device.toString(), command.toString());
+                                    device, command.toString());
                             DeviceCommandResult result = command.execute(device);
                             logger.info("[DCR] After executing device = {} command = {}",
-                                    device.toString(), command.toString());
+                                    device, command.toString());
                             if (result.isFailed()) {
                                 hasFailedTests = true;
                             }
