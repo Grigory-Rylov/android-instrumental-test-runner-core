@@ -1,7 +1,10 @@
 package com.github.grishberg.tests;
 
 import com.android.ddmlib.*;
+import com.android.utils.ILogger;
+import com.github.grishberg.tests.exceptions.PullCoverageException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -10,6 +13,7 @@ import java.util.concurrent.TimeUnit;
  * Wraps {@link IDevice} interface.
  */
 public class DeviceWrapper implements IShellEnabledDevice {
+    public static final String COVERAGE_FILE_NAME = "coverage.ec";
     private final IDevice device;
     private String name;
 
@@ -68,5 +72,51 @@ public class DeviceWrapper implements IShellEnabledDevice {
     public void installPackage(String absolutePath, boolean reinstall, String extraArgument)
             throws InstallException {
         device.installPackage(absolutePath, reinstall, extraArgument);
+    }
+
+    /**
+     * Pulls coverage file from device.
+     *
+     * @param instrumentationInfo
+     * @param coverageFilePrefix  prefix for generating coverage on local dir.
+     * @param coverageFile        full path to coverage file on target device.
+     * @param outCoverageDir      local dir, where coverage file will be copied.
+     * @param logger              logger.
+     * @throws PullCoverageException
+     */
+    public void pullCoverageFile(InstrumentalPluginExtension instrumentationInfo,
+                                 String coverageFilePrefix,
+                                 String coverageFile,
+                                 File outCoverageDir,
+                                 final ILogger logger) throws PullCoverageException {
+        MultiLineReceiver outputReceiver = new MultiLineReceiver() {
+            public void processNewLines(String[] lines) {
+                for (String line : lines) {
+                    logger.verbose(line);
+                }
+            }
+
+            public boolean isCancelled() {
+                return false;
+            }
+        };
+
+        logger.verbose("DeviceWrapper '%s': fetching coverage data from %s",
+                getName(), coverageFile);
+        try {
+            String temporaryCoverageCopy = "/data/local/tmp/" + instrumentationInfo.getApplicationId()
+                    + "." + COVERAGE_FILE_NAME;
+            executeShellCommand("run-as " + instrumentationInfo.getApplicationId() +
+                            " cat " + coverageFile + " | cat > " + temporaryCoverageCopy,
+                    outputReceiver,
+                    30L, TimeUnit.SECONDS);
+            pullFile(temporaryCoverageCopy,
+                    (new File(outCoverageDir, coverageFilePrefix + "-" + COVERAGE_FILE_NAME))
+                            .getPath());
+            executeShellCommand("rm " + temporaryCoverageCopy, outputReceiver, 30L,
+                    TimeUnit.SECONDS);
+        } catch (Exception e) {
+            throw new PullCoverageException(e);
+        }
     }
 }

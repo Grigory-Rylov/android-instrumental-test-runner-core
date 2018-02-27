@@ -49,7 +49,9 @@ public class DefaultCommandProvider implements DeviceCommandProvider {
             commands.add(new SingleInstrumentalTestCommand(project,
                     instrumentationInfo,
                     instrumentalArgs,
-                    currentPlan));
+                    currentPlan,
+                    environment.getCoverageDir(),
+                    environment.getResultsDir()));
         }
 
         return commands.toArray(new DeviceCommand[commands.size()]);
