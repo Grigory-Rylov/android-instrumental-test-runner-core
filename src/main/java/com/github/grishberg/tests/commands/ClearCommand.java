@@ -1,7 +1,7 @@
 package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.MultiLineReceiver;
-import com.github.grishberg.tests.DeviceWrapper;
+import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import org.gradle.api.logging.Logger;
 
@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Cleans app data.
  */
-public class ClearCommand implements DeviceCommand {
+public class ClearCommand implements DeviceRunnerCommand {
     private final Logger logger;
     private final InstrumentalPluginExtension instrumentationInfo;
 
@@ -21,7 +21,7 @@ public class ClearCommand implements DeviceCommand {
     }
 
     @Override
-    public DeviceCommandResult execute(DeviceWrapper device) throws ExecuteCommandException {
+    public DeviceCommandResult execute(ConnectedDeviceWrapper device) throws ExecuteCommandException {
         logger.info("ClearCommand for package " + instrumentationInfo.getApplicationId());
         MultiLineReceiver receiver = new MultiLineReceiver() {
             @Override

@@ -16,8 +16,8 @@ class InstrumentalTestPlugin implements Plugin<Project> {
 
         project.extensions.create(INSTRUMENTAL_PLUGIN_EXTENSION, InstrumentalPluginExtension)
 
-        InstrumentalTestTask task = project.getTasks()
-                .create(InstrumentalTestTask.NAME, InstrumentalTestTask.class)
+        InstrumentationTestTask task = project.getTasks()
+                .create(InstrumentationTestTask.NAME, InstrumentationTestTask.class)
 
         task.setGroup("verification")
         task.setDescription("Plugin for running instrumental tests on multiple devices")

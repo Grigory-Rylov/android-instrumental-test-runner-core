@@ -1,7 +1,7 @@
 package com.github.grishberg.tests;
 
 import com.github.grishberg.tests.commands.ClearCommand;
-import com.github.grishberg.tests.commands.DeviceCommand;
+import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import org.gradle.api.logging.Logger;
 
 import java.util.ArrayList;
@@ -21,8 +21,8 @@ public class DefaultCommandsForAnnotationProvider implements CommandsForAnnotati
     }
 
     @Override
-    public List<DeviceCommand> provideCommand(String[] annotations) {
-        ArrayList<DeviceCommand> commands = new ArrayList<>();
+    public List<DeviceRunnerCommand> provideCommand(String[] annotations) {
+        ArrayList<DeviceRunnerCommand> commands = new ArrayList<>();
         for (String annotation : annotations) {
             if ("ClearData".equals(annotation)) {
                 commands.add(new ClearCommand(logger, instrumentationInfo));

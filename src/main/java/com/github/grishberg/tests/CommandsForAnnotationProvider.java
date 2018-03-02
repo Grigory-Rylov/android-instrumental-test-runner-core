@@ -1,6 +1,6 @@
 package com.github.grishberg.tests;
 
-import com.github.grishberg.tests.commands.DeviceCommand;
+import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 
 import java.util.List;
 
@@ -8,5 +8,5 @@ import java.util.List;
  * Provides command for annotation.
  */
 public interface CommandsForAnnotationProvider {
-    List<DeviceCommand> provideCommand(String[] annotation);
+    List<DeviceRunnerCommand> provideCommand(String[] annotation);
 }

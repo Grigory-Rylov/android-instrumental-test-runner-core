@@ -12,12 +12,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * Wraps {@link IDevice} interface.
  */
-public class DeviceWrapper implements IShellEnabledDevice {
+public class ConnectedDeviceWrapper implements IShellEnabledDevice {
     public static final String COVERAGE_FILE_NAME = "coverage.ec";
     private final IDevice device;
     private String name;
 
-    public DeviceWrapper(IDevice device) {
+    public ConnectedDeviceWrapper(IDevice device) {
         this.device = device;
     }
 
@@ -49,7 +49,7 @@ public class DeviceWrapper implements IShellEnabledDevice {
 
     @Override
     public String toString() {
-        return "DeviceWrapper{" +
+        return "ConnectedDeviceWrapper{" +
                 "sn=" + device.getSerialNumber() +
                 ", isOnline=" + device.isOnline() +
                 ", name='" + getName() + '\'' +
@@ -101,7 +101,7 @@ public class DeviceWrapper implements IShellEnabledDevice {
             }
         };
 
-        logger.verbose("DeviceWrapper '%s': fetching coverage data from %s",
+        logger.verbose("ConnectedDeviceWrapper '%s': fetching coverage data from %s",
                 getName(), coverageFile);
         try {
             String temporaryCoverageCopy = "/data/local/tmp/" + instrumentationInfo.getApplicationId()

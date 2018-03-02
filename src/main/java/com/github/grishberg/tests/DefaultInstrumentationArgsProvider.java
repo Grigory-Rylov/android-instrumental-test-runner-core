@@ -8,7 +8,7 @@ import java.util.Map;
  */
 public class DefaultInstrumentationArgsProvider implements InstrumentationArgsProvider {
     @Override
-    public Map<String, String> provideInstrumentationArgs(DeviceWrapper targetDevice) {
+    public Map<String, String> provideInstrumentationArgs(ConnectedDeviceWrapper device) {
         return new HashMap<>();
     }
 }

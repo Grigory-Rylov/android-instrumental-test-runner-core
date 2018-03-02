@@ -2,7 +2,7 @@ package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestRunResult;
-import com.github.grishberg.tests.DeviceWrapper;
+import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Executes instrumentation test for single test method.
  */
-public class SingleInstrumentalTestCommand implements DeviceCommand {
+public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     private static final String CLASS = "class";
     private final Project project;
     private final InstrumentalPluginExtension instrumentationInfo;
@@ -40,7 +40,7 @@ public class SingleInstrumentalTestCommand implements DeviceCommand {
     }
 
     @Override
-    public DeviceCommandResult execute(DeviceWrapper targetDevice) throws ExecuteCommandException {
+    public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice) throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
 
         RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(
@@ -53,7 +53,7 @@ public class SingleInstrumentalTestCommand implements DeviceCommand {
         }
 
         String coverageFile = "/data/data/" + instrumentationInfo.getApplicationId()
-                + "/" + DeviceWrapper.COVERAGE_FILE_NAME;
+                + "/" + ConnectedDeviceWrapper.COVERAGE_FILE_NAME;
         if (instrumentationInfo.isCoverageEnabled()) {
             runner.addInstrumentationArg("coverage", "true");
             runner.addInstrumentationArg("coverageFile", coverageFile);

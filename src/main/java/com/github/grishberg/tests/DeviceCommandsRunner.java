@@ -1,7 +1,7 @@
 package com.github.grishberg.tests;
 
-import com.github.grishberg.tests.commands.DeviceCommand;
-import com.github.grishberg.tests.commands.DeviceCommandProvider;
+import com.github.grishberg.tests.commands.DeviceRunnerCommand;
+import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.DeviceCommandResult;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.gradle.api.logging.Logger;
@@ -13,13 +13,13 @@ import java.util.concurrent.CountDownLatch;
  */
 class DeviceCommandsRunner {
     private final InstrumentalTestPlanProvider testPlanProvider;
-    private final DeviceCommandProvider commandProvider;
+    private final DeviceRunnerCommandProvider commandProvider;
     private Environment environment;
     private final Logger logger;
     private boolean hasFailedTests;
 
     DeviceCommandsRunner(InstrumentalTestPlanProvider testPlanProvider,
-                         DeviceCommandProvider commandProvider,
+                         DeviceRunnerCommandProvider commandProvider,
                          Environment directoriesProvider,
                          Logger logger) {
         this.testPlanProvider = testPlanProvider;
@@ -28,17 +28,17 @@ class DeviceCommandsRunner {
         this.logger = logger;
     }
 
-    boolean runCommands(DeviceWrapper[] devices) throws InterruptedException {
+    boolean runCommands(ConnectedDeviceWrapper[] devices) throws InterruptedException {
         final CountDownLatch deviceCounter = new CountDownLatch(devices.length);
 
-        for (DeviceWrapper device : devices) {
+        for (ConnectedDeviceWrapper device : devices) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        DeviceCommand[] commands = commandProvider.provideDeviceCommands(device,
+                        DeviceRunnerCommand[] commands = commandProvider.provideCommandsForDevice(device,
                                 testPlanProvider, environment);
-                        for (DeviceCommand command : commands) {
+                        for (DeviceRunnerCommand command : commands) {
                             logger.info("[DCR] Before executing device = {} command = {}",
                                     device, command.toString());
                             DeviceCommandResult result = command.execute(device);

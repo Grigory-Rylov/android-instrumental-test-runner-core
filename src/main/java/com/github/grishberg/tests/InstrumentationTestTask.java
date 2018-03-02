@@ -5,7 +5,7 @@ import com.android.build.gradle.internal.test.report.TestReport;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
 import com.android.utils.FileUtils;
-import com.github.grishberg.tests.commands.DeviceCommandProvider;
+import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * Main task for running instrumental tests.
  */
-public class InstrumentalTestTask extends DefaultTask {
+public class InstrumentationTestTask extends DefaultTask {
     public static final String NAME = "instrumentalTests";
     private static final int ADB_TIMEOUT = 10;
     private static final int ONE_SECOND = 1000;
@@ -31,13 +31,13 @@ public class InstrumentalTestTask extends DefaultTask {
     private File coverageDir;
     private File resultsDir;
     private File reportsDir;
-    private DeviceCommandProvider commandProvider;
+    private DeviceRunnerCommandProvider commandProvider;
     private InstrumentationArgsProvider instrumentationArgsProvider;
     private InstrumentalPluginExtension instrumentationInfo;
     private CommandsForAnnotationProvider commandsForAnnotationProvider;
     private Logger logger;
 
-    public InstrumentalTestTask() {
+    public InstrumentationTestTask() {
         logger = getLogger();
         coverageDir = new File(getProject().getBuildDir(), "outputs/androidTest/coverage/");
         reportsDir = new File(getProject().getBuildDir(), "outputs/reports/androidTest/");
@@ -46,7 +46,7 @@ public class InstrumentalTestTask extends DefaultTask {
 
     @TaskAction
     public void runTask() throws InterruptedException, IOException {
-        logger.info("InstrumentalTestTask.runTask");
+        logger.info("InstrumentationTestTask.runTask");
         instrumentationInfo = getProject().getExtensions()
                 .findByType(InstrumentalPluginExtension.class);
         androidSdkPath = instrumentationInfo.getAndroidSdkPath();
@@ -99,11 +99,11 @@ public class InstrumentalTestTask extends DefaultTask {
         }
     }
 
-    private DeviceWrapper[] provideDevices(AndroidDebugBridge adb) {
+    private ConnectedDeviceWrapper[] provideDevices(AndroidDebugBridge adb) {
         IDevice[] devices = adb.getDevices();
-        DeviceWrapper[] deviceWrappers = new DeviceWrapper[devices.length];
+        ConnectedDeviceWrapper[] deviceWrappers = new ConnectedDeviceWrapper[devices.length];
         for (int i = 0; i < devices.length; i++) {
-            deviceWrappers[i] = new DeviceWrapper(devices[i]);
+            deviceWrappers[i] = new ConnectedDeviceWrapper(devices[i]);
         }
         return deviceWrappers;
     }
@@ -171,7 +171,7 @@ public class InstrumentalTestTask extends DefaultTask {
     }
 
     @Input
-    public void setCommandProvider(DeviceCommandProvider commandProvider) {
+    public void setCommandProvider(DeviceRunnerCommandProvider commandProvider) {
         this.commandProvider = commandProvider;
     }
 

@@ -2,7 +2,7 @@ package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestRunResult;
-import com.github.grishberg.tests.DeviceWrapper;
+import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Executes instrumental tests on connected device.
  */
-public class InstrumentalTestCommand implements DeviceCommand {
+public class InstrumentalTestCommand implements DeviceRunnerCommand {
     private final Project project;
     private final InstrumentalPluginExtension instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
@@ -37,7 +37,7 @@ public class InstrumentalTestCommand implements DeviceCommand {
     }
 
     @Override
-    public DeviceCommandResult execute(DeviceWrapper targetDevice) throws ExecuteCommandException {
+    public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice) throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
 
         RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(
@@ -50,7 +50,7 @@ public class InstrumentalTestCommand implements DeviceCommand {
         }
 
         String coverageFile = "/data/data/" + instrumentationInfo.getApplicationId()
-                + "/" + DeviceWrapper.COVERAGE_FILE_NAME;
+                + "/" + ConnectedDeviceWrapper.COVERAGE_FILE_NAME;
         if (instrumentationInfo.isCoverageEnabled()) {
             runner.addInstrumentationArg("coverage", "true");
             runner.addInstrumentationArg("coverageFile", coverageFile);
@@ -83,7 +83,7 @@ public class InstrumentalTestCommand implements DeviceCommand {
         return result;
     }
 
-    private String provideDeviceNameForReport(DeviceWrapper targetDevice) {
+    private String provideDeviceNameForReport(ConnectedDeviceWrapper targetDevice) {
         String prefix = "";
         if (targetDevice.isEmulator()) {
             prefix = "(AVD)";

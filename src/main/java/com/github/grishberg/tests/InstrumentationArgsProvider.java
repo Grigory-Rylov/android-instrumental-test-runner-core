@@ -7,8 +7,8 @@ import java.util.Map;
  */
 public interface InstrumentationArgsProvider {
     /**
-     * @param targetDevice The target device on which tests will be run.
+     * @param device The target device on which tests will be run.
      * @return map of arguments
      */
-    Map<String, String> provideInstrumentationArgs(DeviceWrapper targetDevice);
+    Map<String, String> provideInstrumentationArgs(ConnectedDeviceWrapper device);
 }

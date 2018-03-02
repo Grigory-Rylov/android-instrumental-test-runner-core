@@ -1,6 +1,6 @@
 package com.github.grishberg.tests.planner;
 
-import com.github.grishberg.tests.DeviceWrapper;
+import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.planner.parser.InstrumentTestLogParser;
 import com.github.grishberg.tests.planner.parser.TestPlan;
@@ -24,7 +24,7 @@ public class InstrumentalTestPlanProvider {
         this.instrumentationInfo = instrumentationInfo;
     }
 
-    public Set<TestPlan> provideTestPlan(DeviceWrapper device,
+    public Set<TestPlan> provideTestPlan(ConnectedDeviceWrapper device,
                                          Map<String, String> instrumentalArgs) {
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");

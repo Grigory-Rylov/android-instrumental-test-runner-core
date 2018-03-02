@@ -1,6 +1,6 @@
 package com.github.grishberg.tests.commands;
 
-import com.github.grishberg.tests.DeviceWrapper;
+import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import org.gradle.api.logging.Logger;
 
 import java.io.File;
@@ -9,7 +9,7 @@ import java.util.Locale;
 /**
  * Installs apk file to current device.
  */
-public class InstallApkCommand implements DeviceCommand {
+public class InstallApkCommand implements DeviceRunnerCommand {
     private final Logger logger;
     private final File apkFile;
 
@@ -19,7 +19,7 @@ public class InstallApkCommand implements DeviceCommand {
     }
 
     @Override
-    public DeviceCommandResult execute(DeviceWrapper device) throws ExecuteCommandException {
+    public DeviceCommandResult execute(ConnectedDeviceWrapper device) throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
         Exception lastException = null;
         for (int i = 0; i < 3; i++) {

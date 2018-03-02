@@ -23,13 +23,13 @@ public class InstrumentalTaskTest extends BaseTestCaseWithLogger {
         ext.setInstrumentalPackage("com.grishberg.gpsexample.test");
         ext.setInstrumentalRunner("android.support.test.runner.AndroidJUnitRunner");
 
-        InstrumentalTestTask task = provideTask();
+        InstrumentationTestTask task = provideTask();
 
         task.runTask();
     }
 
-    private InstrumentalTestTask provideTask() {
+    private InstrumentationTestTask provideTask() {
 
-        return (InstrumentalTestTask) project.getTasks().getByName(InstrumentalTestTask.NAME);
+        return (InstrumentationTestTask) project.getTasks().getByName(InstrumentationTestTask.NAME);
     }
 }
