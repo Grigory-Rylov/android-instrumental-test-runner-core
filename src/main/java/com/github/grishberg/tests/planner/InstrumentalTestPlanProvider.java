@@ -7,6 +7,7 @@ import com.github.grishberg.tests.planner.parser.TestPlan;
 import org.gradle.api.Project;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -14,25 +15,17 @@ import java.util.concurrent.TimeUnit;
  * Provides set of {@link TestPlan} for instrumental tests.
  */
 public class InstrumentalTestPlanProvider {
-    private PackageTreeGenerator packageTreeGenerator;
     private final InstrumentalPluginExtension instrumentationInfo;
     private final Project project;
 
     public InstrumentalTestPlanProvider(Project project,
-                                        PackageTreeGenerator packageTreeGenerator,
                                         InstrumentalPluginExtension instrumentationInfo) {
         this.project = project;
-        this.packageTreeGenerator = packageTreeGenerator;
         this.instrumentationInfo = instrumentationInfo;
     }
 
-    /**
-     * @param device           current device for executing tests.
-     * @param instrumentalArgs additional arguments for excluding some tests.
-     * @return list of TestNodeElements, contains path for executing test in am.
-     */
-    public TestNodeElement provideTestRootNode(ConnectedDeviceWrapper device,
-                                               Map<String, String> instrumentalArgs) {
+    public List<TestPlan> provideTestPlan(ConnectedDeviceWrapper device,
+                                          Map<String, String> instrumentalArgs) {
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");
 
@@ -60,9 +53,7 @@ public class InstrumentalTestPlanProvider {
         } catch (Exception e) {
             project.getLogger().error("InstrumentalTestPlanProvider.execute error:", e);
         }
-
-        // generate path tree
-        return packageTreeGenerator.makePackageTree(receiver.getTestInstances());
+        return receiver.getTestInstances();
     }
 
     private class TestLogParserLogger implements InstrumentTestLogParser.ParserLogger {

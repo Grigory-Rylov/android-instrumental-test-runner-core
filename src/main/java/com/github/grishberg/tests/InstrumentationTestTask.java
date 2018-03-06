@@ -7,7 +7,6 @@ import com.android.ddmlib.IDevice;
 import com.android.utils.FileUtils;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
-import com.github.grishberg.tests.planner.PackageTreeGenerator;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Nullable;
@@ -62,7 +61,6 @@ public class InstrumentationTestTask extends DefaultTask {
 
             InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
                     getProject(),
-                    new PackageTreeGenerator(),
                     instrumentationInfo);
 
             Environment environment = new Environment(resultsDir,

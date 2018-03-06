@@ -3,8 +3,8 @@ package com.github.grishberg.tests.planner.parser;
 import com.android.ddmlib.MultiLineReceiver;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parses am instrument -e log true output and generates.
@@ -17,7 +17,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     private static final String ANNOTATIONS = "annotations";
     private static final String FEATURE = "feature";
     private ParserLogger logger;
-    private final HashSet<TestPlan> testPlanList = new HashSet<>();
+    private final ArrayList<TestPlan> testPlanList = new ArrayList<>();
     private State state = new StartNewObject();
 
     public void setLogger(ParserLogger logger) {
@@ -93,7 +93,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         return false;
     }
 
-    public Set<TestPlan> getTestInstances() {
+    public List<TestPlan> getTestInstances() {
         return testPlanList;
     }
 

@@ -22,6 +22,9 @@ public class TestPlan {
     }
 
     public void addAnnotations(String[] annotations) {
+        if (annotations == null) {
+            return;
+        }
         this.annotations.addAll(Arrays.asList(annotations));
     }
 

@@ -6,10 +6,12 @@ import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
+import com.github.grishberg.tests.planner.parser.TestPlan;
 import org.gradle.api.Project;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,23 +20,37 @@ import java.util.Map;
 public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     private static final String CLASS = "class";
     private final Project project;
+    private String testName;
     private final InstrumentalPluginExtension instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
     private File coverageOuptutDir;
     private File resultsDir;
 
     public SingleInstrumentalTestCommand(Project project,
+                                         String testReportSuffix,
                                          InstrumentalPluginExtension instrumentalInfo,
                                          Map<String, String> instrumentalArgs,
-                                         String commandForExecutionInAm,
+                                         List<TestPlan> testForExecution,
                                          File coverageFilesDir,
                                          File resultsDir) {
         this.project = project;
+        this.testName = testReportSuffix;
         this.instrumentationInfo = instrumentalInfo;
         this.instrumentationArgs = new HashMap<>(instrumentalArgs);
         this.coverageOuptutDir = coverageFilesDir;
         this.resultsDir = resultsDir;
-        instrumentationArgs.put(CLASS, commandForExecutionInAm);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < testForExecution.size(); i++) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            TestPlan plan = testForExecution.get(i);
+            sb.append(plan.getClassName());
+            sb.append("#");
+            sb.append(plan.getMethodName());
+        }
+        instrumentationArgs.put(CLASS, sb.toString());
     }
 
     @Override
@@ -58,7 +74,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         }
 
         RunTestLogger runTestLogger = new RunTestLogger(project.getLogger());
-        String singleTestMethodPrefix = targetDevice.getName() + "#" + instrumentationArgs.get(CLASS);
+        String singleTestMethodPrefix = targetDevice.getName() + "#" + testName;
         TestXmlReportsGenerator testRunListener = new TestXmlReportsGenerator(targetDevice.getName(),
                 project.getName(),
                 instrumentationInfo.getFlavorName(),

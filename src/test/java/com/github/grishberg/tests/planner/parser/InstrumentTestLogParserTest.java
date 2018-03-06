@@ -7,7 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Created by grishberg on 29.10.17.
@@ -30,10 +30,10 @@ public class InstrumentTestLogParserTest {
         }
         parser.processNewLines(lines.toArray(new String[lines.size()]));
 
-        Set<TestPlan> testInstances = parser.getTestInstances();
+        List<TestPlan> testInstances = parser.getTestInstances();
         Assert.assertEquals(6, testInstances.size());
         TestPlan[] testPlanArray = testInstances.toArray(new TestPlan[testInstances.size()]);
-        TestPlan testWithFeature = testPlanArray[2];
+        TestPlan testWithFeature = testPlanArray[3];
         Assert.assertNotNull(testWithFeature.getFeatureParameter());
     }
 }
