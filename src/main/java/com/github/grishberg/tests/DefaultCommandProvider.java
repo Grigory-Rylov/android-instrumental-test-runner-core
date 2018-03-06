@@ -4,13 +4,12 @@ import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.SingleInstrumentalTestCommand;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
-import com.github.grishberg.tests.planner.parser.TestPlan;
+import com.github.grishberg.tests.planner.TestNodeElement;
 import org.gradle.api.Project;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Provides commands for device.
@@ -39,21 +38,38 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
         project.getLogger().info("[DefaultCommandProvider] device={}, args={}",
                 device, instrumentalArgs);
-        Set<TestPlan> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
+        TestNodeElement testRoot = testPlanProvider.provideTestRootNode(device, instrumentalArgs);
 
-        for (TestPlan currentPlan : planSet) {
+        List<TestNodeElement> testMethods = testRoot.getAllTestMethods();
+
+        for (TestNodeElement currentTestMethod : testMethods) {
 
             List<DeviceRunnerCommand> commandsForAnnotations = commandsForAnnotationProvider
-                    .provideCommand(currentPlan.getAnnotations());
-            commands.addAll(commandsForAnnotations);
+                    .provideCommand(currentTestMethod.getAnnotations());
+            if (commandsForAnnotations.size() > 0) {
+                commands.addAll(commandsForAnnotations);
+                commands.add(new SingleInstrumentalTestCommand(project,
+                        instrumentationInfo,
+                        instrumentalArgs,
+                        currentTestMethod.getAmInstrumentPath(),
+                        environment.getCoverageDir(),
+                        environment.getResultsDir()));
+                // call currentTestMethod.excluded() if you want to exclude current test from package tree
+                // for example, you need to change order for current test, or you dont want execute current
+                // test on current device.
+                currentTestMethod.excluded();
+            }
+        }
+
+        List<TestNodeElement> compoundTestNodes = testRoot.getCommandsForAmInstrument();
+        for (TestNodeElement currentTestPackage : compoundTestNodes) {
             commands.add(new SingleInstrumentalTestCommand(project,
                     instrumentationInfo,
                     instrumentalArgs,
-                    currentPlan,
+                    currentTestPackage.getAmInstrumentPath(),
                     environment.getCoverageDir(),
                     environment.getResultsDir()));
         }
-
         return commands.toArray(new DeviceRunnerCommand[commands.size()]);
     }
 }

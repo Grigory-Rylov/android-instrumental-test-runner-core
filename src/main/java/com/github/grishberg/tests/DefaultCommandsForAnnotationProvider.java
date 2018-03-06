@@ -21,7 +21,7 @@ public class DefaultCommandsForAnnotationProvider implements CommandsForAnnotati
     }
 
     @Override
-    public List<DeviceRunnerCommand> provideCommand(String[] annotations) {
+    public List<DeviceRunnerCommand> provideCommand(List<String> annotations) {
         ArrayList<DeviceRunnerCommand> commands = new ArrayList<>();
         for (String annotation : annotations) {
             if ("ClearData".equals(annotation)) {

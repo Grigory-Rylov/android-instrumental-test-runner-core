@@ -195,7 +195,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
             if (!testPlanList.contains(testPlan)) {
                 testPlanList.add(testPlan);
 
-                testPlan.setAnnotations(annotations);
+                testPlan.addAnnotations(annotations);
                 testPlan.setFeatureParameter(feature);
             }
         }
@@ -203,7 +203,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         @Override
         void setAnnotations(String[] annotations) {
             if (testPlan != null) {
-                testPlan.setAnnotations(annotations);
+                testPlan.addAnnotations(annotations);
                 return;
             }
             this.annotations = annotations;

@@ -15,10 +15,7 @@ public class TestPlanTest {
     @Test
     public void whenPutNullAnnotation_annotationsCleared() {
         TestPlan plan = new TestPlan("", "", "");
-        plan.setAnnotations(NOT_EMPTY_ANNOTATIONS);
-
-        plan.setAnnotations(null);
-
-        Assert.assertNull(plan.getAnnotations());
+        plan.addAnnotations(NOT_EMPTY_ANNOTATIONS);
+        Assert.assertNotNull(plan.getAnnotations());
     }
 }

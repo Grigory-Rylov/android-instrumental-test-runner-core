@@ -1,45 +1,40 @@
 package com.github.grishberg.tests.planner.parser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Test plan for running single test.
  */
 public class TestPlan {
     private final String testId;
-    private final String name;
+    private final String methodName;
     private final String className;
-    private String[] annotations;
+    private List<String> annotations;
     private String featureParameter;
 
-    public TestPlan(String testId, String name, String className) {
+    public TestPlan(String testId, String methodName, String fullClassName) {
         this.testId = testId;
-        this.name = name;
-        this.className = className;
-        this.annotations = new String[0];
+        this.methodName = methodName;
+        this.className = fullClassName;
+        this.annotations = new ArrayList<>();
     }
 
-    public void setAnnotations(String[] annotations) {
-        if (annotations == null) {
-            this.annotations = null;
-            return;
-        }
-        this.annotations = annotations.clone();
+    public void addAnnotations(String[] annotations) {
+        this.annotations.addAll(Arrays.asList(annotations));
     }
 
-    public String getName() {
-        return name;
+    public String getMethodName() {
+        return methodName;
     }
 
     public String getClassName() {
         return className;
     }
 
-    public String[] getAnnotations() {
-        if (annotations == null) {
-            return null;
-        }
-        return annotations.clone();
+    public List<String> getAnnotations() {
+        return new ArrayList<>(annotations);
     }
 
     @Override
@@ -56,7 +51,7 @@ public class TestPlan {
         if (testId != null ? !testId.equals(that.testId) : that.testId != null) {
             return false;
         }
-        if (name != null ? !name.equals(that.name) : that.name != null) {
+        if (methodName != null ? !methodName.equals(that.methodName) : that.methodName != null) {
             return false;
         }
         return className != null ? className.equals(that.className) : that.className == null;
@@ -64,10 +59,10 @@ public class TestPlan {
 
     @Override
     public int hashCode() {
-        int result = testId != null ? testId.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (className != null ? className.hashCode() : 0);
-        result = 31 * result + Arrays.hashCode(annotations);
+        int result = testId.hashCode();
+        result = 31 * result + methodName.hashCode();
+        result = 31 * result + className.hashCode();
+        result = 31 * result + annotations.hashCode();
         return result;
     }
 
@@ -82,7 +77,7 @@ public class TestPlan {
     @Override
     public String toString() {
         return "TestPlan{" +
-                "name='" + name + '\'' +
+                "methodName='" + methodName + '\'' +
                 ", className='" + className + '\'' +
                 ", testId='" + testId + '\'' +
                 '}';

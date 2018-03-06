@@ -6,7 +6,6 @@ import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
-import com.github.grishberg.tests.planner.parser.TestPlan;
 import org.gradle.api.Project;
 
 import java.io.File;
@@ -27,7 +26,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     public SingleInstrumentalTestCommand(Project project,
                                          InstrumentalPluginExtension instrumentalInfo,
                                          Map<String, String> instrumentalArgs,
-                                         TestPlan currentPlan,
+                                         String commandForExecutionInAm,
                                          File coverageFilesDir,
                                          File resultsDir) {
         this.project = project;
@@ -35,8 +34,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         this.instrumentationArgs = new HashMap<>(instrumentalArgs);
         this.coverageOuptutDir = coverageFilesDir;
         this.resultsDir = resultsDir;
-        instrumentationArgs.put(CLASS,
-                String.format("%s#%s", currentPlan.getClassName(), currentPlan.getName()));
+        instrumentationArgs.put(CLASS, commandForExecutionInAm);
     }
 
     @Override

@@ -8,5 +8,5 @@ import java.util.List;
  * Provides command for annotation.
  */
 public interface CommandsForAnnotationProvider {
-    List<DeviceRunnerCommand> provideCommand(String[] annotation);
+    List<DeviceRunnerCommand> provideCommand(List<String> annotation);
 }

@@ -8,24 +8,31 @@ import org.gradle.api.Project;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Provides set of {@link TestPlan} for instrumental tests.
  */
 public class InstrumentalTestPlanProvider {
+    private PackageTreeGenerator packageTreeGenerator;
     private final InstrumentalPluginExtension instrumentationInfo;
     private final Project project;
 
     public InstrumentalTestPlanProvider(Project project,
+                                        PackageTreeGenerator packageTreeGenerator,
                                         InstrumentalPluginExtension instrumentationInfo) {
         this.project = project;
+        this.packageTreeGenerator = packageTreeGenerator;
         this.instrumentationInfo = instrumentationInfo;
     }
 
-    public Set<TestPlan> provideTestPlan(ConnectedDeviceWrapper device,
-                                         Map<String, String> instrumentalArgs) {
+    /**
+     * @param device           current device for executing tests.
+     * @param instrumentalArgs additional arguments for excluding some tests.
+     * @return list of TestNodeElements, contains path for executing test in am.
+     */
+    public TestNodeElement provideTestRootNode(ConnectedDeviceWrapper device,
+                                               Map<String, String> instrumentalArgs) {
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");
 
@@ -53,7 +60,9 @@ public class InstrumentalTestPlanProvider {
         } catch (Exception e) {
             project.getLogger().error("InstrumentalTestPlanProvider.execute error:", e);
         }
-        return receiver.getTestInstances();
+
+        // generate path tree
+        return packageTreeGenerator.makePackageTree(receiver.getTestInstances());
     }
 
     private class TestLogParserLogger implements InstrumentTestLogParser.ParserLogger {
