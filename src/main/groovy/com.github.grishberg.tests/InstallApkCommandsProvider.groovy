@@ -23,7 +23,7 @@ class InstallApkCommandsProvider {
         ArrayList<InstallApkCommand> prepareCommands = new ArrayList<>(2)
 
         project.android.applicationVariants.all { variant ->
-            if (variant.getMethodName == buildVariant) {
+            if (variant.getMethodName() == buildVariant) {
                 File testedApk = null
                 File testApk = null
 

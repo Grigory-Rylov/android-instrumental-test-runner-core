@@ -6,8 +6,8 @@ import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
+import com.github.grishberg.tests.common.RunnerLogger;
 import org.gradle.api.Project;
-import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.util.Map;
@@ -17,9 +17,9 @@ import java.util.Map;
  */
 public class InstrumentalTestCommand implements DeviceRunnerCommand {
     private final Project project;
+    private RunnerLogger logger;
     private final InstrumentalPluginExtension instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
-    private final Logger logger;
     private File coverageOuptutDir;
     private File reportsDir;
 
@@ -27,9 +27,10 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
                                    InstrumentalPluginExtension instrumentalInfo,
                                    Map<String, String> instrumentalArgs,
                                    File coverageFilesDir,
-                                   File reportsDir) {
+                                   File reportsDir,
+                                   RunnerLogger logger) {
         this.project = project;
-        this.logger = project.getLogger();
+        this.logger = logger;
         this.instrumentationInfo = instrumentalInfo;
         this.instrumentationArgs = instrumentalArgs;
         this.coverageOuptutDir = coverageFilesDir;
@@ -56,7 +57,7 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
             runner.addInstrumentationArg("coverageFile", coverageFile);
         }
 
-        RunTestLogger runTestLogger = new RunTestLogger(project.getLogger());
+        RunTestLogger runTestLogger = new RunTestLogger(logger);
         TestXmlReportsGenerator testRunListener = new TestXmlReportsGenerator(targetDevice.getName(),
                 project.getName(),
                 instrumentationInfo.getFlavorName(),

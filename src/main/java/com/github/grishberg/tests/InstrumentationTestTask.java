@@ -6,11 +6,12 @@ import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
 import com.android.utils.FileUtils;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
+import com.github.grishberg.tests.common.DefaultGradleLogger;
+import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Nullable;
-import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
@@ -23,6 +24,7 @@ import java.io.IOException;
  * Main task for running instrumental tests.
  */
 public class InstrumentationTestTask extends DefaultTask {
+    private static final String TAG = InstrumentationTestTask.class.getSimpleName();
     public static final String NAME = "instrumentalTests";
     private static final int ADB_TIMEOUT = 10;
     private static final int ONE_SECOND = 1000;
@@ -35,10 +37,10 @@ public class InstrumentationTestTask extends DefaultTask {
     private InstrumentationArgsProvider instrumentationArgsProvider;
     private InstrumentalPluginExtension instrumentationInfo;
     private CommandsForAnnotationProvider commandsForAnnotationProvider;
-    private Logger logger;
+    private RunnerLogger logger;
 
     public InstrumentationTestTask() {
-        logger = getLogger();
+        logger = new DefaultGradleLogger(getLogger());
         coverageDir = new File(getProject().getBuildDir(), "outputs/androidTest/coverage/");
         reportsDir = new File(getProject().getBuildDir(), "outputs/reports/androidTest/");
         resultsDir = new File(getProject().getBuildDir(), "outputs/androidTest/");
@@ -46,7 +48,7 @@ public class InstrumentationTestTask extends DefaultTask {
 
     @TaskAction
     public void runTask() throws InterruptedException, IOException {
-        logger.info("InstrumentationTestTask.runTask");
+        logger.i(TAG, "InstrumentationTestTask.runTask");
         instrumentationInfo = getProject().getExtensions()
                 .findByType(InstrumentalPluginExtension.class);
         androidSdkPath = instrumentationInfo.getAndroidSdkPath();
@@ -116,9 +118,9 @@ public class InstrumentationTestTask extends DefaultTask {
     private void init() {
         AndroidDebugBridge.initIfNeeded(false);
         if (androidSdkPath == null) {
-            logger.info("androidSdkPath is empty, get path from env ANDROID_HOME");
+            logger.i(TAG, "androidSdkPath is empty, get path from env ANDROID_HOME");
             androidSdkPath = System.getenv("ANDROID_HOME");
-            logger.info("androidSdkPath = {}", androidSdkPath);
+            logger.i(TAG, "androidSdkPath = %s", androidSdkPath);
         }
         if (instrumentationInfo == null) {
             throw new RuntimeException("Need to set InstrumentationInfo");
@@ -127,17 +129,17 @@ public class InstrumentationTestTask extends DefaultTask {
             commandsForAnnotationProvider = new DefaultCommandsForAnnotationProvider(getLogger(),
                     instrumentationInfo);
 
-            logger.info("Init: commandsForAnnotationProvider is empty, use DefaultCommandsForAnnotationProvider");
+            logger.i(TAG, "Init: commandsForAnnotationProvider is empty, use DefaultCommandsForAnnotationProvider");
         }
         if (instrumentationArgsProvider == null) {
             instrumentationArgsProvider = new DefaultInstrumentationArgsProvider();
-            logger.info("init: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
+            logger.i(TAG, "init: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
         }
         if (commandProvider == null) {
-            logger.info("command provider is empty, use DefaultCommandProvider");
+            logger.i(TAG, "command provider is empty, use DefaultCommandProvider");
             commandProvider = new DefaultCommandProvider(getProject(),
                     instrumentationInfo,
-                    instrumentationArgsProvider, commandsForAnnotationProvider);
+                    instrumentationArgsProvider, commandsForAnnotationProvider, logger);
         }
         coverageDir = new File(getProject().getBuildDir(),
                 String.format("outputs/androidTest/coverage/%s", instrumentationInfo.getFlavorName()));
@@ -202,5 +204,9 @@ public class InstrumentationTestTask extends DefaultTask {
     @OutputDirectory
     public File getReportsDir() {
         return reportsDir;
+    }
+
+    public void setRunnerLogger(RunnerLogger logger) {
+        this.logger = logger;
     }
 }

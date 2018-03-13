@@ -1,10 +1,10 @@
 package com.github.grishberg.tests;
 
+import com.github.grishberg.tests.commands.DeviceCommandResult;
 import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
-import com.github.grishberg.tests.commands.DeviceCommandResult;
+import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
-import org.gradle.api.logging.Logger;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -12,16 +12,17 @@ import java.util.concurrent.CountDownLatch;
  * Executes commands for online devices.
  */
 class DeviceCommandsRunner {
+    private static final String TAG = "DCR";
     private final InstrumentalTestPlanProvider testPlanProvider;
     private final DeviceRunnerCommandProvider commandProvider;
     private Environment environment;
-    private final Logger logger;
+    private final RunnerLogger logger;
     private boolean hasFailedTests;
 
     DeviceCommandsRunner(InstrumentalTestPlanProvider testPlanProvider,
                          DeviceRunnerCommandProvider commandProvider,
                          Environment directoriesProvider,
-                         Logger logger) {
+                         RunnerLogger logger) {
         this.testPlanProvider = testPlanProvider;
         this.commandProvider = commandProvider;
         this.environment = directoriesProvider;
@@ -39,17 +40,17 @@ class DeviceCommandsRunner {
                         DeviceRunnerCommand[] commands = commandProvider.provideCommandsForDevice(device,
                                 testPlanProvider, environment);
                         for (DeviceRunnerCommand command : commands) {
-                            logger.info("[DCR] Before executing device = {} command = {}",
+                            logger.d(TAG, "Before executing device = %s command = %s",
                                     device, command.toString());
                             DeviceCommandResult result = command.execute(device);
-                            logger.info("[DCR] After executing device = {} command = {}",
+                            logger.d(TAG, "After executing device = %s command = %s",
                                     device, command.toString());
                             if (result.isFailed()) {
                                 hasFailedTests = true;
                             }
                         }
                     } catch (Exception e) {
-                        logger.error("Some Exception", e);
+                        logger.e(TAG, "Some Exception", e);
                     } finally {
                         deviceCounter.countDown();
                     }

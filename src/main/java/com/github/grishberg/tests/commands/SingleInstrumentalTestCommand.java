@@ -6,6 +6,7 @@ import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
+import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.parser.TestPlan;
 import org.gradle.api.Project;
 
@@ -18,13 +19,15 @@ import java.util.Map;
  * Executes instrumentation test for single test method.
  */
 public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
+    private static final String TAG = SingleInstrumentalTestCommand.class.getSimpleName();
     private static final String CLASS = "class";
     private final Project project;
     private String testName;
     private final InstrumentalPluginExtension instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
-    private File coverageOuptutDir;
+    private File coverageOutputDir;
     private File resultsDir;
+    private RunnerLogger logger;
 
     public SingleInstrumentalTestCommand(Project project,
                                          String testReportSuffix,
@@ -32,13 +35,15 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                                          Map<String, String> instrumentalArgs,
                                          List<TestPlan> testForExecution,
                                          File coverageFilesDir,
-                                         File resultsDir) {
+                                         File resultsDir,
+                                         RunnerLogger logger) {
         this.project = project;
         this.testName = testReportSuffix;
         this.instrumentationInfo = instrumentalInfo;
         this.instrumentationArgs = new HashMap<>(instrumentalArgs);
-        this.coverageOuptutDir = coverageFilesDir;
+        this.coverageOutputDir = coverageFilesDir;
         this.resultsDir = resultsDir;
+        this.logger = logger;
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < testForExecution.size(); i++) {
@@ -73,7 +78,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
             runner.addInstrumentationArg("coverageFile", coverageFile);
         }
 
-        RunTestLogger runTestLogger = new RunTestLogger(project.getLogger());
+        RunTestLogger runTestLogger = new RunTestLogger(logger);
         String singleTestMethodPrefix = targetDevice.getName() + "#" + testName;
         TestXmlReportsGenerator testRunListener = new TestXmlReportsGenerator(targetDevice.getName(),
                 project.getName(),
@@ -92,17 +97,17 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                 targetDevice.pullCoverageFile(instrumentationInfo,
                         singleTestMethodPrefix,
                         coverageFile,
-                        coverageOuptutDir,
+                        coverageOutputDir,
                         runTestLogger);
             }
         } catch (Exception e) {
-            project.getLogger().error("InstrumentalTestCommand.execute: Exception", e);
+            logger.e(TAG, "InstrumentalTestCommand.execute: Exception", e);
         }
         return result;
     }
 
     @Override
     public String toString() {
-        return "SingleInstrumentalTestCommand{}";
+        return "SingleInstrumentalTestCommand{}" + instrumentationArgs;
     }
 }
