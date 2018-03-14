@@ -108,6 +108,6 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
 
     @Override
     public String toString() {
-        return "SingleInstrumentalTestCommand{}" + instrumentationArgs;
+        return "SingleInstrumentalTestCommand{ " + instrumentationArgs + " }";
     }
 }
