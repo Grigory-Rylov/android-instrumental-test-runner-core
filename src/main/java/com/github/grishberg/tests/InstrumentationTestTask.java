@@ -9,6 +9,7 @@ import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.common.DefaultGradleLogger;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
+import com.github.grishberg.tests.planner.PackageTreeGenerator;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Nullable;
@@ -61,9 +62,10 @@ public class InstrumentationTestTask extends DefaultTask {
                     .createBridge(androidSdkPath + "/platform-tools/adb", false);
             waitForAdb(adb);
 
+            PackageTreeGenerator packageTreeGenerator = new PackageTreeGenerator();
             InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
                     getProject(),
-                    instrumentationInfo);
+                    instrumentationInfo, packageTreeGenerator);
 
             Environment environment = new Environment(resultsDir,
                     reportsDir, coverageDir);

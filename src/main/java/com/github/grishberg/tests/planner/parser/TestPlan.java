@@ -13,6 +13,12 @@ public class TestPlan {
     private final String className;
     private List<String> annotations;
     private String featureParameter;
+    private boolean isPackage;
+
+    public TestPlan(String packageName) {
+        this("", "", packageName);
+        isPackage = true;
+    }
 
     public TestPlan(String testId, String methodName, String fullClassName) {
         this.testId = testId;
@@ -75,6 +81,20 @@ public class TestPlan {
 
     public void setFeatureParameter(String featureParameter) {
         this.featureParameter = featureParameter;
+    }
+
+    public boolean isPackage() {
+        return isPackage;
+    }
+
+    /**
+     * @return command for am instrument parameter class or package
+     */
+    public String getAmInstrumentCommand() {
+        if (isPackage) {
+            return className;
+        }
+        return className + "#" + methodName;
     }
 
     @Override

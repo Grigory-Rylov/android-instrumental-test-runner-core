@@ -20,7 +20,7 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
     private RunnerLogger logger;
     private final InstrumentalPluginExtension instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
-    private File coverageOuptutDir;
+    private File coverageOutputDir;
     private File reportsDir;
 
     public InstrumentalTestCommand(Project project,
@@ -33,7 +33,7 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
         this.logger = logger;
         this.instrumentationInfo = instrumentalInfo;
         this.instrumentationArgs = instrumentalArgs;
-        this.coverageOuptutDir = coverageFilesDir;
+        this.coverageOutputDir = coverageFilesDir;
         this.reportsDir = reportsDir;
     }
 
@@ -75,7 +75,7 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
                 targetDevice.pullCoverageFile(instrumentationInfo,
                         coverageOutFilePrefix,
                         coverageFile,
-                        coverageOuptutDir,
+                        coverageOutputDir,
                         runTestLogger);
             }
         } catch (Exception e) {

@@ -21,6 +21,7 @@ import java.util.Map;
 public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     private static final String TAG = SingleInstrumentalTestCommand.class.getSimpleName();
     private static final String CLASS = "class";
+    private static final String PACKAGE = "package";
     private final Project project;
     private String testName;
     private final InstrumentalPluginExtension instrumentationInfo;
@@ -45,17 +46,30 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         this.resultsDir = resultsDir;
         this.logger = logger;
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sbClass = new StringBuilder();
+        StringBuilder sbPackage = new StringBuilder();
         for (int i = 0; i < testForExecution.size(); i++) {
-            if (i > 0) {
-                sb.append(",");
-            }
             TestPlan plan = testForExecution.get(i);
-            sb.append(plan.getClassName());
-            sb.append("#");
-            sb.append(plan.getMethodName());
+            if (plan.isPackage()) {
+                if (sbPackage.length() > 0) {
+                    sbPackage.append(",");
+                }
+                sbPackage.append(plan.getAmInstrumentCommand());
+                continue;
+            }
+
+            if (sbClass.length() > 0) {
+                sbClass.append(",");
+            }
+            sbClass.append(plan.getAmInstrumentCommand());
         }
-        instrumentationArgs.put(CLASS, sb.toString());
+
+        if (sbClass.length() > 0) {
+            instrumentationArgs.put(CLASS, sbClass.toString());
+        }
+        if (sbPackage.length() > 0) {
+            instrumentationArgs.put(PACKAGE, sbClass.toString());
+        }
     }
 
     @Override
