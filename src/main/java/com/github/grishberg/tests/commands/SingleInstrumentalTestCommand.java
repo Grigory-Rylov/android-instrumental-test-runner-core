@@ -68,7 +68,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
             instrumentationArgs.put(CLASS, sbClass.toString());
         }
         if (sbPackage.length() > 0) {
-            instrumentationArgs.put(PACKAGE, sbClass.toString());
+            instrumentationArgs.put(PACKAGE, sbPackage.toString());
         }
     }
 

@@ -7,7 +7,6 @@ import com.github.grishberg.tests.planner.parser.TestPlan;
 import org.gradle.api.Project;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -63,9 +62,10 @@ public class InstrumentalTestPlanProvider {
     /**
      * @return iterator with all test methods in project.
      */
-    public Iterator<TestNodeElement> provideTestNodeElementsIterator(ConnectedDeviceWrapper device,
-                                                                     Map<String, String> instrumentalArgs) {
-        return packageTreeGenerator.makePackageTree(provideTestPlan(device, instrumentalArgs));
+    public InstrumentalTestHolder provideInstrumentalTests(ConnectedDeviceWrapper device,
+                                                           Map<String, String> instrumentalArgs) {
+        // TODO: create fabric
+        return new InstrumentalTestHolder(provideTestPlan(device, instrumentalArgs), packageTreeGenerator);
     }
 
     private class TestLogParserLogger implements InstrumentTestLogParser.ParserLogger {

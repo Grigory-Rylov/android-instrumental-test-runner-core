@@ -4,7 +4,6 @@ import com.github.grishberg.tests.planner.parser.TestPlan;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -15,7 +14,7 @@ public class PackageTreeGenerator {
      * @param planList list of TestPlan generated from am instrument log.
      * @return root element of test classes tree.
      */
-    public Iterator<TestNodeElement> makePackageTree(List<TestPlan> planList) {
+    List<TestNodeElement> makePackageTree(List<TestPlan> planList) {
         HashMap<String, TestNodeElement> nodes = new HashMap<>();
         ArrayList<TestNodeElement> roots = new ArrayList<>();
 
@@ -56,31 +55,6 @@ public class PackageTreeGenerator {
             }
         }
 
-        return new FlatIterator(roots);
-    }
-
-    /**
-     * Returns tree-items in flat list.
-     */
-    private static class FlatIterator implements Iterator<TestNodeElement> {
-        private final Iterator<TestNodeElement> iterator;
-
-        FlatIterator(ArrayList<TestNodeElement> roots) {
-            ArrayList<TestNodeElement> flatList = new ArrayList<>();
-            for (TestNodeElement rootElement : roots) {
-                flatList.addAll(rootElement.getAllTestMethods());
-            }
-            iterator = flatList.iterator();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public TestNodeElement next() {
-            return iterator.next();
-        }
+        return roots;
     }
 }

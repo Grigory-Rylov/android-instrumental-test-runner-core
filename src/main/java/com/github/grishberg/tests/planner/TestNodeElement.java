@@ -38,7 +38,7 @@ public class TestNodeElement {
         child.setParent(this);
     }
 
-    public void excluded() {
+    public void exclude() {
         this.excluded = true;
         parent.setHasExcluded(true);
     }
@@ -100,15 +100,15 @@ public class TestNodeElement {
     /**
      * @return not excluded packages list.
      */
-    public List<TestNodeElement> getCommandsForAmInstrument() {
+    List<TestNodeElement> getCompoundElements() {
         ArrayList<TestNodeElement> result = new ArrayList<>();
-        if (!hasExcluded) {
+        if (!hasExcluded && !excluded) {
             result.add(this);
             return result;
         }
 
         for (TestNodeElement child : children) {
-            result.addAll(child.getCommandsForAmInstrument());
+            result.addAll(child.getCompoundElements());
         }
         return result;
     }
