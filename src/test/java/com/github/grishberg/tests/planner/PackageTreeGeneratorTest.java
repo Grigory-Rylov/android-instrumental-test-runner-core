@@ -37,7 +37,7 @@ public class PackageTreeGeneratorTest {
         testMethods.get(0).exclude();
 
         List<TestNodeElement> compoundElements = root.getCompoundElements();
-        Assert.assertTrue(compoundElements.size() == 3);
+        Assert.assertTrue(compoundElements.size() == 4);
     }
 
     @NotNull
