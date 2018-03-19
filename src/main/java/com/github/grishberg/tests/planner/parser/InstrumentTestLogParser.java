@@ -17,7 +17,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     private static final String ANNOTATIONS = "annotations";
     private static final String FEATURE = "feature";
     private ParserLogger logger;
-    private final ArrayList<TestPlan> testPlanList = new ArrayList<>();
+    private final ArrayList<TestPlanElement> testPlanList = new ArrayList<>();
     private State state = new StartNewObject();
 
     public void setLogger(ParserLogger logger) {
@@ -93,7 +93,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         return false;
     }
 
-    public List<TestPlan> getTestInstances() {
+    public List<TestPlanElement> getTestInstances() {
         return testPlanList;
     }
 
@@ -171,7 +171,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         private final String testId;
         private final String testMethodName;
         private final String testClassName;
-        private TestPlan testPlan;
+        private TestPlanElement testPlan;
         private String[] annotations;
         private String feature;
 
@@ -190,7 +190,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
 
         @Override
         void storeValuesIfNeeded() {
-            testPlan = new TestPlan(testId, testMethodName, testClassName);
+            testPlan = new TestPlanElement(testId, testMethodName, testClassName);
 
             if (!testPlanList.contains(testPlan)) {
                 testPlanList.add(testPlan);

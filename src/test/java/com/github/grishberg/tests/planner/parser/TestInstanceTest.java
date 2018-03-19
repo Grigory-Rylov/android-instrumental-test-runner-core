@@ -9,15 +9,15 @@ import org.junit.Test;
 public class TestInstanceTest {
     @Test
     public void testItemsAreEquals() {
-        TestPlan item1 = new TestPlan("id1", "test1", "Class1");
-        TestPlan item2 = new TestPlan("id1", "test1", "Class1");
+        TestPlanElement item1 = new TestPlanElement("id1", "test1", "Class1");
+        TestPlanElement item2 = new TestPlanElement("id1", "test1", "Class1");
         Assert.assertEquals(item1, item2);
     }
 
     @Test
     public void testItemsAreNotEquals() {
-        TestPlan item1 = new TestPlan("id1", "test1", "Class1");
-        TestPlan item2 = new TestPlan("id1", "test1", "Class2");
+        TestPlanElement item1 = new TestPlanElement("id1", "test1", "Class1");
+        TestPlanElement item2 = new TestPlanElement("id1", "test1", "Class2");
         Assert.assertNotEquals(item1, item2);
     }
 }

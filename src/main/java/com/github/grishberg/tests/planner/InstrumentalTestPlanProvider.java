@@ -3,7 +3,7 @@ package com.github.grishberg.tests.planner;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.planner.parser.InstrumentTestLogParser;
-import com.github.grishberg.tests.planner.parser.TestPlan;
+import com.github.grishberg.tests.planner.parser.TestPlanElement;
 import org.gradle.api.Project;
 
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Provides set of {@link TestPlan} for instrumental tests.
+ * Provides set of {@link TestPlanElement} for instrumental tests.
  */
 public class InstrumentalTestPlanProvider {
     private final InstrumentalPluginExtension instrumentationInfo;
@@ -26,8 +26,8 @@ public class InstrumentalTestPlanProvider {
         this.packageTreeGenerator = packageTreeGenerator;
     }
 
-    public List<TestPlan> provideTestPlan(ConnectedDeviceWrapper device,
-                                          Map<String, String> instrumentalArgs) {
+    public List<TestPlanElement> provideTestPlan(ConnectedDeviceWrapper device,
+                                                 Map<String, String> instrumentalArgs) {
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");
 

@@ -7,7 +7,7 @@ import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
-import com.github.grishberg.tests.planner.parser.TestPlan;
+import com.github.grishberg.tests.planner.parser.TestPlanElement;
 import org.gradle.api.Project;
 
 import java.io.File;
@@ -34,7 +34,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                                          String testReportSuffix,
                                          InstrumentalPluginExtension instrumentalInfo,
                                          Map<String, String> instrumentalArgs,
-                                         List<TestPlan> testForExecution,
+                                         List<TestPlanElement> testForExecution,
                                          File coverageFilesDir,
                                          File resultsDir,
                                          RunnerLogger logger) {
@@ -46,10 +46,14 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         this.resultsDir = resultsDir;
         this.logger = logger;
 
+        initTargetTestArgs(testForExecution);
+    }
+
+    private void initTargetTestArgs(List<TestPlanElement> testForExecution) {
         StringBuilder sbClass = new StringBuilder();
         StringBuilder sbPackage = new StringBuilder();
         for (int i = 0; i < testForExecution.size(); i++) {
-            TestPlan plan = testForExecution.get(i);
+            TestPlanElement plan = testForExecution.get(i);
             if (plan.isPackage()) {
                 if (sbPackage.length() > 0) {
                     sbPackage.append(",");

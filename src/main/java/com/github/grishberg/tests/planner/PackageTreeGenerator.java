@@ -1,6 +1,6 @@
 package com.github.grishberg.tests.planner;
 
-import com.github.grishberg.tests.planner.parser.TestPlan;
+import com.github.grishberg.tests.planner.parser.TestPlanElement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,14 +11,14 @@ import java.util.List;
  */
 public class PackageTreeGenerator {
     /**
-     * @param planList list of TestPlan generated from am instrument log.
+     * @param planList list of TestPlanElement generated from am instrument log.
      * @return root element of test classes tree.
      */
-    List<TestNodeElement> makePackageTree(List<TestPlan> planList) {
+    List<TestNodeElement> makePackageTree(List<TestPlanElement> planList) {
         HashMap<String, TestNodeElement> nodes = new HashMap<>();
         ArrayList<TestNodeElement> roots = new ArrayList<>();
 
-        for (TestPlan currentTestPlan : planList) {
+        for (TestPlanElement currentTestPlan : planList) {
 
             String methodName = currentTestPlan.getMethodName();
             String[] leftPart = currentTestPlan.getClassName().split("\\.");

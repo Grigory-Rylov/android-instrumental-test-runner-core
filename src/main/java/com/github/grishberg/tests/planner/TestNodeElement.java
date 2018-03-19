@@ -1,6 +1,6 @@
 package com.github.grishberg.tests.planner;
 
-import com.github.grishberg.tests.planner.parser.TestPlan;
+import com.github.grishberg.tests.planner.parser.TestPlanElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public class TestNodeElement {
     private boolean excluded;
     private boolean hasExcluded;
     private final ArrayList<String> annotations = new ArrayList<>();
-    private TestPlan testPlan;
+    private TestPlanElement testPlan;
 
     public TestNodeElement(NodeType type, String name) {
         this.type = type;
@@ -74,6 +74,7 @@ public class TestNodeElement {
         return "TestNodeElement{" +
                 "type=" + type +
                 ", name='" + name + '\'' +
+                ", hasExcl=" + hasExcluded +
                 '}';
     }
 
@@ -102,7 +103,7 @@ public class TestNodeElement {
      */
     List<TestNodeElement> getCompoundElements() {
         ArrayList<TestNodeElement> result = new ArrayList<>();
-        if (!hasExcluded && !excluded) {
+        if (!hasExcluded && !excluded && type != NodeType.PACKAGE) {
             result.add(this);
             return result;
         }
@@ -113,16 +114,13 @@ public class TestNodeElement {
         return result;
     }
 
-    void setTestPlan(TestPlan testPlan) {
+    void setTestPlan(TestPlanElement testPlan) {
         this.testPlan = testPlan;
     }
 
-    public TestPlan getTestPlan() {
-        if (type == NodeType.PACKAGE) {
-            return new TestPlan(amInstrumentPath);
-        }
+    public TestPlanElement getTestPlan() {
         if (type == NodeType.CLASS) {
-            return new TestPlan("", "", amInstrumentPath);
+            return new TestPlanElement("", "", amInstrumentPath);
         }
         return testPlan;
     }

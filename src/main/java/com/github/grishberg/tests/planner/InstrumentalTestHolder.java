@@ -1,6 +1,6 @@
 package com.github.grishberg.tests.planner;
 
-import com.github.grishberg.tests.planner.parser.TestPlan;
+import com.github.grishberg.tests.planner.parser.TestPlanElement;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,11 +10,11 @@ import java.util.List;
  * Holder for instrumental test.
  */
 public class InstrumentalTestHolder {
-    private List<TestPlan> planList;
+    private List<TestPlanElement> planList;
     private final PackageTreeGenerator packageTreeGenerator;
     private ArrayList<TestNodeElement> prevRoots = new ArrayList<>();
 
-    InstrumentalTestHolder(List<TestPlan> planList, PackageTreeGenerator packageTreeGenerator) {
+    InstrumentalTestHolder(List<TestPlanElement> planList, PackageTreeGenerator packageTreeGenerator) {
         this.planList = planList;
 
         this.packageTreeGenerator = packageTreeGenerator;
@@ -29,8 +29,8 @@ public class InstrumentalTestHolder {
         return new FlatIterator(prevRoots);
     }
 
-    public List<TestPlan> provideCompoundTestPlan() {
-        ArrayList<TestPlan> compoundPlans = new ArrayList<>();
+    public List<TestPlanElement> provideCompoundTestPlan() {
+        ArrayList<TestPlanElement> compoundPlans = new ArrayList<>();
         for (TestNodeElement rootElement : prevRoots) {
             List<TestNodeElement> compoundElements = rootElement.getCompoundElements();
             for (TestNodeElement currentCompoundElement : compoundElements) {
