@@ -20,7 +20,8 @@ public class InstrumentalTestPlanProvider {
     private final PackageTreeGenerator packageTreeGenerator;
 
     public InstrumentalTestPlanProvider(Project project,
-                                        InstrumentalPluginExtension instrumentationInfo, PackageTreeGenerator packageTreeGenerator) {
+                                        InstrumentalPluginExtension instrumentationInfo,
+                                        PackageTreeGenerator packageTreeGenerator) {
         this.project = project;
         this.instrumentationInfo = instrumentationInfo;
         this.packageTreeGenerator = packageTreeGenerator;
@@ -35,8 +36,7 @@ public class InstrumentalTestPlanProvider {
         receiver.setLogger(new TestLogParserLogger());
         StringBuilder command = new StringBuilder("am instrument -r -w");
 
-        args.put("listener",
-                "com.github.grishberg.annotationprinter.AnnotationsTestPrinter");
+        args.put("listener", instrumentationInfo.getInstrumentListener());
 
         for (Map.Entry<String, String> arg : args.entrySet()) {
             command.append(" -e ");
@@ -48,10 +48,9 @@ public class InstrumentalTestPlanProvider {
         command.append(instrumentationInfo.getInstrumentalPackage());
         command.append("/");
         command.append(instrumentationInfo.getInstrumentalRunner());
-        System.out.println(command.toString());
+
         try {
-            device.executeShellCommand(command.toString(), receiver,
-                    0, TimeUnit.SECONDS);
+            device.executeShellCommand(command.toString(), receiver, 0, TimeUnit.SECONDS);
         } catch (Exception e) {
             project.getLogger().error("InstrumentalTestPlanProvider.execute error:", e);
         }
@@ -60,7 +59,7 @@ public class InstrumentalTestPlanProvider {
     }
 
     /**
-     * @return iterator with all test methods in project.
+     * @return test holder contains all test methods in project.
      */
     public InstrumentalTestHolder provideInstrumentalTests(ConnectedDeviceWrapper device,
                                                            Map<String, String> instrumentalArgs) {

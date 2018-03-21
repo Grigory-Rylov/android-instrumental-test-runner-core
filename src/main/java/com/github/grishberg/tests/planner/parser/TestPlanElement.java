@@ -13,7 +13,7 @@ public class TestPlanElement {
     private final String className;
     private List<String> annotations;
     private String feature;
-    private String flags[] = new String[0];
+    private String[] flags = new String[0];
 
     public TestPlanElement(String testId, String methodName, String fullClassName) {
         this.testId = testId;
@@ -74,7 +74,7 @@ public class TestPlanElement {
         return feature;
     }
 
-    public void setFeature(String feature) {
+    void setFeature(String feature) {
         this.feature = feature;
     }
 
@@ -100,7 +100,7 @@ public class TestPlanElement {
         return flags.clone();
     }
 
-    public void setFlags(String[] flags) {
+    void setFlags(String[] flags) {
         if (flags == null) {
             this.flags = new String[0];
             return;

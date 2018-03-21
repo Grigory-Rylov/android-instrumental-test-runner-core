@@ -13,6 +13,7 @@ public class InstrumentalPluginExtension {
     String applicationId;
     String instrumentalPackage;
     String instrumentalRunner;
+    String instrumentListener = "com.github.grishberg.annotationprinter.AnnotationsTestPrinter";
     boolean coverageEnabled;
     Closure<Map<String, String>> instrumentationArgsProvider;
 
@@ -70,5 +71,13 @@ public class InstrumentalPluginExtension {
 
     public void setInstrumentationArgsProvider(Closure<Map<String, String>> instrumentationArgsProvider) {
         this.instrumentationArgsProvider = instrumentationArgsProvider;
+    }
+
+    public String getInstrumentListener() {
+        return instrumentListener;
+    }
+
+    public void setInstrumentListener(String instrumentListener) {
+        this.instrumentListener = instrumentListener;
     }
 }

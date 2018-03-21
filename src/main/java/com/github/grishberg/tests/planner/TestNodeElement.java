@@ -25,7 +25,7 @@ public class TestNodeElement {
         amInstrumentPath = name;
     }
 
-    ArrayList<TestNodeElement> getChildren() {
+    private ArrayList<TestNodeElement> getChildren() {
         return children;
     }
 
@@ -58,7 +58,7 @@ public class TestNodeElement {
         this.annotations.addAll(annotations);
     }
 
-    void setHasExcluded(boolean hasExcluded) {
+    private void setHasExcluded(boolean hasExcluded) {
         this.hasExcluded = hasExcluded;
         if (parent != null) {
             parent.setHasExcluded(hasExcluded);
@@ -94,7 +94,10 @@ public class TestNodeElement {
         return amInstrumentPath;
     }
 
-    public ArrayList<String> getAnnotations() {
+    /**
+     * @return annotations list.
+     */
+    public List<String> getAnnotations() {
         return annotations;
     }
 

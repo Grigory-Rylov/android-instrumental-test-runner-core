@@ -3,7 +3,6 @@ package com.github.grishberg.tests.planner;
 import com.github.grishberg.tests.planner.parser.TestPlanElement;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -12,15 +11,14 @@ import java.util.List;
 public class TestPlanSplitter {
     private static final int STRING_LIMIT = 3500;
 
+    private TestPlanSplitter() {/* not used */}
+
     public static List<TestPlanElement[]> splitByArgumentLimit(List<TestPlanElement> src) {
         ArrayList<TestPlanElement[]> result = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         ArrayList<TestPlanElement> currentRange = new ArrayList<>();
 
-        Iterator<TestPlanElement> iterator = src.iterator();
-        while (iterator.hasNext()) {
-            TestPlanElement testPlan = iterator.next();
-
+        for (TestPlanElement testPlan : src) {
             String testName = testPlan.getAmInstrumentCommand();
             if (sb.length() + testName.length() + 1 > STRING_LIMIT) {
                 // add current range to result
@@ -37,7 +35,7 @@ public class TestPlanSplitter {
             currentRange.add(testPlan);
         }
 
-        if (currentRange.size() > 0) {
+        if (!currentRange.isEmpty()) {
             result.add(currentRange.toArray(new TestPlanElement[currentRange.size()]));
         }
         return result;

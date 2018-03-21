@@ -13,6 +13,8 @@ import java.util.logging.*;
  */
 public class FileLogger implements RunnerLogger {
     private static final Logger sLogger = Logger.getLogger("LOG");
+    private static final String FORMAT_STR = "%s: %s";
+    private static final String DEBUG_FORMAT = "D/%s: %s";
 
     public FileLogger(Project project, String logName) {
         FileHandler fh;
@@ -28,37 +30,37 @@ public class FileLogger implements RunnerLogger {
 
     @Override
     public void w(String tag, String msg) {
-        sLogger.warning(tag + ": " + msg);
+        sLogger.warning(String.format(FORMAT_STR, tag, msg));
     }
 
     @Override
     public void i(String tag, String msg) {
-        sLogger.info(tag + ": " + msg);
+        sLogger.info(String.format(FORMAT_STR, tag, msg));
     }
 
     @Override
     public void i(String tag, String msgFormat, Object... objects) {
-        sLogger.info(tag + ": " + String.format(msgFormat, objects));
+        sLogger.info(String.format(FORMAT_STR, tag, String.format(msgFormat, objects)));
     }
 
     @Override
     public void d(String tag, String msg) {
-        sLogger.log(Level.INFO, "D/" + tag + ": " + msg);
+        sLogger.log(Level.INFO, String.format(DEBUG_FORMAT, tag, msg));
     }
 
     @Override
     public void d(String tag, String msgFormat, Object... objects) {
-        sLogger.log(Level.INFO, "D/" + tag + ": " + String.format(msgFormat, objects));
+        sLogger.log(Level.INFO, String.format(DEBUG_FORMAT, tag, String.format(msgFormat, objects)));
     }
 
     @Override
     public void e(String tag, String msg) {
-        sLogger.log(Level.INFO, tag + ": " + msg);
+        sLogger.log(Level.INFO, String.format(FORMAT_STR, tag, msg));
     }
 
     @Override
     public void e(String tag, String msg, Throwable throwable) {
-        sLogger.log(Level.INFO, tag + ": " + msg, throwable);
+        sLogger.log(Level.INFO, String.format(FORMAT_STR, tag, msg), throwable);
     }
 
     private static class MyFormatter extends Formatter {

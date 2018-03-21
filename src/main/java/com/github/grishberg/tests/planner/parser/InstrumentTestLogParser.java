@@ -114,26 +114,19 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     }
 
     private static class State {
-        void storeValuesIfNeeded() {
-        }
+        void storeValuesIfNeeded() { /* to be implemented in subclass */ }
 
-        void setAnnotations(String[] annotations) {
-        }
+        void setAnnotations(String[] annotations) { /* to be implemented in subclass */ }
 
-        void setTestId(String testId) {
-        }
+        void setTestId(String testId) { /* to be implemented in subclass */ }
 
-        void setTestMethod(String testMethod) {
-        }
+        void setTestMethod(String testMethod) { /* to be implemented in subclass */ }
 
-        void setClassName(String className) {
-        }
+        void setClassName(String className) { /* to be implemented in subclass */ }
 
-        void setFeature(String feature) {
-        }
+        void setFeature(String feature) { /* to be implemented in subclass */ }
 
-        void setFlags(String[] flags) {
-        }
+        void setFlags(String[] flags) { /* to be implemented in subclass */ }
     }
 
     private class StartNewObject extends State {
@@ -143,9 +136,6 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         private String feature;
         private String[] annotations;
         private String[] flags;
-
-        StartNewObject() {
-        }
 
         @Override
         void setTestId(String id) {
