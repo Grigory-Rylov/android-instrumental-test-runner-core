@@ -53,29 +53,26 @@ public class InstrumentationTestTask extends DefaultTask {
         instrumentationInfo = getProject().getExtensions()
                 .findByType(InstrumentalPluginExtension.class);
         androidSdkPath = instrumentationInfo.getAndroidSdkPath();
-        try {
-            init();
 
-            prepareOutputFolders();
+        init();
 
-            AndroidDebugBridge adb = AndroidDebugBridge
-                    .createBridge(androidSdkPath + "/platform-tools/adb", false);
-            waitForAdb(adb);
+        prepareOutputFolders();
 
-            PackageTreeGenerator packageTreeGenerator = new PackageTreeGenerator();
-            InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
-                    getProject(),
-                    instrumentationInfo, packageTreeGenerator);
+        AndroidDebugBridge adb = AndroidDebugBridge
+                .createBridge(androidSdkPath + "/platform-tools/adb", false);
+        waitForAdb(adb);
 
-            Environment environment = new Environment(resultsDir,
-                    reportsDir, coverageDir);
-            DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider,
-                    environment, logger);
+        PackageTreeGenerator packageTreeGenerator = new PackageTreeGenerator();
+        InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
+                getProject(),
+                instrumentationInfo, packageTreeGenerator);
 
-            generateHtmlReport(runner.runCommands(provideDevices(adb)));
-        } finally {
-            terminate();
-        }
+        Environment environment = new Environment(resultsDir,
+                reportsDir, coverageDir);
+        DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider,
+                environment, logger);
+
+        generateHtmlReport(runner.runCommands(provideDevices(adb)));
     }
 
     private void prepareOutputFolders() throws IOException {
@@ -113,10 +110,6 @@ public class InstrumentationTestTask extends DefaultTask {
         return deviceWrappers;
     }
 
-    private void terminate() {
-
-    }
-
     private void init() {
         AndroidDebugBridge.initIfNeeded(false);
         if (androidSdkPath == null) {
@@ -125,7 +118,7 @@ public class InstrumentationTestTask extends DefaultTask {
             logger.i(TAG, "androidSdkPath = %s", androidSdkPath);
         }
         if (instrumentationInfo == null) {
-            throw new RuntimeException("Need to set InstrumentationInfo");
+            throw new GradleException("Need to set InstrumentationInfo");
         }
         if (commandsForAnnotationProvider == null) {
             commandsForAnnotationProvider = new DefaultCommandsForAnnotationProvider(getLogger(),

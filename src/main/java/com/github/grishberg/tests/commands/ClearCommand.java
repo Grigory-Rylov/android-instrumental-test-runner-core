@@ -22,7 +22,7 @@ public class ClearCommand implements DeviceRunnerCommand {
 
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper device) throws ExecuteCommandException {
-        logger.info("ClearCommand for package " + instrumentationInfo.getApplicationId());
+        logger.info("ClearCommand for package {}", instrumentationInfo.getApplicationId());
         MultiLineReceiver receiver = new MultiLineReceiver() {
             @Override
             public void processNewLines(String[] lines) {

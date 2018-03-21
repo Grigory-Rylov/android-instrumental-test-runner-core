@@ -80,14 +80,4 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
         }
         return result;
     }
-
-    private String provideDeviceNameForReport(ConnectedDeviceWrapper targetDevice) {
-        String prefix = "";
-        if (targetDevice.isEmulator()) {
-            prefix = "(AVD)";
-        }
-        String targetDeviceName = targetDevice.getName();
-        return targetDeviceName != null ?
-                targetDeviceName + prefix : targetDevice.getSerialNumber();
-    }
 }
