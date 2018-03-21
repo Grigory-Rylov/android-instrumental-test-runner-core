@@ -12,7 +12,8 @@ public class TestPlanElement {
     private final String methodName;
     private final String className;
     private List<String> annotations;
-    private String featureParameter;
+    private String feature;
+    private String flags[] = new String[0];
 
     public TestPlanElement(String testId, String methodName, String fullClassName) {
         this.testId = testId;
@@ -69,12 +70,12 @@ public class TestPlanElement {
         return result;
     }
 
-    public String getFeatureParameter() {
-        return featureParameter;
+    public String getFeature() {
+        return feature;
     }
 
-    public void setFeatureParameter(String featureParameter) {
-        this.featureParameter = featureParameter;
+    public void setFeature(String feature) {
+        this.feature = feature;
     }
 
     public boolean isClass() {
@@ -93,6 +94,18 @@ public class TestPlanElement {
             return className;
         }
         return className + "#" + methodName;
+    }
+
+    public String[] getFlags() {
+        return flags.clone();
+    }
+
+    public void setFlags(String[] flags) {
+        if (flags == null) {
+            this.flags = new String[0];
+            return;
+        }
+        this.flags = flags.clone();
     }
 
     @Override

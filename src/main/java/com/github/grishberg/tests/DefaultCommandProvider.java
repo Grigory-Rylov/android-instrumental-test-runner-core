@@ -47,10 +47,9 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
         List<TestPlanElement> planList = new ArrayList<>();
         int testIndex = 0;
         for (TestPlanElement currentPlan : planSet) {
-
             List<DeviceRunnerCommand> commandsForAnnotations = commandsForAnnotationProvider
                     .provideCommand(currentPlan.getAnnotations());
-            if (commandsForAnnotations.size() > 0 && planList.size() > 0) {
+            if (!commandsForAnnotations.isEmpty() && !planList.isEmpty()) {
                 commands.addAll(commandsForAnnotations);
                 commands.add(new SingleInstrumentalTestCommand(project,
                         String.format("test_%d", testIndex++),

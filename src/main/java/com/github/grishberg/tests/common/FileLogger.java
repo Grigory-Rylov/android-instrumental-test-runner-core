@@ -22,7 +22,7 @@ public class FileLogger implements RunnerLogger {
             fh.setFormatter(formatter);
             sLogger.addHandler(fh);
         } catch (IOException e) {
-            e.printStackTrace();
+            project.getLogger().error("Error while setup FileHandler", e);
         }
     }
 

@@ -34,6 +34,6 @@ public class InstrumentTestLogParserTest {
         Assert.assertEquals(6, testInstances.size());
         TestPlanElement[] testPlanArray = testInstances.toArray(new TestPlanElement[testInstances.size()]);
         TestPlanElement testWithFeature = testPlanArray[3];
-        Assert.assertNotNull(testWithFeature.getFeatureParameter());
+        Assert.assertNotNull(testWithFeature.getFeature());
     }
 }
