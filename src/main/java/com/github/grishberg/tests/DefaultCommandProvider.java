@@ -56,8 +56,7 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
                         instrumentationInfo,
                         instrumentalArgs,
                         planList,
-                        environment.getCoverageDir(),
-                        environment.getResultsDir(),
+                        environment,
                         logger));
                 planList.clear();
                 continue;
