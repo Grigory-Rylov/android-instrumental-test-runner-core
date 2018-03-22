@@ -19,6 +19,9 @@ public class FileLogger implements RunnerLogger {
     public FileLogger(Project project, String logName) {
         FileHandler fh;
         try {
+            if (!project.getBuildDir().exists()) {
+                project.getBuildDir().mkdirs();
+            }
             fh = new FileHandler(new File(project.getBuildDir(), logName).toString());
             Formatter formatter = new MyFormatter();
             fh.setFormatter(formatter);
@@ -40,6 +43,9 @@ public class FileLogger implements RunnerLogger {
 
     @Override
     public void i(String tag, String msgFormat, Object... objects) {
+        if (msgFormat == null) {
+            return;
+        }
         sLogger.info(String.format(FORMAT_STR, tag, String.format(msgFormat, objects)));
     }
 
@@ -50,6 +56,9 @@ public class FileLogger implements RunnerLogger {
 
     @Override
     public void d(String tag, String msgFormat, Object... objects) {
+        if (msgFormat == null) {
+            return;
+        }
         sLogger.log(Level.INFO, String.format(DEBUG_FORMAT, tag, String.format(msgFormat, objects)));
     }
 
