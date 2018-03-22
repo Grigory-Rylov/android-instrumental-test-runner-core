@@ -25,6 +25,9 @@ public class DefaultGradleLogger implements RunnerLogger {
 
     @Override
     public void i(String tag, String msgFormat, Object... args) {
+        if (msgFormat == null) {
+            return;
+        }
         logger.info(FORMAT_STR, tag, String.format(msgFormat, args));
     }
 
@@ -35,7 +38,10 @@ public class DefaultGradleLogger implements RunnerLogger {
 
     @Override
     public void d(String tag, String msgFormat, Object... args) {
-        logger.info(FORMAT_STR, tag, String.format(msgFormat, args));
+        if (msgFormat == null) {
+            return;
+        }
+        logger.debug(FORMAT_STR, tag, String.format(msgFormat, args));
     }
 
     @Override
