@@ -65,7 +65,7 @@ public class InstrumentationTestTask extends DefaultTask {
         PackageTreeGenerator packageTreeGenerator = new PackageTreeGenerator();
         InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
                 getProject(),
-                instrumentationInfo, packageTreeGenerator);
+                instrumentationInfo, packageTreeGenerator, logger);
 
         Environment environment = new Environment(resultsDir,
                 reportsDir, coverageDir);

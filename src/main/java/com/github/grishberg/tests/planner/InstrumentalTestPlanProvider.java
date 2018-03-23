@@ -2,6 +2,7 @@ package com.github.grishberg.tests.planner;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.parser.InstrumentTestLogParser;
 import com.github.grishberg.tests.planner.parser.TestPlanElement;
 import org.gradle.api.Project;
@@ -15,16 +16,20 @@ import java.util.concurrent.TimeUnit;
  * Provides set of {@link TestPlanElement} for instrumental tests.
  */
 public class InstrumentalTestPlanProvider {
+    private static final String TAG = InstrumentalTestPlanProvider.class.getSimpleName();
     private final InstrumentalPluginExtension instrumentationInfo;
     private final Project project;
     private final PackageTreeGenerator packageTreeGenerator;
+    private RunnerLogger logger;
 
     public InstrumentalTestPlanProvider(Project project,
                                         InstrumentalPluginExtension instrumentationInfo,
-                                        PackageTreeGenerator packageTreeGenerator) {
+                                        PackageTreeGenerator packageTreeGenerator,
+                                        RunnerLogger logger) {
         this.project = project;
         this.instrumentationInfo = instrumentationInfo;
         this.packageTreeGenerator = packageTreeGenerator;
+        this.logger = logger;
     }
 
     public List<TestPlanElement> provideTestPlan(ConnectedDeviceWrapper device,
@@ -52,7 +57,7 @@ public class InstrumentalTestPlanProvider {
         try {
             device.executeShellCommand(command.toString(), receiver, 0, TimeUnit.SECONDS);
         } catch (Exception e) {
-            project.getLogger().error("InstrumentalTestPlanProvider.execute error:", e);
+            logger.e(TAG,"InstrumentalTestPlanProvider.execute error:", e);
         }
 
         return receiver.getTestInstances();
