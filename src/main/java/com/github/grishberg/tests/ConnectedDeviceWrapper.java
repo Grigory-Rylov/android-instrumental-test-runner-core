@@ -119,4 +119,12 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice {
             throw new PullCoverageException(e);
         }
     }
+
+    @Override
+    public void executeShellCommand(String command, IShellOutputReceiver receiver,
+                                    long maxTimeout, long maxTimeToOutputResponse,
+                                    TimeUnit maxTimeUnits) throws TimeoutException,
+            AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        device.executeShellCommand(command, receiver, maxTimeout, maxTimeToOutputResponse, maxTimeUnits);
+    }
 }

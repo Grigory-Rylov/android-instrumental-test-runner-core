@@ -14,7 +14,7 @@ public class TestPlanTest {
 
     @Test
     public void whenPutNullAnnotation_annotationsCleared() {
-        TestPlan plan = new TestPlan("", "", "");
+        TestPlanElement plan = new TestPlanElement("", "", "");
         plan.addAnnotations(NOT_EMPTY_ANNOTATIONS);
         Assert.assertNotNull(plan.getAnnotations());
     }

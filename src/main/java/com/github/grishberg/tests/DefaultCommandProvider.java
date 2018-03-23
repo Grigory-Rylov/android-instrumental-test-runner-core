@@ -5,7 +5,7 @@ import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.SingleInstrumentalTestCommand;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
-import com.github.grishberg.tests.planner.parser.TestPlan;
+import com.github.grishberg.tests.planner.parser.TestPlanElement;
 import org.gradle.api.Project;
 
 import java.util.ArrayList;
@@ -42,23 +42,21 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
         logger.i(TAG, "device = %s, args = %s",
                 device, instrumentalArgs);
-        List<TestPlan> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
+        List<TestPlanElement> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
 
-        List<TestPlan> planList = new ArrayList<>();
+        List<TestPlanElement> planList = new ArrayList<>();
         int testIndex = 0;
-        for (TestPlan currentPlan : planSet) {
-
+        for (TestPlanElement currentPlan : planSet) {
             List<DeviceRunnerCommand> commandsForAnnotations = commandsForAnnotationProvider
                     .provideCommand(currentPlan.getAnnotations());
-            if (commandsForAnnotations.size() > 0 && planList.size() > 0) {
+            if (!commandsForAnnotations.isEmpty() && !planList.isEmpty()) {
                 commands.addAll(commandsForAnnotations);
                 commands.add(new SingleInstrumentalTestCommand(project,
                         String.format("test_%d", testIndex++),
                         instrumentationInfo,
                         instrumentalArgs,
                         planList,
-                        environment.getCoverageDir(),
-                        environment.getResultsDir(),
+                        environment,
                         logger));
                 planList.clear();
                 continue;

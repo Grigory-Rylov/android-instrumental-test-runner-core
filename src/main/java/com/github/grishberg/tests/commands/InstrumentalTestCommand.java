@@ -3,13 +3,13 @@ package com.github.grishberg.tests.commands;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
+import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.gradle.api.Project;
 
-import java.io.File;
 import java.util.Map;
 
 /**
@@ -17,24 +17,21 @@ import java.util.Map;
  */
 public class InstrumentalTestCommand implements DeviceRunnerCommand {
     private final Project project;
+    private Environment environment;
     private RunnerLogger logger;
     private final InstrumentalPluginExtension instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
-    private File coverageOuptutDir;
-    private File reportsDir;
 
     public InstrumentalTestCommand(Project project,
                                    InstrumentalPluginExtension instrumentalInfo,
                                    Map<String, String> instrumentalArgs,
-                                   File coverageFilesDir,
-                                   File reportsDir,
+                                   Environment environment,
                                    RunnerLogger logger) {
         this.project = project;
+        this.environment = environment;
         this.logger = logger;
         this.instrumentationInfo = instrumentalInfo;
         this.instrumentationArgs = instrumentalArgs;
-        this.coverageOuptutDir = coverageFilesDir;
-        this.reportsDir = reportsDir;
     }
 
     @Override
@@ -64,7 +61,7 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
                 "",
                 runTestLogger
         );
-        testRunListener.setReportDir(reportsDir);
+        testRunListener.setReportDir(environment.getReportsDir());
 
         try {
             runner.run(testRunListener);
@@ -75,22 +72,12 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
                 targetDevice.pullCoverageFile(instrumentationInfo,
                         coverageOutFilePrefix,
                         coverageFile,
-                        coverageOuptutDir,
+                        environment.getCoverageDir(),
                         runTestLogger);
             }
         } catch (Exception e) {
             project.getLogger().error("InstrumentalTestCommand.execute: Exception", e);
         }
         return result;
-    }
-
-    private String provideDeviceNameForReport(ConnectedDeviceWrapper targetDevice) {
-        String prefix = "";
-        if (targetDevice.isEmulator()) {
-            prefix = "(AVD)";
-        }
-        String targetDeviceName = targetDevice.getName();
-        return targetDeviceName != null ?
-                targetDeviceName + prefix : targetDevice.getSerialNumber();
     }
 }

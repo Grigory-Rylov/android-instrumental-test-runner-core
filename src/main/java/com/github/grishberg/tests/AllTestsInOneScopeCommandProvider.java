@@ -43,8 +43,7 @@ public class AllTestsInOneScopeCommandProvider implements DeviceRunnerCommandPro
         commands.add(new InstrumentalTestCommand(project,
                 instrumentationInfo,
                 instrumentalArgs,
-                environment.getCoverageDir(),
-                environment.getReportsDir(),
+                environment,
                 logger));
         return commands.toArray(new DeviceRunnerCommand[commands.size()]);
     }

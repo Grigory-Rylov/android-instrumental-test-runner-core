@@ -9,6 +9,7 @@ import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.common.DefaultGradleLogger;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
+import com.github.grishberg.tests.planner.PackageTreeGenerator;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Nullable;
@@ -52,28 +53,26 @@ public class InstrumentationTestTask extends DefaultTask {
         instrumentationInfo = getProject().getExtensions()
                 .findByType(InstrumentalPluginExtension.class);
         androidSdkPath = instrumentationInfo.getAndroidSdkPath();
-        try {
-            init();
 
-            prepareOutputFolders();
+        init();
 
-            AndroidDebugBridge adb = AndroidDebugBridge
-                    .createBridge(androidSdkPath + "/platform-tools/adb", false);
-            waitForAdb(adb);
+        prepareOutputFolders();
 
-            InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
-                    getProject(),
-                    instrumentationInfo);
+        AndroidDebugBridge adb = AndroidDebugBridge
+                .createBridge(androidSdkPath + "/platform-tools/adb", false);
+        waitForAdb(adb);
 
-            Environment environment = new Environment(resultsDir,
-                    reportsDir, coverageDir);
-            DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider,
-                    environment, logger);
+        PackageTreeGenerator packageTreeGenerator = new PackageTreeGenerator();
+        InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
+                getProject(),
+                instrumentationInfo, packageTreeGenerator, logger);
 
-            generateHtmlReport(runner.runCommands(provideDevices(adb)));
-        } finally {
-            terminate();
-        }
+        Environment environment = new Environment(resultsDir,
+                reportsDir, coverageDir);
+        DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider,
+                environment, logger);
+
+        generateHtmlReport(runner.runCommands(provideDevices(adb)));
     }
 
     private void prepareOutputFolders() throws IOException {
@@ -111,10 +110,6 @@ public class InstrumentationTestTask extends DefaultTask {
         return deviceWrappers;
     }
 
-    private void terminate() {
-
-    }
-
     private void init() {
         AndroidDebugBridge.initIfNeeded(false);
         if (androidSdkPath == null) {
@@ -123,7 +118,7 @@ public class InstrumentationTestTask extends DefaultTask {
             logger.i(TAG, "androidSdkPath = %s", androidSdkPath);
         }
         if (instrumentationInfo == null) {
-            throw new RuntimeException("Need to set InstrumentationInfo");
+            throw new GradleException("Need to set InstrumentationInfo");
         }
         if (commandsForAnnotationProvider == null) {
             commandsForAnnotationProvider = new DefaultCommandsForAnnotationProvider(getLogger(),

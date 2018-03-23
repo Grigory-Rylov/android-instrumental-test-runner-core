@@ -16,21 +16,33 @@ public class RunTestLogger implements ILogger {
 
     @Override
     public void error(Throwable t, String msgFormat, Object... args) {
+        if (msgFormat == null) {
+            return;
+        }
         logger.e(TAG, String.format(msgFormat, args), t);
     }
 
     @Override
     public void warning(String msgFormat, Object... args) {
+        if (msgFormat == null) {
+            return;
+        }
         logger.w(TAG, String.format(msgFormat, args));
     }
 
     @Override
     public void info(String msgFormat, Object... args) {
+        if (msgFormat == null) {
+            return;
+        }
         logger.i(TAG, String.format(msgFormat, args));
     }
 
     @Override
     public void verbose(String msgFormat, Object... args) {
+        if (msgFormat == null) {
+            return;
+        }
         logger.i(TAG, String.format(msgFormat, args));
     }
 }

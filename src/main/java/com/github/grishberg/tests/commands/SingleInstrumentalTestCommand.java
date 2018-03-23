@@ -3,14 +3,14 @@ package com.github.grishberg.tests.commands;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
+import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
-import com.github.grishberg.tests.planner.parser.TestPlan;
+import com.github.grishberg.tests.planner.parser.TestPlanElement;
 import org.gradle.api.Project;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,41 +21,56 @@ import java.util.Map;
 public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     private static final String TAG = SingleInstrumentalTestCommand.class.getSimpleName();
     private static final String CLASS = "class";
+    private static final String PACKAGE = "package";
     private final Project project;
     private String testName;
     private final InstrumentalPluginExtension instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
-    private File coverageOutputDir;
-    private File resultsDir;
+    private Environment environment;
     private RunnerLogger logger;
 
     public SingleInstrumentalTestCommand(Project project,
                                          String testReportSuffix,
                                          InstrumentalPluginExtension instrumentalInfo,
                                          Map<String, String> instrumentalArgs,
-                                         List<TestPlan> testForExecution,
-                                         File coverageFilesDir,
-                                         File resultsDir,
+                                         List<TestPlanElement> testForExecution,
+                                         Environment environment,
                                          RunnerLogger logger) {
         this.project = project;
         this.testName = testReportSuffix;
         this.instrumentationInfo = instrumentalInfo;
         this.instrumentationArgs = new HashMap<>(instrumentalArgs);
-        this.coverageOutputDir = coverageFilesDir;
-        this.resultsDir = resultsDir;
+        this.environment = environment;
         this.logger = logger;
 
-        StringBuilder sb = new StringBuilder();
+        initTargetTestArgs(testForExecution);
+    }
+
+    private void initTargetTestArgs(List<TestPlanElement> testForExecution) {
+        StringBuilder sbClass = new StringBuilder();
+        StringBuilder sbPackage = new StringBuilder();
         for (int i = 0; i < testForExecution.size(); i++) {
-            if (i > 0) {
-                sb.append(",");
+            TestPlanElement plan = testForExecution.get(i);
+            if (plan.isPackage()) {
+                if (sbPackage.length() > 0) {
+                    sbPackage.append(",");
+                }
+                sbPackage.append(plan.getAmInstrumentCommand());
+                continue;
             }
-            TestPlan plan = testForExecution.get(i);
-            sb.append(plan.getClassName());
-            sb.append("#");
-            sb.append(plan.getMethodName());
+
+            if (sbClass.length() > 0) {
+                sbClass.append(",");
+            }
+            sbClass.append(plan.getAmInstrumentCommand());
         }
-        instrumentationArgs.put(CLASS, sb.toString());
+
+        if (sbClass.length() > 0) {
+            instrumentationArgs.put(CLASS, sbClass.toString());
+        }
+        if (sbPackage.length() > 0) {
+            instrumentationArgs.put(PACKAGE, sbPackage.toString());
+        }
     }
 
     @Override
@@ -79,14 +94,14 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         }
 
         RunTestLogger runTestLogger = new RunTestLogger(logger);
-        String singleTestMethodPrefix = targetDevice.getName() + "#" + testName;
+        String singleTestMethodPrefix = String.format("%s#%s", targetDevice.getName(), testName);
         TestXmlReportsGenerator testRunListener = new TestXmlReportsGenerator(targetDevice.getName(),
                 project.getName(),
                 instrumentationInfo.getFlavorName(),
                 singleTestMethodPrefix,
                 runTestLogger
         );
-        testRunListener.setReportDir(resultsDir);
+        testRunListener.setReportDir(environment.getResultsDir());
 
         try {
             runner.run(testRunListener);
@@ -97,7 +112,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                 targetDevice.pullCoverageFile(instrumentationInfo,
                         singleTestMethodPrefix,
                         coverageFile,
-                        coverageOutputDir,
+                        environment.getCoverageDir(),
                         runTestLogger);
             }
         } catch (Exception e) {
@@ -108,6 +123,6 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
 
     @Override
     public String toString() {
-        return "SingleInstrumentalTestCommand{}" + instrumentationArgs;
+        return "SingleInstrumentalTestCommand{ " + instrumentationArgs + " }";
     }
 }

@@ -33,27 +33,24 @@ class DeviceCommandsRunner {
         final CountDownLatch deviceCounter = new CountDownLatch(devices.length);
 
         for (ConnectedDeviceWrapper device : devices) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        DeviceRunnerCommand[] commands = commandProvider.provideCommandsForDevice(device,
-                                testPlanProvider, environment);
-                        for (DeviceRunnerCommand command : commands) {
-                            logger.d(TAG, "Before executing device = %s command = %s",
-                                    device, command.toString());
-                            DeviceCommandResult result = command.execute(device);
-                            logger.d(TAG, "After executing device = %s command = %s",
-                                    device, command.toString());
-                            if (result.isFailed()) {
-                                hasFailedTests = true;
-                            }
+            new Thread(() -> {
+                try {
+                    DeviceRunnerCommand[] commands = commandProvider.provideCommandsForDevice(device,
+                            testPlanProvider, environment);
+                    for (DeviceRunnerCommand command : commands) {
+                        logger.d(TAG, "Before executing device = %s command = %s",
+                                device, command.toString());
+                        DeviceCommandResult result = command.execute(device);
+                        logger.d(TAG, "After executing device = %s command = %s",
+                                device, command.toString());
+                        if (result.isFailed()) {
+                            hasFailedTests = true;
                         }
-                    } catch (Exception e) {
-                        logger.e(TAG, "Some Exception", e);
-                    } finally {
-                        deviceCounter.countDown();
                     }
+                } catch (Exception e) {
+                    logger.e(TAG, "Some Exception", e);
+                } finally {
+                    deviceCounter.countDown();
                 }
             }).start();
         }

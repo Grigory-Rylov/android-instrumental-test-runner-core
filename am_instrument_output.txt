@@ -7,6 +7,7 @@ INSTRUMENTATION_STATUS: numtests=6
 INSTRUMENTATION_STATUS: test=espressoTest1
 INSTRUMENTATION_STATUS_CODE: 1
 INSTRUMENTATION_STATUS: feature=+feature1?param1=enabled&param2=disabled
+INSTRUMENTATION_STATUS: flags=flag1=value1,flag2=value2
 INSTRUMENTATION_STATUS: annotations=com.github.grishberg.annotaions.Feature,com.github.grishberg.instrumentaltestwithtestgroupsordering.EspressoTest1,org.junit.Test
 INSTRUMENTATION_STATUS_CODE: 1
 INSTRUMENTATION_STATUS: id=AndroidJUnitRunner

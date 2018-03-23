@@ -1,7 +1,10 @@
 package com.github.grishberg.tests.planner.parser;
 
+import com.github.grishberg.tests.planner.parser.InstrumentTestLogParser.ParserLogger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -9,14 +12,20 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 /**
  * Created by grishberg on 29.10.17.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class InstrumentTestLogParserTest {
+    public static final String TEST_LINE = "test line";
+    private InstrumentTestLogParser parser = new InstrumentTestLogParser();
+
     @Test
     public void parseAmInstrumentOutput() throws Exception {
         String fileName = "am_instrument_output.txt";
-        InstrumentTestLogParser parser = new InstrumentTestLogParser();
 
         ArrayList<String> lines = new ArrayList<>();
 
@@ -30,10 +39,20 @@ public class InstrumentTestLogParserTest {
         }
         parser.processNewLines(lines.toArray(new String[lines.size()]));
 
-        List<TestPlan> testInstances = parser.getTestInstances();
+        List<TestPlanElement> testInstances = parser.getTestInstances();
         Assert.assertEquals(6, testInstances.size());
-        TestPlan[] testPlanArray = testInstances.toArray(new TestPlan[testInstances.size()]);
-        TestPlan testWithFeature = testPlanArray[3];
-        Assert.assertNotNull(testWithFeature.getFeatureParameter());
+        TestPlanElement[] testPlanArray = testInstances.toArray(new TestPlanElement[testInstances.size()]);
+        TestPlanElement testWithFeature = testPlanArray[3];
+        Assert.assertNotNull(testWithFeature.getFeature());
+    }
+
+    @Test
+    public void useLoggerFromSetter() {
+        ParserLogger mockLogger = mock(ParserLogger.class);
+        parser.setLogger(mockLogger);
+
+        parser.processNewLines(new String[]{TEST_LINE});
+
+        verify(mockLogger).logLine(TEST_LINE);
     }
 }
