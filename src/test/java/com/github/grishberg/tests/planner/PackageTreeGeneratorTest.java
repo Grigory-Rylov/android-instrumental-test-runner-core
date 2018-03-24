@@ -20,22 +20,22 @@ public class PackageTreeGeneratorTest {
     public void makeCompoundClasses() throws Exception {
         ArrayList<TestPlanElement> list = provideTestPlanElements();
 
-        List<TestNodeElement> result = generator.makePackageTree(list);
-        TestNodeElement root = result.get(0);
-        List<TestNodeElement> compoundElements = root.getCompoundElements();
+        List<TestPlanElement> result = generator.makePackageTree(list);
+        TestPlanElement root = result.get(0);
+        List<TestPlanElement> compoundElements = root.getCompoundElements();
         Assert.assertTrue(compoundElements.size() == 3);
     }
 
     @Test
     public void makeCompoundClassesAndMethods() throws Exception {
         ArrayList<TestPlanElement> list = provideTestPlanElements();
-        List<TestNodeElement> result = generator.makePackageTree(list);
-        TestNodeElement root = result.get(0);
+        List<TestPlanElement> result = generator.makePackageTree(list);
+        TestPlanElement root = result.get(0);
 
-        List<TestNodeElement> testMethods = root.getAllTestMethods();
+        List<TestPlanElement> testMethods = root.getAllTestMethods();
         testMethods.get(0).exclude();
 
-        List<TestNodeElement> compoundElements = root.getCompoundElements();
+        List<TestPlanElement> compoundElements = root.getCompoundElements();
         Assert.assertTrue(compoundElements.size() == 4);
     }
 

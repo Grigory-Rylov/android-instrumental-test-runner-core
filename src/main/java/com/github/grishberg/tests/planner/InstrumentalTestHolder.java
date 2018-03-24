@@ -10,7 +10,7 @@ import java.util.List;
 public class InstrumentalTestHolder {
     private List<TestPlanElement> planList;
     private final PackageTreeGenerator packageTreeGenerator;
-    private ArrayList<TestNodeElement> prevRoots = new ArrayList<>();
+    private ArrayList<TestPlanElement> prevRoots = new ArrayList<>();
 
     InstrumentalTestHolder(List<TestPlanElement> planList, PackageTreeGenerator packageTreeGenerator) {
         this.planList = planList;
@@ -21,7 +21,7 @@ public class InstrumentalTestHolder {
     /**
      * @return iterator with all test methods in project.
      */
-    public Iterator<TestNodeElement> provideTestNodeElementsIterator() {
+    public Iterator<TestPlanElement> provideTestNodeElementsIterator() {
         prevRoots.clear();
         prevRoots.addAll(packageTreeGenerator.makePackageTree(planList));
         return new FlatIterator(prevRoots);
@@ -29,10 +29,10 @@ public class InstrumentalTestHolder {
 
     public List<TestPlanElement> provideCompoundTestPlan() {
         ArrayList<TestPlanElement> compoundPlans = new ArrayList<>();
-        for (TestNodeElement rootElement : prevRoots) {
-            List<TestNodeElement> compoundElements = rootElement.getCompoundElements();
-            for (TestNodeElement currentCompoundElement : compoundElements) {
-                compoundPlans.add(currentCompoundElement.getTestPlan());
+        for (TestPlanElement rootElement : prevRoots) {
+            List<TestPlanElement> compoundElements = rootElement.getCompoundElements();
+            for (TestPlanElement currentCompoundElement : compoundElements) {
+                compoundPlans.add(currentCompoundElement);
             }
         }
         return compoundPlans;
@@ -41,12 +41,12 @@ public class InstrumentalTestHolder {
     /**
      * Returns tree-items in flat list.
      */
-    private static class FlatIterator implements Iterator<TestNodeElement> {
-        private final Iterator<TestNodeElement> iterator;
+    private static class FlatIterator implements Iterator<TestPlanElement> {
+        private final Iterator<TestPlanElement> iterator;
 
-        FlatIterator(ArrayList<TestNodeElement> roots) {
-            ArrayList<TestNodeElement> flatList = new ArrayList<>();
-            for (TestNodeElement rootElement : roots) {
+        FlatIterator(ArrayList<TestPlanElement> roots) {
+            ArrayList<TestPlanElement> flatList = new ArrayList<>();
+            for (TestPlanElement rootElement : roots) {
                 flatList.addAll(rootElement.getAllTestMethods());
             }
             iterator = flatList.iterator();
@@ -58,7 +58,7 @@ public class InstrumentalTestHolder {
         }
 
         @Override
-        public TestNodeElement next() {
+        public TestPlanElement next() {
             return iterator.next();
         }
     }

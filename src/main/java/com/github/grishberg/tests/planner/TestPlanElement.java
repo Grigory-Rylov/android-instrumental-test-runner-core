@@ -1,5 +1,6 @@
 package com.github.grishberg.tests.planner;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,12 +14,27 @@ public class TestPlanElement {
     private List<String> annotations;
     private String feature;
     private List<String> flags = new ArrayList<>();
+    @Nullable
+    private TestPlanElement parent;
+    private final NodeType type;
+    private final ArrayList<TestPlanElement> children = new ArrayList<>();
+    private boolean excluded;
+    private boolean hasExcluded;
+
+    public TestPlanElement(NodeType type, String packageName) {
+        this.type = type;
+        testId = "";
+        methodName = "";
+        className = packageName;
+    }
 
     public TestPlanElement(String testId, String methodName, String fullClassName) {
         this.testId = testId;
         this.methodName = methodName;
         this.className = fullClassName;
         this.annotations = new ArrayList<>();
+        type = (methodName == null || methodName.length() == 0) ?
+                NodeType.CLASS : NodeType.METHOD;
     }
 
     public void addAnnotations(List<String> annotations) {
@@ -107,12 +123,62 @@ public class TestPlanElement {
         this.flags = new ArrayList<>(flags);
     }
 
+    public void exclude() {
+        excluded = true;
+        if (parent != null) {
+            parent.setHasExcluded(true);
+        }
+    }
+
+    private void setHasExcluded(boolean hasExcluded) {
+        this.hasExcluded = hasExcluded;
+        if (parent != null) {
+            parent.setHasExcluded(hasExcluded);
+        }
+    }
+
+    void addChild(TestPlanElement child) {
+        children.add(child);
+        child.parent = this;
+    }
+
+    List<TestPlanElement> getAllTestMethods() {
+        if (type == NodeType.CLASS) {
+            return children;
+        }
+        ArrayList<TestPlanElement> methods = new ArrayList<>();
+        for (TestPlanElement element : children) {
+            methods.addAll(element.getAllTestMethods());
+        }
+        return methods;
+    }
+
+    public NodeType getType() {
+        return type;
+    }
+
+    /**
+     * @return not excluded packages list.
+     */
+    List<TestPlanElement> getCompoundElements() {
+        ArrayList<TestPlanElement> result = new ArrayList<>();
+        if (!hasExcluded && !excluded && type != NodeType.PACKAGE) {
+            result.add(this);
+            return result;
+        }
+
+        for (TestPlanElement child : children) {
+            result.addAll(child.getCompoundElements());
+        }
+        return result;
+    }
+
     @Override
     public String toString() {
         return "TestPlanElement{" +
                 "methodName='" + methodName + '\'' +
                 ", className='" + className + '\'' +
-                ", testId='" + testId + '\'' +
+                ", type=" + type +
                 '}';
     }
 }
