@@ -1,7 +1,6 @@
-package com.github.grishberg.tests.planner.parser;
+package com.github.grishberg.tests.planner;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,7 +12,7 @@ public class TestPlanElement {
     private final String className;
     private List<String> annotations;
     private String feature;
-    private String[] flags = new String[0];
+    private List<String> flags = new ArrayList<>();
 
     public TestPlanElement(String testId, String methodName, String fullClassName) {
         this.testId = testId;
@@ -22,11 +21,11 @@ public class TestPlanElement {
         this.annotations = new ArrayList<>();
     }
 
-    public void addAnnotations(String[] annotations) {
+    public void addAnnotations(List<String> annotations) {
         if (annotations == null) {
             return;
         }
-        this.annotations.addAll(Arrays.asList(annotations));
+        this.annotations.addAll(annotations);
     }
 
     public String getMethodName() {
@@ -96,16 +95,16 @@ public class TestPlanElement {
         return className + "#" + methodName;
     }
 
-    public String[] getFlags() {
-        return flags.clone();
+    public List<String> getFlags() {
+        return new ArrayList<>(flags);
     }
 
-    void setFlags(String[] flags) {
+    void setFlags(List<String> flags) {
         if (flags == null) {
-            this.flags = new String[0];
+            this.flags.clear();
             return;
         }
-        this.flags = flags.clone();
+        this.flags = new ArrayList<>(flags);
     }
 
     @Override

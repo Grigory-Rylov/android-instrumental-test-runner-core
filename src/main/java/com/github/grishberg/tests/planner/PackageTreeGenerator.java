@@ -1,6 +1,5 @@
 package com.github.grishberg.tests.planner;
 
-import com.github.grishberg.tests.planner.parser.TestPlanElement;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;

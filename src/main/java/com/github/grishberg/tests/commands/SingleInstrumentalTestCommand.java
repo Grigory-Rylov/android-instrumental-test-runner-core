@@ -8,7 +8,7 @@ import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
-import com.github.grishberg.tests.planner.parser.TestPlanElement;
+import com.github.grishberg.tests.planner.TestPlanElement;
 import org.gradle.api.Project;
 
 import java.util.HashMap;

@@ -32,9 +32,9 @@ public class AllTestsInOneScopeCommandProvider implements DeviceRunnerCommandPro
     }
 
     @Override
-    public DeviceRunnerCommand[] provideCommandsForDevice(ConnectedDeviceWrapper device,
-                                                          InstrumentalTestPlanProvider testPlanProvider,
-                                                          Environment environment) {
+    public List<DeviceRunnerCommand> provideCommandsForDevice(ConnectedDeviceWrapper device,
+                                                              InstrumentalTestPlanProvider testPlanProvider,
+                                                              Environment environment) {
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
         logger.i(TAG, "device = %s, args = %s",
@@ -45,6 +45,6 @@ public class AllTestsInOneScopeCommandProvider implements DeviceRunnerCommandPro
                 instrumentalArgs,
                 environment,
                 logger));
-        return commands.toArray(new DeviceRunnerCommand[commands.size()]);
+        return commands;
     }
 }

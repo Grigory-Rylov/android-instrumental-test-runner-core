@@ -1,5 +1,6 @@
-package com.github.grishberg.tests.planner.parser;
+package com.github.grishberg.tests.planner;
 
+import com.github.grishberg.tests.planner.TestPlanElement;
 import org.junit.Assert;
 import org.junit.Test;
 

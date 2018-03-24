@@ -6,6 +6,7 @@ import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -35,7 +36,7 @@ class DeviceCommandsRunner {
         for (ConnectedDeviceWrapper device : devices) {
             new Thread(() -> {
                 try {
-                    DeviceRunnerCommand[] commands = commandProvider.provideCommandsForDevice(device,
+                    List<DeviceRunnerCommand> commands = commandProvider.provideCommandsForDevice(device,
                             testPlanProvider, environment);
                     for (DeviceRunnerCommand command : commands) {
                         logger.d(TAG, "Before executing device = %s command = %s",

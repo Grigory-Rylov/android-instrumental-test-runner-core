@@ -1,6 +1,5 @@
 package com.github.grishberg.tests.planner;
 
-import com.github.grishberg.tests.planner.parser.TestPlanElement;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;

@@ -3,8 +3,6 @@ package com.github.grishberg.tests.planner;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.common.RunnerLogger;
-import com.github.grishberg.tests.planner.parser.InstrumentTestLogParser;
-import com.github.grishberg.tests.planner.parser.TestPlanElement;
 import org.gradle.api.Project;
 
 import java.util.HashMap;
