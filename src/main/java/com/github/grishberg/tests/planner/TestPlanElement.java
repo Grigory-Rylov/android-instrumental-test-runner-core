@@ -105,10 +105,14 @@ public class TestPlanElement {
      * @return command for am instrument parameter class or package
      */
     public String getAmInstrumentCommand() {
-        if (isClass()) {
-            return className;
+        if (type == NodeType.METHOD) {
+            return className + "#" + methodName;
         }
-        return className + "#" + methodName;
+        String prefix = "";
+        if (parent != null) {
+            prefix = parent.getAmInstrumentCommand() + ".";
+        }
+        return prefix + className;
     }
 
     public List<String> getFlags() {
