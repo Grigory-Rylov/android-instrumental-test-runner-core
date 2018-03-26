@@ -1,6 +1,8 @@
-package com.github.grishberg.tests.planner.parser;
+package com.github.grishberg.tests.planner;
 
-import com.github.grishberg.tests.planner.parser.InstrumentTestLogParser.ParserLogger;
+import com.github.grishberg.tests.planner.InstrumentTestLogParser;
+import com.github.grishberg.tests.planner.InstrumentTestLogParser.ParserLogger;
+import com.github.grishberg.tests.planner.TestPlanElement;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

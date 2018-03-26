@@ -1,7 +1,5 @@
 package com.github.grishberg.tests.planner;
 
-import com.github.grishberg.tests.planner.parser.TestPlanElement;
-
 import java.util.ArrayList;
 import java.util.List;
 

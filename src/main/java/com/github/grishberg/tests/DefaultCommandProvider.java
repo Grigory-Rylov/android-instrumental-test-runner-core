@@ -5,7 +5,7 @@ import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.SingleInstrumentalTestCommand;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
-import com.github.grishberg.tests.planner.parser.TestPlanElement;
+import com.github.grishberg.tests.planner.TestPlanElement;
 import org.gradle.api.Project;
 
 import java.util.ArrayList;
@@ -35,9 +35,9 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
     }
 
     @Override
-    public DeviceRunnerCommand[] provideCommandsForDevice(ConnectedDeviceWrapper device,
-                                                          InstrumentalTestPlanProvider testPlanProvider,
-                                                          Environment environment) {
+    public List<DeviceRunnerCommand> provideCommandsForDevice(ConnectedDeviceWrapper device,
+                                                              InstrumentalTestPlanProvider testPlanProvider,
+                                                              Environment environment) {
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
         logger.i(TAG, "device = %s, args = %s",
@@ -64,6 +64,6 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
             planList.add(currentPlan);
         }
 
-        return commands.toArray(new DeviceRunnerCommand[commands.size()]);
+        return commands;
     }
 }

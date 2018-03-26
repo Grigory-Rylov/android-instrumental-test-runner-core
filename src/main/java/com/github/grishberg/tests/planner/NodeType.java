@@ -1,7 +1,7 @@
 package com.github.grishberg.tests.planner;
 
 /**
- * Type of {@link TestNodeElement}.
+ * Type of {@link TestPlanElement}.
  */
 public enum NodeType {
     PACKAGE,

@@ -1,9 +1,11 @@
-package com.github.grishberg.tests.planner.parser;
+package com.github.grishberg.tests.planner;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Arrays;
 
 /**
  * Created by grishberg on 27.02.18.
@@ -15,7 +17,7 @@ public class TestPlanTest {
     @Test
     public void whenPutNullAnnotation_annotationsCleared() {
         TestPlanElement plan = new TestPlanElement("", "", "");
-        plan.addAnnotations(NOT_EMPTY_ANNOTATIONS);
+        plan.addAnnotations(Arrays.asList(NOT_EMPTY_ANNOTATIONS));
         Assert.assertNotNull(plan.getAnnotations());
     }
 }
