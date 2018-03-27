@@ -11,8 +11,8 @@ public class TestPlanSplitter {
 
     private TestPlanSplitter() {/* not used */}
 
-    public static List<TestPlanElement[]> splitByArgumentLimit(List<TestPlanElement> src) {
-        ArrayList<TestPlanElement[]> result = new ArrayList<>();
+    public static List<List<TestPlanElement>> splitByArgumentLimit(List<TestPlanElement> src) {
+        ArrayList<List<TestPlanElement>> result = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         ArrayList<TestPlanElement> currentRange = new ArrayList<>();
 
@@ -20,7 +20,7 @@ public class TestPlanSplitter {
             String testName = testPlan.getAmInstrumentCommand();
             if (sb.length() + testName.length() + 1 > STRING_LIMIT) {
                 // add current range to result
-                result.add(currentRange.toArray(new TestPlanElement[currentRange.size()]));
+                result.add(currentRange);
 
                 sb = new StringBuilder();
                 currentRange = new ArrayList<>();
@@ -34,7 +34,7 @@ public class TestPlanSplitter {
         }
 
         if (!currentRange.isEmpty()) {
-            result.add(currentRange.toArray(new TestPlanElement[currentRange.size()]));
+            result.add(currentRange);
         }
         return result;
     }
