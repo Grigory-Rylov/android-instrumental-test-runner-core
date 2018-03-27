@@ -23,11 +23,18 @@ public class InstrumentalTestHolder {
      */
     public Iterator<TestPlanElement> provideTestNodeElementsIterator() {
         prevRoots.clear();
-        prevRoots.addAll(packageTreeGenerator.makePackageTree(planList));
+        populateRootsElements();
         return new FlatIterator(prevRoots);
     }
 
+    private void populateRootsElements() {
+        prevRoots.addAll(packageTreeGenerator.makePackageTree(planList));
+    }
+
     public List<TestPlanElement> provideCompoundTestPlan() {
+        if (prevRoots.size() == 0) {
+            populateRootsElements();
+        }
         ArrayList<TestPlanElement> compoundPlans = new ArrayList<>();
         for (TestPlanElement rootElement : prevRoots) {
             List<TestPlanElement> compoundElements = rootElement.getCompoundElements();
