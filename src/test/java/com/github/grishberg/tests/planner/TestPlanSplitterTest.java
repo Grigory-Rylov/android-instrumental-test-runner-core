@@ -19,7 +19,7 @@ public class TestPlanSplitterTest {
     @Test
     public void testSplit() {
         List<TestPlanElement> list = provideTestPlanElements();
-        List<TestPlanElement[]> res = TestPlanSplitter.splitByArgumentLimit(list);
+        List<List<TestPlanElement>> res = TestPlanSplitter.splitByArgumentLimit(list);
         Assert.assertTrue(res.size() == 1);
     }
 

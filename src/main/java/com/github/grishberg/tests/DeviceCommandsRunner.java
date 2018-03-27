@@ -49,7 +49,7 @@ class DeviceCommandsRunner {
                         }
                     }
                 } catch (Exception e) {
-                    logger.e(TAG, "Some Exception", e);
+                    logger.e(TAG, "Execute command exception:", e);
                 } finally {
                     deviceCounter.countDown();
                 }
