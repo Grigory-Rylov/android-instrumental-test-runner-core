@@ -26,6 +26,7 @@ import java.io.IOException;
  */
 public class InstrumentationTestTask extends DefaultTask {
     private static final String TAG = InstrumentationTestTask.class.getSimpleName();
+    private static final String DEFAULT_FLAVOR = "default_flavor";
     public static final String NAME = "instrumentalTests";
     private static final int ADB_TIMEOUT = 10;
     private static final int ONE_SECOND = 1000;
@@ -42,16 +43,14 @@ public class InstrumentationTestTask extends DefaultTask {
 
     public InstrumentationTestTask() {
         logger = new DefaultGradleLogger(getLogger());
-        coverageDir = new File(getProject().getBuildDir(), "outputs/androidTest/coverage/");
-        reportsDir = new File(getProject().getBuildDir(), "outputs/reports/androidTest/");
-        resultsDir = new File(getProject().getBuildDir(), "outputs/androidTest/");
+        instrumentationInfo = getProject().getExtensions()
+                .findByType(InstrumentalPluginExtension.class);
     }
 
     @TaskAction
     public void runTask() throws InterruptedException, IOException {
         logger.i(TAG, "InstrumentationTestTask.runTask");
-        instrumentationInfo = getProject().getExtensions()
-                .findByType(InstrumentalPluginExtension.class);
+
         androidSdkPath = instrumentationInfo.getAndroidSdkPath();
 
         init();
@@ -67,8 +66,8 @@ public class InstrumentationTestTask extends DefaultTask {
                 getProject(),
                 instrumentationInfo, packageTreeGenerator, logger);
 
-        Environment environment = new Environment(resultsDir,
-                reportsDir, coverageDir);
+        Environment environment = new Environment(getResultsDir(),
+                getReportsDir(), getCoverageDir());
         DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider,
                 environment, logger);
 
@@ -76,9 +75,9 @@ public class InstrumentationTestTask extends DefaultTask {
     }
 
     private void prepareOutputFolders() throws IOException {
-        cleanFolder(reportsDir);
-        cleanFolder(resultsDir);
-        cleanFolder(coverageDir);
+        cleanFolder(getReportsDir());
+        cleanFolder(getResultsDir());
+        cleanFolder(getCoverageDir());
     }
 
     private static void cleanFolder(File dir) throws IOException {
@@ -89,12 +88,12 @@ public class InstrumentationTestTask extends DefaultTask {
     }
 
     private void generateHtmlReport(boolean success) throws IOException {
-        FileUtils.cleanOutputDir(reportsDir);
-        TestReport report = new TestReport(ReportType.SINGLE_FLAVOR, getResultsDir(), reportsDir);
+        FileUtils.cleanOutputDir(getReportsDir());
+        TestReport report = new TestReport(ReportType.SINGLE_FLAVOR, getResultsDir(), getReportsDir());
         report.generateReport();
         if (!success) {
             String reportUrl = (new ConsoleRenderer())
-                    .asClickableFileUrl(new File(reportsDir, "index.html"));
+                    .asClickableFileUrl(new File(getReportsDir(), "index.html"));
             String message = String.format("There were failing tests. See the report at: %s",
                     reportUrl);
             throw new GradleException(message);
@@ -136,12 +135,6 @@ public class InstrumentationTestTask extends DefaultTask {
                     instrumentationInfo,
                     instrumentationArgsProvider, commandsForAnnotationProvider, logger);
         }
-        coverageDir = new File(getProject().getBuildDir(),
-                String.format("outputs/androidTest/coverage/%s", instrumentationInfo.getFlavorName()));
-        reportsDir = new File(getProject().getBuildDir(),
-                String.format("outputs/reports/androidTest/%s", instrumentationInfo.getFlavorName()));
-        resultsDir = new File(getProject().getBuildDir(),
-                String.format("outputs/androidTest/%s", instrumentationInfo.getFlavorName()));
     }
 
     private void waitForAdb(AndroidDebugBridge adb) throws InterruptedException {
@@ -189,15 +182,36 @@ public class InstrumentationTestTask extends DefaultTask {
     }
 
     public File getCoverageDir() {
+        if (coverageDir == null) {
+            String flavor = instrumentationInfo.getFlavorName() != null ?
+                    instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
+            coverageDir = new File(getProject().getBuildDir(),
+                    String.format("outputs/androidTest/coverage/%s", flavor));
+            logger.d(TAG, "Coverage dir is empty, generate default value %s", coverageDir);
+        }
         return coverageDir;
     }
 
     public File getResultsDir() {
+        if (resultsDir == null) {
+            String flavor = instrumentationInfo.getFlavorName() != null ?
+                    instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
+            resultsDir = new File(getProject().getBuildDir(),
+                    String.format("outputs/androidTest/%s", flavor));
+            logger.d(TAG, "Results dir is empty, generate default value %s", resultsDir);
+        }
         return resultsDir;
     }
 
     @OutputDirectory
     public File getReportsDir() {
+        if (reportsDir == null) {
+            String flavor = instrumentationInfo.getFlavorName() != null ?
+                    instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
+            reportsDir = new File(getProject().getBuildDir(),
+                    String.format("outputs/reports/androidTest/%s", flavor));
+            logger.d(TAG, "Reports dir is empty, generate default value %s", reportsDir);
+        }
         return reportsDir;
     }
 
