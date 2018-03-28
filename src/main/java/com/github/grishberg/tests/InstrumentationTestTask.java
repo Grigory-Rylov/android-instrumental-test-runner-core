@@ -26,7 +26,6 @@ import java.io.IOException;
  */
 public class InstrumentationTestTask extends DefaultTask {
     private static final String TAG = InstrumentationTestTask.class.getSimpleName();
-    private static final String DEFAULT_FLAVOR = "default_flavor";
     public static final String NAME = "instrumentalTests";
     private static final int ADB_TIMEOUT = 10;
     private static final int ONE_SECOND = 1000;
@@ -43,14 +42,16 @@ public class InstrumentationTestTask extends DefaultTask {
 
     public InstrumentationTestTask() {
         logger = new DefaultGradleLogger(getLogger());
-        instrumentationInfo = getProject().getExtensions()
-                .findByType(InstrumentalPluginExtension.class);
+        coverageDir = new File(getProject().getBuildDir(), "outputs/androidTest/coverage/");
+        reportsDir = new File(getProject().getBuildDir(), "outputs/reports/androidTest/");
+        resultsDir = new File(getProject().getBuildDir(), "outputs/androidTest/");
     }
 
     @TaskAction
     public void runTask() throws InterruptedException, IOException {
         logger.i(TAG, "InstrumentationTestTask.runTask");
-
+        instrumentationInfo = getProject().getExtensions()
+                .findByType(InstrumentalPluginExtension.class);
         androidSdkPath = instrumentationInfo.getAndroidSdkPath();
 
         init();
@@ -135,6 +136,12 @@ public class InstrumentationTestTask extends DefaultTask {
                     instrumentationInfo,
                     instrumentationArgsProvider, commandsForAnnotationProvider, logger);
         }
+        coverageDir = new File(getProject().getBuildDir(),
+                String.format("outputs/androidTest/coverage/%s", instrumentationInfo.getFlavorName()));
+        reportsDir = new File(getProject().getBuildDir(),
+                String.format("outputs/reports/androidTest/%s", instrumentationInfo.getFlavorName()));
+        resultsDir = new File(getProject().getBuildDir(),
+                String.format("outputs/androidTest/%s", instrumentationInfo.getFlavorName()));
     }
 
     private void waitForAdb(AndroidDebugBridge adb) throws InterruptedException {
@@ -182,36 +189,15 @@ public class InstrumentationTestTask extends DefaultTask {
     }
 
     public File getCoverageDir() {
-        if (coverageDir == null) {
-            String flavor = instrumentationInfo.getFlavorName() != null ?
-                    instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
-            coverageDir = new File(getProject().getBuildDir(),
-                    String.format("outputs/androidTest/coverage/%s", flavor));
-            logger.d(TAG, "Coverage dir is empty, generate default value %s", coverageDir);
-        }
         return coverageDir;
     }
 
     public File getResultsDir() {
-        if (resultsDir == null) {
-            String flavor = instrumentationInfo.getFlavorName() != null ?
-                    instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
-            resultsDir = new File(getProject().getBuildDir(),
-                    String.format("outputs/androidTest/%s", flavor));
-            logger.d(TAG, "Results dir is empty, generate default value %s", resultsDir);
-        }
         return resultsDir;
     }
 
     @OutputDirectory
     public File getReportsDir() {
-        if (reportsDir == null) {
-            String flavor = instrumentationInfo.getFlavorName() != null ?
-                    instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
-            reportsDir = new File(getProject().getBuildDir(),
-                    String.format("outputs/reports/androidTest/%s", flavor));
-            logger.d(TAG, "Reports dir is empty, generate default value %s", reportsDir);
-        }
         return reportsDir;
     }
 
