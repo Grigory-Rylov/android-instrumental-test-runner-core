@@ -32,6 +32,7 @@ public class InstrumentalTestPlanProvider {
 
     public List<TestPlanElement> provideTestPlan(ConnectedDeviceWrapper device,
                                                  Map<String, String> instrumentalArgs) {
+        logger.i(TAG, "provideTestPlan for device %s", device.getName());
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");
 
@@ -55,7 +56,7 @@ public class InstrumentalTestPlanProvider {
         try {
             device.executeShellCommand(command.toString(), receiver, 0, TimeUnit.SECONDS);
         } catch (Exception e) {
-            logger.e(TAG,"InstrumentalTestPlanProvider.execute error:", e);
+            logger.e(TAG, "InstrumentalTestPlanProvider.execute error:", e);
         }
 
         return receiver.getTestInstances();

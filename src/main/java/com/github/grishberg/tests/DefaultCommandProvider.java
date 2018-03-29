@@ -40,7 +40,7 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
                                                               Environment environment) {
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
-        logger.i(TAG, "device = %s, args = %s",
+        logger.i(TAG, "provideCommandsForDevice: device = %s, args = %s",
                 device, instrumentalArgs);
         List<TestPlanElement> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
 
@@ -62,6 +62,16 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
                 continue;
             }
             planList.add(currentPlan);
+        }
+
+        if (!planList.isEmpty()) {
+            commands.add(new SingleInstrumentalTestCommand(project,
+                    String.format("test_%d", testIndex),
+                    instrumentationInfo,
+                    instrumentalArgs,
+                    planList,
+                    environment,
+                    logger));
         }
 
         return commands;
