@@ -2,6 +2,7 @@ package com.github.grishberg.tests;
 
 import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
+import com.github.grishberg.tests.commands.SetAnimationSpeedCommand;
 import com.github.grishberg.tests.commands.SingleInstrumentalTestCommand;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
@@ -39,6 +40,7 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
                                                               InstrumentalTestPlanProvider testPlanProvider,
                                                               Environment environment) {
         List<DeviceRunnerCommand> commands = new ArrayList<>();
+        commands.add(new SetAnimationSpeedCommand(0, 0, 0));
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
         logger.i(TAG, "provideCommandsForDevice: device = %s, args = %s",
                 device, instrumentalArgs);
@@ -73,7 +75,7 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
                     environment,
                     logger));
         }
-
+        commands.add(new SetAnimationSpeedCommand(1, 1, 1));
         return commands;
     }
 }

@@ -2,7 +2,9 @@ package com.github.grishberg.tests;
 
 import com.android.ddmlib.*;
 import com.android.utils.ILogger;
+import com.github.grishberg.tests.commands.ExecuteCommandException;
 import com.github.grishberg.tests.exceptions.PullCoverageException;
+import org.gradle.internal.impldep.org.apache.maven.wagon.CommandExecutionException;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,5 +128,19 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice {
                                     TimeUnit maxTimeUnits) throws TimeoutException,
             AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         device.executeShellCommand(command, receiver, maxTimeout, maxTimeToOutputResponse, maxTimeUnits);
+    }
+
+    /**
+     * Execute adb shell command on device.
+     *
+     * @param command adb shell command for execution.
+     * @throws CommandExecutionException
+     */
+    public void executeShellCommand(String command) throws ExecuteCommandException {
+        try {
+            executeShellCommand(command, new CollectingOutputReceiver(), 30L, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            throw new ExecuteCommandException("executeShellCommand exception:", e);
+        }
     }
 }
