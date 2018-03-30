@@ -5,11 +5,9 @@ import com.android.build.gradle.internal.test.report.TestReport;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
 import com.android.utils.FileUtils;
+import com.github.grishberg.tests.adb.AdbWrapper;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
-import com.github.grishberg.tests.common.DefaultGradleLogger;
 import com.github.grishberg.tests.common.RunnerLogger;
-import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
-import com.github.grishberg.tests.planner.PackageTreeGenerator;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Nullable;
@@ -28,8 +26,6 @@ public class InstrumentationTestTask extends DefaultTask {
     private static final String TAG = InstrumentationTestTask.class.getSimpleName();
     private static final String DEFAULT_FLAVOR = "default_flavor";
     public static final String NAME = "instrumentalTests";
-    private static final int ADB_TIMEOUT = 10;
-    private static final int ONE_SECOND = 1000;
     @Nullable
     private String androidSdkPath;
     private File coverageDir;
@@ -39,12 +35,21 @@ public class InstrumentationTestTask extends DefaultTask {
     private InstrumentationArgsProvider instrumentationArgsProvider;
     private InstrumentalPluginExtension instrumentationInfo;
     private CommandsForAnnotationProvider commandsForAnnotationProvider;
+    private DeviceCommandsRunnerFabric deviceCommandsRunnerFabric;
+    private AdbWrapper adbWrapper;
     private RunnerLogger logger;
 
     public InstrumentationTestTask() {
-        logger = new DefaultGradleLogger(getLogger());
         instrumentationInfo = getProject().getExtensions()
                 .findByType(InstrumentalPluginExtension.class);
+    }
+
+    void initAfterApply(AdbWrapper adbWrapper,
+                        DeviceCommandsRunnerFabric deviceCommandsRunnerFabric,
+                        RunnerLogger logger) {
+        this.adbWrapper = adbWrapper;
+        this.deviceCommandsRunnerFabric = deviceCommandsRunnerFabric;
+        this.logger = logger;
     }
 
     @TaskAction
@@ -52,26 +57,20 @@ public class InstrumentationTestTask extends DefaultTask {
         logger.i(TAG, "InstrumentationTestTask.runTask");
 
         androidSdkPath = instrumentationInfo.getAndroidSdkPath();
+        adbWrapper.initWithAndroidSdk(androidSdkPath);
 
         init();
 
         prepareOutputFolders();
 
-        AndroidDebugBridge adb = AndroidDebugBridge
-                .createBridge(androidSdkPath + "/platform-tools/adb", false);
-        waitForAdb(adb);
-
-        PackageTreeGenerator packageTreeGenerator = new PackageTreeGenerator();
-        InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
-                getProject(),
-                instrumentationInfo, packageTreeGenerator, logger);
+        adbWrapper.waitForAdb();
 
         Environment environment = new Environment(getResultsDir(),
                 getReportsDir(), getCoverageDir());
-        DeviceCommandsRunner runner = new DeviceCommandsRunner(testPlanProvider, commandProvider,
-                environment, logger);
+        DeviceCommandsRunner runner = deviceCommandsRunnerFabric
+                .provideDeviceCommandRunner(commandProvider, environment);
 
-        generateHtmlReport(runner.runCommands(provideDevices(adb)));
+        generateHtmlReport(runner.runCommands(provideDevices()));
     }
 
     private void prepareOutputFolders() throws IOException {
@@ -100,8 +99,8 @@ public class InstrumentationTestTask extends DefaultTask {
         }
     }
 
-    private ConnectedDeviceWrapper[] provideDevices(AndroidDebugBridge adb) {
-        IDevice[] devices = adb.getDevices();
+    private ConnectedDeviceWrapper[] provideDevices() {
+        IDevice[] devices = adbWrapper.provideDevices();
         ConnectedDeviceWrapper[] deviceWrappers = new ConnectedDeviceWrapper[devices.length];
         for (int i = 0; i < devices.length; i++) {
             deviceWrappers[i] = new ConnectedDeviceWrapper(devices[i]);
@@ -127,22 +126,13 @@ public class InstrumentationTestTask extends DefaultTask {
         }
         if (instrumentationArgsProvider == null) {
             instrumentationArgsProvider = new DefaultInstrumentationArgsProvider();
-            logger.i(TAG, "init: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
+            logger.i(TAG, "initWithAndroidSdk: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
         }
         if (commandProvider == null) {
             logger.i(TAG, "command provider is empty, use DefaultCommandProvider");
             commandProvider = new DefaultCommandProvider(getProject(),
                     instrumentationInfo,
                     instrumentationArgsProvider, commandsForAnnotationProvider, logger);
-        }
-    }
-
-    private void waitForAdb(AndroidDebugBridge adb) throws InterruptedException {
-        for (int counter = 0; counter < ADB_TIMEOUT; counter++) {
-            if (adb.isConnected()) {
-                break;
-            }
-            Thread.sleep(ONE_SECOND);
         }
     }
 

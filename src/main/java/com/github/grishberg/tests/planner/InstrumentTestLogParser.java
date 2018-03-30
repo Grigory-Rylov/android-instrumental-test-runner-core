@@ -3,6 +3,7 @@ package com.github.grishberg.tests.planner;
 import com.android.ddmlib.MultiLineReceiver;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -83,11 +84,8 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
     }
 
-    private List<String> parseFlags(String flags) {
+    private List<String> parseFlags(@Nonnull String flags) {
         ArrayList<String> result = new ArrayList<>();
-        if (flags == null) {
-            return result;
-        }
         if (flags.indexOf(',') < 0) {
             result.add(flags);
             return result;
@@ -100,11 +98,8 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         return payload.split("=", 2);
     }
 
-    private List<String> parseAnnotations(String annotations) {
+    private List<String> parseAnnotations(@Nonnull String annotations) {
         ArrayList<String> result = new ArrayList<>();
-        if (annotations == null) {
-            return result;
-        }
         if (annotations.indexOf(',') < 0) {
             result.add(annotations);
             return result;
@@ -132,7 +127,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
 
         void setClassName(String className) { /* to be implemented in subclass */ }
 
-        void setFeature(String feature) { /* to be implemented in subclass */ }
+        void setFeature(@Nonnull String feature) { /* to be implemented in subclass */ }
 
         void setFlags(List<String> flags) { /* to be implemented in subclass */ }
     }
@@ -141,7 +136,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         private String testId;
         private String testMethodName;
         private String testClassName;
-        private String feature;
+        private String feature = "";
         private List<String> annotations;
         private List<String> flags;
 
@@ -163,7 +158,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
 
         @Override
-        void setFeature(String feature) {
+        void setFeature(@Nonnull String feature) {
             this.feature = feature;
         }
 
@@ -199,7 +194,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         private final String testClassName;
         private TestPlanElement testPlan;
         private List<String> annotations;
-        private String feature;
+        private String feature = "";
         private List<String> flags;
 
         private ReadyToStoreObject(String testId, String testMethodName, String testClassName) {
@@ -238,7 +233,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
 
         @Override
-        void setFeature(String feature) {
+        void setFeature(@Nonnull String feature) {
             if (testPlan != null) {
                 testPlan.setFeature(feature);
                 return;

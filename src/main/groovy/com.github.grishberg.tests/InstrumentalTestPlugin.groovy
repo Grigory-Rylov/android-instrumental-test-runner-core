@@ -1,5 +1,10 @@
 package com.github.grishberg.tests
 
+import com.github.grishberg.tests.adb.AdbWrapper
+import com.github.grishberg.tests.common.DefaultGradleLogger
+import com.github.grishberg.tests.common.RunnerLogger
+import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider
+import com.github.grishberg.tests.planner.PackageTreeGenerator
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -14,12 +19,22 @@ class InstrumentalTestPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.getLogger().info("InstrumentalTestPlugin apply")
 
-        project.extensions.create(INSTRUMENTAL_PLUGIN_EXTENSION, InstrumentalPluginExtension)
+        InstrumentalPluginExtension extension = project.extensions
+                .create(INSTRUMENTAL_PLUGIN_EXTENSION, InstrumentalPluginExtension)
 
         InstrumentationTestTask task = project.getTasks()
                 .create(InstrumentationTestTask.NAME, InstrumentationTestTask.class)
 
         task.setGroup("verification")
         task.setDescription("Plugin for running instrumental tests on multiple devices")
+
+        RunnerLogger logger = new DefaultGradleLogger(project.getLogger())
+        PackageTreeGenerator packageTreeGenerator = new PackageTreeGenerator()
+        InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
+                project, extension, packageTreeGenerator, logger)
+        DeviceCommandsRunnerFabric deviceCommandsRunnerFabric = new DeviceCommandsRunnerFabric(logger,
+                testPlanProvider)
+        AdbWrapper adbWrapper = new AdbWrapper()
+        task.initAfterApply(adbWrapper, deviceCommandsRunnerFabric, logger)
     }
 }
