@@ -37,7 +37,7 @@ public class TestPlanElement {
                 NodeType.CLASS : NodeType.METHOD;
     }
 
-    public void addAnnotations(List<String> annotations) {
+    void addAnnotations(List<String> annotations) {
         if (annotations == null) {
             return;
         }
@@ -93,12 +93,8 @@ public class TestPlanElement {
         this.feature = feature;
     }
 
-    public boolean isClass() {
-        return methodName == null || methodName.length() == 0;
-    }
-
     public boolean isPackage() {
-        return false;
+        return type == NodeType.PACKAGE;
     }
 
     /**
