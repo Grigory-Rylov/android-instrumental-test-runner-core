@@ -57,9 +57,10 @@ public class InstrumentationTestTask extends DefaultTask {
         logger.i(TAG, "InstrumentationTestTask.runTask");
 
         androidSdkPath = instrumentationInfo.getAndroidSdkPath();
-        adbWrapper.initWithAndroidSdk(androidSdkPath);
 
         init();
+
+        adbWrapper.initWithAndroidSdk(androidSdkPath);
 
         prepareOutputFolders();
 
@@ -119,7 +120,7 @@ public class InstrumentationTestTask extends DefaultTask {
             throw new GradleException("Need to set InstrumentationInfo");
         }
         if (commandsForAnnotationProvider == null) {
-            commandsForAnnotationProvider = new DefaultCommandsForAnnotationProvider(getLogger(),
+            commandsForAnnotationProvider = new DefaultCommandsForAnnotationProvider(logger,
                     instrumentationInfo);
 
             logger.i(TAG, "Init: commandsForAnnotationProvider is empty, use DefaultCommandsForAnnotationProvider");

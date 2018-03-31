@@ -2,7 +2,7 @@ package com.github.grishberg.tests.commands;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
-import org.gradle.api.logging.Logger;
+import com.github.grishberg.tests.common.RunnerLogger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class ClearCommandTest {
     @Mock
-    Logger logger;
+    RunnerLogger logger;
     @Mock
     InstrumentalPluginExtension ext;
     @Mock
@@ -37,6 +37,6 @@ public class ClearCommandTest {
         clearCommand.execute(deviceWrapper);
 
         Mockito.verify(deviceWrapper).executeShellCommand("pm clear appId");
-        verify(logger).info("ClearCommand for package {}", "appId");
+        verify(logger).i(ClearCommand.class.getSimpleName(), "ClearCommand for package %s", "appId");
     }
 }

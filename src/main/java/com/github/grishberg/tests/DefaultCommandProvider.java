@@ -24,10 +24,11 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
     private final CommandsForAnnotationProvider commandsForAnnotationProvider;
     private final RunnerLogger logger;
 
-    public DefaultCommandProvider(Project project,
-                                  InstrumentalPluginExtension instrumentalInfo,
-                                  InstrumentationArgsProvider argsProvider,
-                                  CommandsForAnnotationProvider commandsForAnnotationProvider, RunnerLogger logger) {
+    DefaultCommandProvider(Project project,
+                           InstrumentalPluginExtension instrumentalInfo,
+                           InstrumentationArgsProvider argsProvider,
+                           CommandsForAnnotationProvider commandsForAnnotationProvider,
+                           RunnerLogger logger) {
         this.project = project;
         this.instrumentationInfo = instrumentalInfo;
         this.argsProvider = argsProvider;
@@ -51,17 +52,19 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
         for (TestPlanElement currentPlan : planSet) {
             List<DeviceRunnerCommand> commandsForAnnotations = commandsForAnnotationProvider
                     .provideCommand(currentPlan.getAnnotations());
-            if (!commandsForAnnotations.isEmpty() && !planList.isEmpty()) {
+            if (!commandsForAnnotations.isEmpty()) {
+                if (!planList.isEmpty()) {
+                    commands.add(new SingleInstrumentalTestCommand(project,
+                            String.format("test_%d", testIndex++),
+                            instrumentationInfo,
+                            instrumentalArgs,
+                            planList,
+                            environment,
+                            logger));
+                    planList.clear();
+                }
+
                 commands.addAll(commandsForAnnotations);
-                commands.add(new SingleInstrumentalTestCommand(project,
-                        String.format("test_%d", testIndex++),
-                        instrumentationInfo,
-                        instrumentalArgs,
-                        planList,
-                        environment,
-                        logger));
-                planList.clear();
-                continue;
             }
             planList.add(currentPlan);
         }

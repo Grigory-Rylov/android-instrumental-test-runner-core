@@ -2,23 +2,24 @@ package com.github.grishberg.tests.commands;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
-import org.gradle.api.logging.Logger;
+import com.github.grishberg.tests.common.RunnerLogger;
 
 /**
  * Cleans app data.
  */
 public class ClearCommand implements DeviceRunnerCommand {
-    private final Logger logger;
+    private static final String TAG = ClearCommand.class.getSimpleName();
+    private final RunnerLogger logger;
     private final InstrumentalPluginExtension instrumentationInfo;
 
-    public ClearCommand(Logger logger, InstrumentalPluginExtension instrumentalInfo) {
+    public ClearCommand(RunnerLogger logger, InstrumentalPluginExtension instrumentalInfo) {
         this.logger = logger;
         this.instrumentationInfo = instrumentalInfo;
     }
 
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper device) throws ExecuteCommandException {
-        logger.info("ClearCommand for package {}", instrumentationInfo.getApplicationId());
+        logger.i(TAG, "ClearCommand for package %s", instrumentationInfo.getApplicationId());
         StringBuilder command = new StringBuilder("pm clear ");
         command.append(instrumentationInfo.getApplicationId());
 
