@@ -19,13 +19,24 @@ public class DefaultGradleLogger implements RunnerLogger {
     }
 
     @Override
+    public void w(String tag, String msgFormat, Object... args) {
+        if (!logger.isWarnEnabled()) {
+            return;
+        }
+        logger.warn(FORMAT_STR, tag, String.format(msgFormat, args));
+    }
+
+    @Override
     public void i(String tag, String message) {
+        if (!logger.isInfoEnabled()) {
+            return;
+        }
         logger.info(FORMAT_STR, tag, message);
     }
 
     @Override
     public void i(String tag, String msgFormat, Object... args) {
-        if (msgFormat == null) {
+        if (msgFormat == null || !logger.isInfoEnabled()) {
             return;
         }
         logger.info(FORMAT_STR, tag, String.format(msgFormat, args));
@@ -38,7 +49,7 @@ public class DefaultGradleLogger implements RunnerLogger {
 
     @Override
     public void d(String tag, String msgFormat, Object... args) {
-        if (msgFormat == null) {
+        if (msgFormat == null || !logger.isDebugEnabled()) {
             return;
         }
         logger.debug(FORMAT_STR, tag, String.format(msgFormat, args));

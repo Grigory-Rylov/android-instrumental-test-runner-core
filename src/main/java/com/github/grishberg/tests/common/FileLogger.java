@@ -33,17 +33,31 @@ public class FileLogger implements RunnerLogger {
 
     @Override
     public void w(String tag, String msg) {
+        if (!sLogger.isLoggable(Level.WARNING)) {
+            return;
+        }
         sLogger.warning(String.format(FORMAT_STR, tag, msg));
     }
 
     @Override
+    public void w(String tag, String msgFormat, Object... args) {
+        if (!sLogger.isLoggable(Level.WARNING)) {
+            return;
+        }
+        sLogger.info(String.format(FORMAT_STR, tag, String.format(msgFormat, args)));
+    }
+
+    @Override
     public void i(String tag, String msg) {
+        if (!sLogger.isLoggable(Level.INFO)) {
+            return;
+        }
         sLogger.info(String.format(FORMAT_STR, tag, msg));
     }
 
     @Override
     public void i(String tag, String msgFormat, Object... objects) {
-        if (msgFormat == null) {
+        if (msgFormat == null || !sLogger.isLoggable(Level.INFO)) {
             return;
         }
         sLogger.info(String.format(FORMAT_STR, tag, String.format(msgFormat, objects)));
@@ -51,12 +65,15 @@ public class FileLogger implements RunnerLogger {
 
     @Override
     public void d(String tag, String msg) {
+        if (!sLogger.isLoggable(Level.INFO)) {
+            return;
+        }
         sLogger.log(Level.INFO, String.format(DEBUG_FORMAT, tag, msg));
     }
 
     @Override
     public void d(String tag, String msgFormat, Object... objects) {
-        if (msgFormat == null) {
+        if (msgFormat == null || !sLogger.isLoggable(Level.INFO)) {
             return;
         }
         sLogger.log(Level.INFO, String.format(DEBUG_FORMAT, tag, String.format(msgFormat, objects)));
@@ -64,11 +81,17 @@ public class FileLogger implements RunnerLogger {
 
     @Override
     public void e(String tag, String msg) {
+        if (!sLogger.isLoggable(Level.INFO)) {
+            return;
+        }
         sLogger.log(Level.INFO, String.format(FORMAT_STR, tag, msg));
     }
 
     @Override
     public void e(String tag, String msg, Throwable throwable) {
+        if (!sLogger.isLoggable(Level.INFO)) {
+            return;
+        }
         sLogger.log(Level.INFO, String.format(FORMAT_STR, tag, msg), throwable);
     }
 

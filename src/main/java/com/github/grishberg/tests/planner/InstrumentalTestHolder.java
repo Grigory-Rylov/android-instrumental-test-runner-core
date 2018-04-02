@@ -32,7 +32,7 @@ public class InstrumentalTestHolder {
     }
 
     public List<TestPlanElement> provideCompoundTestPlan() {
-        if (prevRoots.size() == 0) {
+        if (prevRoots.isEmpty()) {
             populateRootsElements();
         }
         ArrayList<TestPlanElement> compoundPlans = new ArrayList<>();
