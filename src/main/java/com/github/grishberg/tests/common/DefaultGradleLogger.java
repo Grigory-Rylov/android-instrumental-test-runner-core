@@ -7,6 +7,7 @@ import org.gradle.api.logging.Logger;
  */
 public class DefaultGradleLogger implements RunnerLogger {
     private static final String FORMAT_STR = "{}: {}";
+    private static final String TAG_DIVIDER = ": ";
     private final Logger logger;
 
     public DefaultGradleLogger(Logger logger) {
@@ -20,18 +21,16 @@ public class DefaultGradleLogger implements RunnerLogger {
 
     @Override
     public void w(String tag, String msgFormat, Object... args) {
-        if (!logger.isWarnEnabled()) {
-            return;
+        if (logger.isWarnEnabled()) {
+            logger.warn(tag + TAG_DIVIDER + msgFormat, args);
         }
-        logger.warn(FORMAT_STR, tag, String.format(msgFormat, args));
     }
 
     @Override
     public void i(String tag, String message) {
-        if (!logger.isInfoEnabled()) {
-            return;
+        if (logger.isInfoEnabled()) {
+            logger.info(FORMAT_STR, tag, message);
         }
-        logger.info(FORMAT_STR, tag, message);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class DefaultGradleLogger implements RunnerLogger {
         if (msgFormat == null || !logger.isInfoEnabled()) {
             return;
         }
-        logger.info(FORMAT_STR, tag, String.format(msgFormat, args));
+        logger.info(tag + TAG_DIVIDER + msgFormat, args);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class DefaultGradleLogger implements RunnerLogger {
         if (msgFormat == null || !logger.isDebugEnabled()) {
             return;
         }
-        logger.debug(FORMAT_STR, tag, String.format(msgFormat, args));
+        logger.debug(tag + TAG_DIVIDER + msgFormat, args);
     }
 
     @Override
@@ -62,6 +61,6 @@ public class DefaultGradleLogger implements RunnerLogger {
 
     @Override
     public void e(String tag, String message, Throwable throwable) {
-        logger.error(FORMAT_STR, tag, message, throwable);
+        logger.error(tag + TAG_DIVIDER + message, throwable);
     }
 }
