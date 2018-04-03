@@ -1,6 +1,5 @@
 package com.github.grishberg.tests.commands;
 
-import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
@@ -38,21 +37,9 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
     public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice) throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
 
-        RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(
-                instrumentationInfo.getInstrumentalPackage(),
-                instrumentationInfo.getInstrumentalRunner(),
-                targetDevice.getDevice());
-
-        for (Map.Entry<String, String> arg : instrumentationArgs.entrySet()) {
-            runner.addInstrumentationArg(arg.getKey(), arg.getValue());
-        }
-
-        String coverageFile = "/data/data/" + instrumentationInfo.getApplicationId()
-                + "/" + ConnectedDeviceWrapper.COVERAGE_FILE_NAME;
-        if (instrumentationInfo.isCoverageEnabled()) {
-            runner.addInstrumentationArg("coverage", "true");
-            runner.addInstrumentationArg("coverageFile", coverageFile);
-        }
+        TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(instrumentationInfo,
+                instrumentationArgs,
+                targetDevice);
 
         RunTestLogger runTestLogger = new RunTestLogger(logger);
         TestXmlReportsGenerator testRunListener = new TestXmlReportsGenerator(targetDevice.getName(),
@@ -64,14 +51,14 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
         testRunListener.setReportDir(environment.getReportsDir());
 
         try {
-            runner.run(testRunListener);
+            testRunnerBuilder.getTestRunner().run(testRunListener);
             TestRunResult runResult = testRunListener.getRunResult();
             result.setFailed(runResult.hasFailedTests());
             String coverageOutFilePrefix = targetDevice.getName();
             if (instrumentationInfo.isCoverageEnabled()) {
                 targetDevice.pullCoverageFile(instrumentationInfo,
                         coverageOutFilePrefix,
-                        coverageFile,
+                        testRunnerBuilder.getCoverageFile(),
                         environment.getCoverageDir(),
                         runTestLogger);
             }
