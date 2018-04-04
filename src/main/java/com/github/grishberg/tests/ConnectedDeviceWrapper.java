@@ -39,7 +39,6 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice {
 
     public String getName() {
         if (name == null) {
-            //TODO: format device name from api level
             name = device.getAvdName();
         }
         return name;
@@ -79,7 +78,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice {
     /**
      * Pulls coverage file from device.
      *
-     * @param instrumentationInfo
+     * @param instrumentationInfo plugin extension with instrumentation info.
      * @param coverageFilePrefix  prefix for generating coverage on local dir.
      * @param coverageFile        full path to coverage file on target device.
      * @param outCoverageDir      local dir, where coverage file will be copied.

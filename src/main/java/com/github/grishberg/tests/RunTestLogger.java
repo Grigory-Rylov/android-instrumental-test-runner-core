@@ -40,9 +40,6 @@ public class RunTestLogger implements ILogger {
 
     @Override
     public void verbose(String msgFormat, Object... args) {
-        if (msgFormat == null) {
-            return;
-        }
-        logger.i(TAG, msgFormat, args);
+        info(msgFormat, args);
     }
 }
