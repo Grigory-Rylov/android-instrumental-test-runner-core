@@ -37,6 +37,6 @@ public class ClearCommandTest {
         clearCommand.execute(deviceWrapper);
 
         Mockito.verify(deviceWrapper).executeShellCommand("pm clear appId");
-        verify(logger).i(ClearCommand.class.getSimpleName(), "ClearCommand for package %s", "appId");
+        verify(logger).i(ClearCommand.class.getSimpleName(), "ClearCommand for package {}", "appId");
     }
 }

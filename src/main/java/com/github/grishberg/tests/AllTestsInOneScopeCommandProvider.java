@@ -37,7 +37,7 @@ public class AllTestsInOneScopeCommandProvider implements DeviceRunnerCommandPro
                                                               Environment environment) {
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
-        logger.i(TAG, "device = %s, args = %s",
+        logger.i(TAG, "device = {}, args = {}",
                 device, instrumentalArgs);
 
         commands.add(new InstrumentalTestCommand(project,

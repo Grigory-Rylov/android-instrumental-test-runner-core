@@ -90,19 +90,9 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice {
                                  String coverageFile,
                                  File outCoverageDir,
                                  final ILogger logger) throws PullCoverageException {
-        MultiLineReceiver outputReceiver = new MultiLineReceiver() {
-            public void processNewLines(String[] lines) {
-                for (String line : lines) {
-                    logger.verbose(line);
-                }
-            }
+        MultiLineReceiver outputReceiver = new MultilineLoggerReceiver(logger);
 
-            public boolean isCancelled() {
-                return false;
-            }
-        };
-
-        logger.verbose("ConnectedDeviceWrapper '%s': fetching coverage data from %s",
+        logger.verbose("ConnectedDeviceWrapper '{}': fetching coverage data from {}",
                 getName(), coverageFile);
         try {
             String temporaryCoverageCopy = "/data/local/tmp/" + instrumentationInfo.getApplicationId()
@@ -140,6 +130,26 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice {
             executeShellCommand(command, new CollectingOutputReceiver(), 30L, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new ExecuteCommandException("executeShellCommand exception:", e);
+        }
+    }
+
+    private class MultilineLoggerReceiver extends MultiLineReceiver {
+        private final ILogger logger;
+
+        MultilineLoggerReceiver(ILogger logger) {
+            this.logger = logger;
+        }
+
+        @Override
+        public void processNewLines(String[] lines) {
+            for (String line : lines) {
+                logger.verbose(line);
+            }
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return false;
         }
     }
 }

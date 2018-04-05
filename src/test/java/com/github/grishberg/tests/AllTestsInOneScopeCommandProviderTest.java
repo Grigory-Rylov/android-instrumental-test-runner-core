@@ -54,6 +54,6 @@ public class AllTestsInOneScopeCommandProviderTest {
         Assert.assertNotNull(command);
         verify(argsProvider).provideInstrumentationArgs(deviceWrapper);
         verify(logger).i(AllTestsInOneScopeCommandProvider.class.getSimpleName(),
-                "device = %s, args = %s", deviceWrapper, ARGS);
+                "device = {}, args = {}", deviceWrapper, ARGS);
     }
 }

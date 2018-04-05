@@ -2,6 +2,7 @@ package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.testrunner.InstrumentationResultParser;
+import com.android.utils.ILogger;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
@@ -12,14 +13,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -74,6 +77,37 @@ public class SingleInstrumentalTestCommandTest {
         cmd.execute(deviceWrapper);
 
         verifyExecuteDeviceCommand(TEST_COVERAGE_COMMAND);
+    }
+
+    @Test
+    public void pullCoverageFileWhenEnabledCoverage() throws Exception {
+        ext.setCoverageEnabled(true);
+        when(environment.getCoverageDir()).thenReturn(new File("/coverage"));
+
+        testCommand.execute(deviceWrapper);
+
+        verify(deviceWrapper).pullCoverageFile(
+                any(InstrumentalPluginExtension.class),
+                anyString(),
+                anyString(),
+                any(File.class),
+                any(ILogger.class));
+    }
+
+    @Test(expected = ExecuteCommandException.class)
+    public void throwExecuteCommandExceptionWhenSomeDeviceException() throws Exception {
+        Mockito.doThrow(new IOException(new Throwable())).when(device)
+                .executeShellCommand(
+                        eq(TEST_COMMAND),
+                        any(InstrumentationResultParser.class),
+                        any(Long.class),
+                        any(Long.class),
+                        eq(TimeUnit.MILLISECONDS));
+        testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
+        testCommand = new SingleInstrumentalTestCommand(project,
+                "test_prefix", ext, args, testElements, environment, logger);
+
+        testCommand.execute(deviceWrapper);
     }
 
     private void verifyExecuteDeviceCommand(String cmd) throws Exception {

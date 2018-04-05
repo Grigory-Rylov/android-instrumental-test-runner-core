@@ -2,7 +2,11 @@ package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
+import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
+import com.github.grishberg.tests.common.RunnerLogger;
+import org.gradle.api.Project;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,13 +29,19 @@ public class TestRunnerBuilderTest {
     private Map<String, String> args = new HashMap<>();
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
+    @Mock
+    Project project;
+    @Mock
+    Environment environment;
+    @Mock
+    RunnerLogger logger;
 
     @Before
     public void setUp() throws Exception {
         extension.setApplicationId("com.test.packageId");
         extension.setInstrumentalPackage(TEST_PACKAGE);
         extension.setInstrumentalRunner(RUNNER_NAME);
-        builder = new TestRunnerBuilder(extension, args, deviceWrapper);
+        builder = new TestRunnerBuilder(project, extension, args, deviceWrapper, environment, logger);
     }
 
     @Test
@@ -42,5 +52,12 @@ public class TestRunnerBuilderTest {
         Assert.assertEquals(RUNNER_NAME, testRunner.getRunnerName());
         testRunner.getAmInstrumentCommand();
         Assert.assertEquals("/data/data/com.test.packageId/coverage.ec", builder.getCoverageFile());
+    }
+
+    @Test
+    public void getTestRunnerListener() {
+
+        TestXmlReportsGenerator reportsGenerator = builder.getTestRunListener();
+        Assert.assertNotNull(reportsGenerator);
     }
 }

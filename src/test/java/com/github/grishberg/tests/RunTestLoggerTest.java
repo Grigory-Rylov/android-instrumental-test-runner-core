@@ -37,19 +37,19 @@ public class RunTestLoggerTest {
     @Test
     public void warning() throws Exception {
         logger.warning("msg %s %s", 1, "test");
-        verify(runnerLogger).w(TAG, "msg %s %s", 1, "test");
+        verify(runnerLogger).w(TAG, "msg 1 test");
     }
 
     @Test
     public void info() throws Exception {
         logger.info("msg %s %s", 1, "test");
-        verify(runnerLogger).i(TAG, "msg %s %s", 1, "test");
+        verify(runnerLogger).i(TAG, "msg 1 test");
     }
 
     @Test
     public void verbose() throws Exception {
         logger.verbose("msg %s %s", 1, "test");
-        verify(runnerLogger).i(TAG, "msg %s %s", 1, "test");
+        verify(runnerLogger).i(TAG, "msg 1 test");
     }
 
     @Test

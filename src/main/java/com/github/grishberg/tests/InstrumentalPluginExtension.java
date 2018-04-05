@@ -15,6 +15,7 @@ public class InstrumentalPluginExtension {
     String instrumentalRunner;
     String instrumentListener = "com.github.grishberg.annotationprinter.AnnotationsTestPrinter";
     boolean coverageEnabled;
+    boolean makeScreenshotsWhenFail;
     Closure<Map<String, String>> instrumentationArgsProvider;
 
     public void setFlavorName(String flavorName) {
@@ -79,5 +80,13 @@ public class InstrumentalPluginExtension {
 
     public void setInstrumentListener(String instrumentListener) {
         this.instrumentListener = instrumentListener;
+    }
+
+    public boolean isMakeScreenshotsWhenFail() {
+        return makeScreenshotsWhenFail;
+    }
+
+    public void setMakeScreenshotsWhenFail(boolean makeScreenshotsWhenFail) {
+        this.makeScreenshotsWhenFail = makeScreenshotsWhenFail;
     }
 }

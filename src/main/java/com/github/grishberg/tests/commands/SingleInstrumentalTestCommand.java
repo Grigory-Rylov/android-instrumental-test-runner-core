@@ -4,7 +4,6 @@ import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
-import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.TestPlanElement;
@@ -76,22 +75,20 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice) throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
 
-        TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(instrumentationInfo,
+        TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(project,
+                instrumentationInfo,
                 instrumentationArgs,
-                targetDevice);
+                targetDevice,
+                environment,
+                logger);
 
-        RunTestLogger runTestLogger = new RunTestLogger(logger);
         String singleTestMethodPrefix = String.format("%s#%s", targetDevice.getName(), testName);
-        TestXmlReportsGenerator testRunListener = new TestXmlReportsGenerator(targetDevice.getName(),
-                project.getName(),
-                instrumentationInfo.getFlavorName(),
-                singleTestMethodPrefix,
-                runTestLogger
-        );
-        testRunListener.setReportDir(environment.getResultsDir());
 
         try {
+            TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();
+
             testRunnerBuilder.getTestRunner().run(testRunListener);
+
             TestRunResult runResult = testRunListener.getRunResult();
             result.setFailed(runResult.hasFailedTests());
 
@@ -100,10 +97,11 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                         singleTestMethodPrefix,
                         testRunnerBuilder.getCoverageFile(),
                         environment.getCoverageDir(),
-                        runTestLogger);
+                        testRunnerBuilder.getRunTestLogger());
             }
         } catch (Exception e) {
             logger.e(TAG, "InstrumentalTestCommand.execute: Exception", e);
+            throw new ExecuteCommandException("SingleInstrumentalTestCommand.execute failed:", e);
         }
         return result;
     }

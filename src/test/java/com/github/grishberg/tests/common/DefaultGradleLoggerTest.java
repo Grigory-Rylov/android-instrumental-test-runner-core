@@ -22,9 +22,9 @@ public class DefaultGradleLoggerTest {
 
     private void initLogger() {
         OutputEventListenerBackedLoggerContext loggerFactory = (OutputEventListenerBackedLoggerContext) LoggerFactory.getILoggerFactory();
-        loggerFactory.setLevel(LogLevel.INFO);
+        loggerFactory.setLevel(LogLevel.DEBUG);
         OutputEventRenderer outputEventListener = (OutputEventRenderer) loggerFactory.getOutputEventListener();
-        outputEventListener.configure(LogLevel.INFO);
+        outputEventListener.configure(LogLevel.DEBUG);
     }
 
     @Test

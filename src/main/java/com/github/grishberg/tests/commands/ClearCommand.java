@@ -19,7 +19,7 @@ public class ClearCommand implements DeviceRunnerCommand {
 
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper device) throws ExecuteCommandException {
-        logger.i(TAG, "ClearCommand for package %s", instrumentationInfo.getApplicationId());
+        logger.i(TAG, "ClearCommand for package {}", instrumentationInfo.getApplicationId());
         StringBuilder command = new StringBuilder("pm clear ");
         command.append(instrumentationInfo.getApplicationId());
 

@@ -43,7 +43,7 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         commands.add(new SetAnimationSpeedCommand(0, 0, 0));
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
-        logger.i(TAG, "provideCommandsForDevice: device = %s, args = %s",
+        logger.i(TAG, "provideCommandsForDevice: device = {}, args = {}",
                 device, instrumentalArgs);
         List<TestPlanElement> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
 

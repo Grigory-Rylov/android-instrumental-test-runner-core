@@ -4,7 +4,6 @@ import com.android.build.gradle.internal.test.report.ReportType;
 import com.android.build.gradle.internal.test.report.TestReport;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
-import com.android.utils.FileUtils;
 import com.github.grishberg.tests.adb.AdbWrapper;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.common.RunnerLogger;
@@ -18,6 +17,8 @@ import org.gradle.internal.logging.ConsoleRenderer;
 
 import java.io.File;
 import java.io.IOException;
+
+import static com.github.grishberg.tests.common.FileHelper.cleanFolder;
 
 /**
  * Main task for running instrumental tests.
@@ -80,15 +81,7 @@ public class InstrumentationTestTask extends DefaultTask {
         cleanFolder(getCoverageDir());
     }
 
-    private static void cleanFolder(File dir) throws IOException {
-        org.apache.commons.io.FileUtils.deleteQuietly(dir);
-        if (!dir.mkdirs()) {
-            throw new IOException("Cant create folder " + dir.getAbsolutePath());
-        }
-    }
-
     private void generateHtmlReport(boolean success) throws IOException {
-        FileUtils.cleanOutputDir(getReportsDir());
         TestReport report = new TestReport(ReportType.SINGLE_FLAVOR, getResultsDir(), getReportsDir());
         report.generateReport();
         if (!success) {
@@ -178,7 +171,7 @@ public class InstrumentationTestTask extends DefaultTask {
                     instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
             coverageDir = new File(getProject().getBuildDir(),
                     String.format("outputs/androidTest/coverage/%s", flavor));
-            logger.d(TAG, "Coverage dir is empty, generate default value %s", coverageDir);
+            logger.d(TAG, "Coverage dir is empty, generate default value {}", coverageDir);
         }
         return coverageDir;
     }
@@ -189,7 +182,7 @@ public class InstrumentationTestTask extends DefaultTask {
                     instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
             resultsDir = new File(getProject().getBuildDir(),
                     String.format("outputs/androidTest/%s", flavor));
-            logger.d(TAG, "Results dir is empty, generate default value %s", resultsDir);
+            logger.d(TAG, "Results dir is empty, generate default value {}", resultsDir);
         }
         return resultsDir;
     }
@@ -201,7 +194,7 @@ public class InstrumentationTestTask extends DefaultTask {
                     instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
             reportsDir = new File(getProject().getBuildDir(),
                     String.format("outputs/reports/androidTest/%s", flavor));
-            logger.d(TAG, "Reports dir is empty, generate default value %s", reportsDir);
+            logger.d(TAG, "Reports dir is empty, generate default value {}", reportsDir);
         }
         return reportsDir;
     }

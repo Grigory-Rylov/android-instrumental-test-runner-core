@@ -27,7 +27,7 @@ public class RunTestLogger implements ILogger {
         if (msgFormat == null) {
             return;
         }
-        logger.w(TAG, msgFormat, args);
+        logger.w(TAG, String.format(msgFormat, args));
     }
 
     @Override
@@ -35,7 +35,7 @@ public class RunTestLogger implements ILogger {
         if (msgFormat == null) {
             return;
         }
-        logger.i(TAG, msgFormat, args);
+        logger.i(TAG, String.format(msgFormat, args));
     }
 
     @Override

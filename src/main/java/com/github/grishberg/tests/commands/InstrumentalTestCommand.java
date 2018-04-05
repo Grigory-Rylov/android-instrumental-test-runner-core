@@ -4,7 +4,6 @@ import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
-import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.gradle.api.Project;
@@ -37,33 +36,32 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
     public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice) throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
 
-        TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(instrumentationInfo,
+        TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(project,
+                instrumentationInfo,
                 instrumentationArgs,
-                targetDevice);
-
-        RunTestLogger runTestLogger = new RunTestLogger(logger);
-        TestXmlReportsGenerator testRunListener = new TestXmlReportsGenerator(targetDevice.getName(),
-                project.getName(),
-                instrumentationInfo.getFlavorName(),
-                "",
-                runTestLogger
-        );
-        testRunListener.setReportDir(environment.getReportsDir());
+                targetDevice,
+                environment,
+                logger);
 
         try {
+            TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();
+
             testRunnerBuilder.getTestRunner().run(testRunListener);
+
             TestRunResult runResult = testRunListener.getRunResult();
             result.setFailed(runResult.hasFailedTests());
             String coverageOutFilePrefix = targetDevice.getName();
+
             if (instrumentationInfo.isCoverageEnabled()) {
                 targetDevice.pullCoverageFile(instrumentationInfo,
                         coverageOutFilePrefix,
                         testRunnerBuilder.getCoverageFile(),
                         environment.getCoverageDir(),
-                        runTestLogger);
+                        testRunnerBuilder.getRunTestLogger());
             }
         } catch (Exception e) {
             project.getLogger().error("InstrumentalTestCommand.execute: Exception", e);
+            throw new ExecuteCommandException("InstrumentalTestCommand.execute failed:", e);
         }
         return result;
     }

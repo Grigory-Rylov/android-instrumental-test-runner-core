@@ -32,7 +32,7 @@ public class InstrumentalTestPlanProvider {
 
     public List<TestPlanElement> provideTestPlan(ConnectedDeviceWrapper device,
                                                  Map<String, String> instrumentalArgs) {
-        logger.i(TAG, "provideTestPlan for device %s", device.getName());
+        logger.i(TAG, "provideTestPlan for device {}", device.getName());
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");
 

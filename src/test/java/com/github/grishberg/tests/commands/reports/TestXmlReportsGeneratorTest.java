@@ -16,13 +16,16 @@ import java.io.File;
 public class TestXmlReportsGeneratorTest {
     @Mock
     ILogger logger;
+    @Mock
+    ScreenShotMaker screenShotMaker;
 
     @Test
     public void getResultFile() throws Exception {
         TestXmlReportsGenerator generator = new TestXmlReportsGenerator("DevName",
                 "ProjectName",
                 "FlavorName",
-                "TestPrefix", logger);
+                "TestPrefix",
+                logger, screenShotMaker);
         File file = generator.getResultFile(new File("/report"));
         Assert.assertEquals(new File("/report/TEST-DevName-ProjectName-FlavorNameTestPrefix.xml"), file);
     }
