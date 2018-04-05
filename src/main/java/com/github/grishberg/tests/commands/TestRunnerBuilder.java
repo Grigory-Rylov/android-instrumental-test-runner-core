@@ -58,7 +58,7 @@ class TestRunnerBuilder {
                 runTestLogger,
                 screenShotMaker
         );
-        testRunListener.setReportDir(environment.getReportsDir());
+        testRunListener.setReportDir(environment.getResultsDir());
     }
 
     RemoteAndroidTestRunner getTestRunner() {

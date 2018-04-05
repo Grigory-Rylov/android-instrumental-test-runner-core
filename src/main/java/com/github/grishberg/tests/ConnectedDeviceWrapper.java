@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Wraps {@link IDevice} interface.
  */
-public class ConnectedDeviceWrapper implements IShellEnabledDevice {
+public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellExecuter {
     public static final String COVERAGE_FILE_NAME = "coverage.ec";
     private final IDevice device;
     private String name;
@@ -37,6 +37,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice {
         return device.getSystemProperty(name);
     }
 
+    @Override
     public String getName() {
         if (name == null) {
             name = device.getAvdName();
@@ -57,9 +58,13 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice {
                 '}';
     }
 
-    public void pullFile(String temporaryCoverageCopy, String path) throws TimeoutException,
-            AdbCommandRejectedException, SyncException, IOException {
-        device.pullFile(temporaryCoverageCopy, path);
+    @Override
+    public void pullFile(String temporaryCoverageCopy, String path) throws ExecuteCommandException {
+        try {
+            device.pullFile(temporaryCoverageCopy, path);
+        } catch (Exception e) {
+            throw new ExecuteCommandException("pullFile exception:", e);
+        }
     }
 
     public boolean isEmulator() {
@@ -100,7 +105,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice {
             executeShellCommand("run-as " + instrumentationInfo.getApplicationId() +
                             " cat " + coverageFile + " | cat > " + temporaryCoverageCopy,
                     outputReceiver,
-                    30L, TimeUnit.SECONDS);
+                    2L, TimeUnit.MINUTES);
             pullFile(temporaryCoverageCopy,
                     (new File(outCoverageDir, coverageFilePrefix + "-" + COVERAGE_FILE_NAME))
                             .getPath());
@@ -127,7 +132,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice {
      */
     public void executeShellCommand(String command) throws ExecuteCommandException {
         try {
-            executeShellCommand(command, new CollectingOutputReceiver(), 30L, TimeUnit.SECONDS);
+            executeShellCommand(command, new CollectingOutputReceiver(), 5L, TimeUnit.MINUTES);
         } catch (Exception e) {
             throw new ExecuteCommandException("executeShellCommand exception:", e);
         }
