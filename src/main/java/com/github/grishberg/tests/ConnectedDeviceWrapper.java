@@ -97,7 +97,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
                                  final ILogger logger) throws PullCoverageException {
         MultiLineReceiver outputReceiver = new MultilineLoggerReceiver(logger);
 
-        logger.verbose("ConnectedDeviceWrapper '{}': fetching coverage data from {}",
+        logger.verbose("ConnectedDeviceWrapper '%s': fetching coverage data from %s",
                 getName(), coverageFile);
         try {
             String temporaryCoverageCopy = "/data/local/tmp/" + instrumentationInfo.getApplicationId()
@@ -133,6 +133,17 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     public void executeShellCommand(String command) throws ExecuteCommandException {
         try {
             executeShellCommand(command, new CollectingOutputReceiver(), 5L, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            throw new ExecuteCommandException("executeShellCommand exception:", e);
+        }
+    }
+
+    @Override
+    public String executeShellCommandAndReturnOutput(String command) throws ExecuteCommandException {
+        try {
+            CollectingOutputReceiver receiver = new CollectingOutputReceiver();
+            executeShellCommand(command, receiver, 5L, TimeUnit.MINUTES);
+            return receiver.getOutput();
         } catch (Exception e) {
             throw new ExecuteCommandException("executeShellCommand exception:", e);
         }

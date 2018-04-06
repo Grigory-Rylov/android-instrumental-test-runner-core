@@ -11,8 +11,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
+import java.util.HashMap;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by grishberg on 03.04.18.
@@ -26,8 +28,9 @@ public class TestXmlReportsGeneratorTest {
     @Mock
     ScreenShotMaker screenShotMaker;
     @Mock
+    LogcatSaver logcatSaver;
+    @Mock
     TestIdentifier testIdentifier;
-
     private TestXmlReportsGenerator generator;
 
     @Before
@@ -38,8 +41,7 @@ public class TestXmlReportsGeneratorTest {
                 "ProjectName",
                 "FlavorName",
                 "TestPrefix",
-                logger, screenShotMaker);
-
+                logger, screenShotMaker, logcatSaver);
     }
 
     @Test
@@ -53,7 +55,14 @@ public class TestXmlReportsGeneratorTest {
         generator.testFailed(testIdentifier, "trace");
 
         Mockito.verify(screenShotMaker).makeScreenshot(TEST_CLASS, TEST_NAME);
+        verify(logcatSaver, never()).saveLogcat(anyString());
+        verify(logcatSaver, never()).clearLogcat();
+    }
 
+    @Test
+    public void saveLogcatWhenAllTestEnded() {
+        generator.testRunEnded(100, new HashMap<>());
 
+        verify(logcatSaver).saveLogcat("logcat");
     }
 }

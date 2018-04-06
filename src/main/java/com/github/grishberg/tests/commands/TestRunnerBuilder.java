@@ -6,10 +6,7 @@ import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.RunTestLogger;
-import com.github.grishberg.tests.commands.reports.EmptyScreenShotMaker;
-import com.github.grishberg.tests.commands.reports.ScreenShotMaker;
-import com.github.grishberg.tests.commands.reports.ScreenShotMakerImpl;
-import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
+import com.github.grishberg.tests.commands.reports.*;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.gradle.api.Project;
 
@@ -44,10 +41,8 @@ class TestRunnerBuilder {
             runner.addInstrumentationArg("coverageFile", coverageFile);
         }
 
-        ScreenShotMaker screenShotMaker = new EmptyScreenShotMaker();
-        if (instrumentationInfo.isMakeScreenshotsWhenFail()) {
-            screenShotMaker = new ScreenShotMakerImpl(environment.getReportsDir(), targetDevice, logger);
-        }
+        ScreenShotMaker screenShotMaker = getScreenShotMaker(instrumentationInfo, targetDevice, environment, logger);
+        LogcatSaver logcatSaver = getLogcatSaver(instrumentationInfo, targetDevice, environment, logger);
 
         runTestLogger = new RunTestLogger(logger);
 
@@ -56,9 +51,29 @@ class TestRunnerBuilder {
                 instrumentationInfo.getFlavorName(),
                 "",
                 runTestLogger,
-                screenShotMaker
-        );
+                screenShotMaker,
+                logcatSaver);
         testRunListener.setReportDir(environment.getResultsDir());
+    }
+
+    private ScreenShotMaker getScreenShotMaker(InstrumentalPluginExtension instrumentationInfo,
+                                               ConnectedDeviceWrapper targetDevice,
+                                               Environment environment,
+                                               RunnerLogger logger) {
+        if (instrumentationInfo.isMakeScreenshotsWhenFail()) {
+            return new ScreenShotMakerImpl(environment.getReportsDir(), targetDevice, logger);
+        }
+        return new EmptyScreenShotMaker();
+    }
+
+    private LogcatSaver getLogcatSaver(InstrumentalPluginExtension instrumentationInfo,
+                                       ConnectedDeviceWrapper targetDevice,
+                                       Environment environment,
+                                       RunnerLogger logger) {
+        if (instrumentationInfo.isSaveLogcat()) {
+            return new LogcatSaverImpl(targetDevice, environment.getReportsDir(), logger);
+        }
+        return new EmptyLogcatSaver();
     }
 
     RemoteAndroidTestRunner getTestRunner() {

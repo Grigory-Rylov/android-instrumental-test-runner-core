@@ -6,29 +6,33 @@ import com.android.utils.ILogger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Xml report generator with prefix for single tests.
  */
 public class TestXmlReportsGenerator extends CustomTestRunListener {
-    private String deviceName;
-    private String projectName;
-    private String flavorName;
-    private String testPrefix;
-    private ScreenShotMaker screenShotMaker;
+    private final String deviceName;
+    private final String projectName;
+    private final String flavorName;
+    private final String testPrefix;
+    private final ScreenShotMaker screenShotMaker;
+    private final LogcatSaver logcatSaver;
 
     public TestXmlReportsGenerator(String deviceName,
                                    String projectName,
                                    String flavorName,
                                    String testPrefix,
                                    ILogger logger,
-                                   ScreenShotMaker screenShotMaker) {
+                                   ScreenShotMaker screenShotMaker,
+                                   LogcatSaver logcatSaver) {
         super(deviceName, projectName, flavorName, logger);
         this.deviceName = deviceName;
         this.projectName = projectName;
         this.flavorName = flavorName;
         this.testPrefix = testPrefix;
         this.screenShotMaker = screenShotMaker;
+        this.logcatSaver = logcatSaver;
     }
 
     @Override
@@ -42,5 +46,11 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
     public void testFailed(TestIdentifier test, String trace) {
         super.testFailed(test, trace);
         screenShotMaker.makeScreenshot(test.getClassName(), test.getTestName());
+    }
+
+    @Override
+    public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
+        super.testRunEnded(elapsedTime, runMetrics);
+        logcatSaver.saveLogcat("logcat");
     }
 }

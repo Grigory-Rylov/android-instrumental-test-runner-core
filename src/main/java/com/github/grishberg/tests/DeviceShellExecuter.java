@@ -8,6 +8,8 @@ import com.github.grishberg.tests.commands.ExecuteCommandException;
 public interface DeviceShellExecuter {
     void executeShellCommand(String command) throws ExecuteCommandException;
 
+    String executeShellCommandAndReturnOutput(String command) throws ExecuteCommandException;
+
     void pullFile(String temporaryCoverageCopy, String path) throws ExecuteCommandException;
 
     String getName();

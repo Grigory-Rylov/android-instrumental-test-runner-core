@@ -1,7 +1,6 @@
 package com.github.grishberg.tests.commands.reports;
 
 import com.github.grishberg.tests.DeviceShellExecuter;
-import com.github.grishberg.tests.common.FileHelper;
 import com.github.grishberg.tests.common.RunnerLogger;
 
 import java.io.File;
@@ -14,28 +13,26 @@ public class ScreenShotMakerImpl implements ScreenShotMaker {
     private static final String SCREENSHOT_DIR = "screenshots";
     private final DeviceShellExecuter deviceWrapper;
     private RunnerLogger logger;
-    private File reportsDir;
+    private File screenshotDir;
 
     public ScreenShotMakerImpl(File reportsDir,
                                DeviceShellExecuter deviceWrapper,
                                RunnerLogger logger) {
-        this.reportsDir = reportsDir;
         this.deviceWrapper = deviceWrapper;
         this.logger = logger;
+
+        screenshotDir = new File(reportsDir, SCREENSHOT_DIR);
+        if (!screenshotDir.exists()) {
+            if (!screenshotDir.mkdirs()) {
+                logger.e(TAG, "ScreenShotMakerImpl: cant make dir " + screenshotDir);
+            }
+        }
     }
 
     @Override
     public void makeScreenshot(String className, String testName) {
         File outFile = generateScreenshotFile(className, testName);
         try {
-            File parentDir = outFile.getParentFile();
-            if (!parentDir.exists()) {
-                if (!parentDir.mkdirs()) {
-                    logger.e(TAG, "makeScreenshot: cant make dir " + parentDir);
-                    return;
-                }
-            }
-            FileHelper.cleanFolder(parentDir);
             deviceWrapper.executeShellCommand("screencap -p /sdcard/fail_screen.png");
             deviceWrapper.pullFile("/sdcard/fail_screen.png", outFile.getAbsolutePath());
             deviceWrapper.executeShellCommand("rm /sdcard/fail_screen.png");
@@ -45,7 +42,7 @@ public class ScreenShotMakerImpl implements ScreenShotMaker {
     }
 
     private File generateScreenshotFile(String className, String testName) {
-        return new File(reportsDir, String.format("%s/%s-%s#%s.png",
-                SCREENSHOT_DIR, deviceWrapper.getName(), className, testName));
+        return new File(screenshotDir, String.format("%s-%s#%s.png",
+                deviceWrapper.getName(), className, testName));
     }
 }

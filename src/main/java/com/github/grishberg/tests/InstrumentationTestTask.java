@@ -107,7 +107,7 @@ public class InstrumentationTestTask extends DefaultTask {
         if (androidSdkPath == null) {
             logger.i(TAG, "androidSdkPath is empty, get path from env ANDROID_HOME");
             androidSdkPath = System.getenv("ANDROID_HOME");
-            logger.i(TAG, "androidSdkPath = %s", androidSdkPath);
+            logger.i(TAG, "androidSdkPath = {}", androidSdkPath);
         }
         if (instrumentationInfo == null) {
             throw new GradleException("Need to set InstrumentationInfo");

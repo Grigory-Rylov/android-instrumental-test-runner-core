@@ -16,6 +16,7 @@ public class InstrumentalPluginExtension {
     String instrumentListener = "com.github.grishberg.annotationprinter.AnnotationsTestPrinter";
     boolean coverageEnabled;
     boolean makeScreenshotsWhenFail;
+    boolean saveLogcat;
     Closure<Map<String, String>> instrumentationArgsProvider;
 
     public void setFlavorName(String flavorName) {
@@ -88,5 +89,13 @@ public class InstrumentalPluginExtension {
 
     public void setMakeScreenshotsWhenFail(boolean makeScreenshotsWhenFail) {
         this.makeScreenshotsWhenFail = makeScreenshotsWhenFail;
+    }
+
+    public boolean isSaveLogcat() {
+        return saveLogcat;
+    }
+
+    public void setSaveLogcat(boolean saveLogcat) {
+        this.saveLogcat = saveLogcat;
     }
 }
