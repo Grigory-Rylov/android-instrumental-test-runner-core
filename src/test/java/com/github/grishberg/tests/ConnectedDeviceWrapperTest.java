@@ -1,5 +1,6 @@
 package com.github.grishberg.tests;
 
+import com.android.ddmlib.CollectingOutputReceiver;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.utils.ILogger;
@@ -12,7 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -94,5 +95,19 @@ public class ConnectedDeviceWrapperTest {
                 TimeUnit.MILLISECONDS);
         verify(device).executeShellCommand("cmd", shellOutputReceiver, 0L, 0L,
                 TimeUnit.MILLISECONDS);
+    }
+
+    @Test
+    public void executeShellCommand2() throws Exception {
+        deviceWrapper.executeShellCommand("cmd");
+        verify(device).executeShellCommand(eq("cmd"), any(CollectingOutputReceiver.class),
+                eq(5L), eq(TimeUnit.MINUTES));
+    }
+
+    @Test
+    public void executeShellCommandAndReturnOutput() throws Exception {
+        String result = deviceWrapper.executeShellCommandAndReturnOutput("cmd");
+        verify(device).executeShellCommand(eq("cmd"), any(CollectingOutputReceiver.class),
+                eq(5L), eq(TimeUnit.MINUTES));
     }
 }
