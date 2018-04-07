@@ -137,23 +137,23 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         return testPlanList;
     }
 
-    private static class State {
-        void storeValuesIfNeeded() { /* to be implemented in subclass */ }
+    private interface State {
+        void storeValuesIfNeeded();
 
-        void setAnnotations(List<String> annotations) { /* to be implemented in subclass */ }
+        void setAnnotations(List<String> annotations);
 
-        void setTestId(String testId) { /* to be implemented in subclass */ }
+        void setTestId(String testId);
 
-        void setTestMethod(String testMethod) { /* to be implemented in subclass */ }
+        void setTestMethod(String testMethod);
 
-        void setClassName(String className) { /* to be implemented in subclass */ }
+        void setClassName(String className);
 
-        void setFeature(@Nonnull String feature) { /* to be implemented in subclass */ }
+        void setFeature(@Nonnull String feature);
 
-        void setFlags(List<String> flags) { /* to be implemented in subclass */ }
+        void setFlags(List<String> flags);
     }
 
-    private class StartNewObject extends State {
+    private class StartNewObject implements State {
         private String testId;
         private String testMethodName;
         private String testClassName;
@@ -162,35 +162,40 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         private List<String> flags;
 
         @Override
-        void setTestId(String id) {
+        public void setTestId(String id) {
             testId = id;
         }
 
         @Override
-        void setTestMethod(String testMethod) {
+        public void setTestMethod(String testMethod) {
             testMethodName = testMethod;
             changeStateIfNeeded();
         }
 
         @Override
-        void setClassName(String className) {
+        public void setClassName(String className) {
             testClassName = className;
             changeStateIfNeeded();
         }
 
         @Override
-        void setFeature(@Nonnull String feature) {
+        public void setFeature(@Nonnull String feature) {
             this.feature = feature;
         }
 
         @Override
-        void setAnnotations(List<String> annotations) {
+        public void setAnnotations(List<String> annotations) {
             this.annotations = annotations;
         }
 
         @Override
-        void setFlags(List<String> flags) {
+        public void setFlags(List<String> flags) {
             this.flags = flags;
+        }
+
+        @Override
+        public void storeValuesIfNeeded() {
+            /* not used */
         }
 
         private void changeStateIfNeeded() {
@@ -209,7 +214,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
     }
 
-    private class ReadyToStoreObject extends State {
+    private class ReadyToStoreObject implements State {
         private final String testId;
         private final String testMethodName;
         private final String testClassName;
@@ -225,14 +230,14 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
 
         @Override
-        void setTestId(String testId) {
+        public void setTestId(String testId) {
             storeValuesIfNeeded();
             state = new StartNewObject();
             state.setTestId(testId);
         }
 
         @Override
-        void storeValuesIfNeeded() {
+        public void storeValuesIfNeeded() {
             testPlan = new TestPlanElement(testId, testMethodName, testClassName);
 
             if (!testPlanList.contains(testPlan)) {
@@ -245,7 +250,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
 
         @Override
-        void setAnnotations(List<String> annotations) {
+        public void setAnnotations(List<String> annotations) {
             if (testPlan != null) {
                 testPlan.addAnnotations(annotations);
                 return;
@@ -254,7 +259,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
 
         @Override
-        void setFeature(@Nonnull String feature) {
+        public void setFeature(@Nonnull String feature) {
             if (testPlan != null) {
                 testPlan.setFeature(feature);
                 return;
@@ -263,13 +268,19 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
 
         @Override
-        void setFlags(List<String> flags) {
+        public void setFlags(List<String> flags) {
             if (testPlan != null) {
                 testPlan.setFlags(flags);
                 return;
             }
             this.flags = flags;
         }
+
+        @Override
+        public void setTestMethod(String testMethod) {/* not used */}
+
+        @Override
+        public void setClassName(String className) {/* not used */}
     }
 
     public interface ParserLogger {
