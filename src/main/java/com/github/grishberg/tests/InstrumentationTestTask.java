@@ -82,7 +82,7 @@ public class InstrumentationTestTask extends DefaultTask {
         cleanFolder(getCoverageDir());
     }
 
-    private void generateHtmlReport(boolean success) throws IOException {
+    private void generateHtmlReport(boolean success) {
         TestReport report = new TestReport(ReportType.SINGLE_FLAVOR, getResultsDir(), getReportsDir());
         report.generateReport();
         if (!success) {

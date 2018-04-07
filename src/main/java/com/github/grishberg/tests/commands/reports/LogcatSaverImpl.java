@@ -23,10 +23,8 @@ public class LogcatSaverImpl implements LogcatSaver {
         this.logger = logger;
 
         logcatDir = new File(reportsDir, OUT_DIR);
-        if (!logcatDir.exists()) {
-            if (!logcatDir.mkdirs()) {
-                logger.e(TAG, "LogcatSaverImpl: cant make dir " + logcatDir);
-            }
+        if (!logcatDir.exists() && !logcatDir.mkdirs()) {
+            logger.e(TAG, "LogcatSaverImpl: cant make dir " + logcatDir);
         }
     }
 
@@ -53,19 +51,10 @@ public class LogcatSaverImpl implements LogcatSaver {
 
     private void saveToFile(String testName, String logcat) throws ExecuteCommandException {
         File outFile = new File(logcatDir, String.format("%s-%s.log", device.getName(), testName));
-        BufferedWriter writer = null;
-        try {
-            writer = new BufferedWriter(new FileWriter(outFile));
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outFile))) {
             writer.write(logcat);
         } catch (Exception e) {
             throw new ExecuteCommandException(e);
-        } finally {
-            if (writer != null) {
-                try {
-                    // Close the writer regardless of what happens...
-                    writer.close();
-                } catch (Exception e) {/* do nothing */}
-            }
         }
     }
 }
