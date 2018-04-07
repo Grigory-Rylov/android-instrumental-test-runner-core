@@ -3,7 +3,10 @@ package com.github.grishberg.tests;
 import com.android.ddmlib.CollectingOutputReceiver;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.IShellOutputReceiver;
+import com.android.ddmlib.TimeoutException;
 import com.android.utils.ILogger;
+import com.github.grishberg.tests.commands.ExecuteCommandException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,9 +16,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by grishberg on 22.03.18.
@@ -109,5 +113,18 @@ public class ConnectedDeviceWrapperTest {
         String result = deviceWrapper.executeShellCommandAndReturnOutput("cmd");
         verify(device).executeShellCommand(eq("cmd"), any(CollectingOutputReceiver.class),
                 eq(5L), eq(TimeUnit.MINUTES));
+    }
+
+    @Test
+    public void returnDeviceWhenAsked() {
+        Assert.assertEquals(device, deviceWrapper.getDevice());
+    }
+
+    @Test(expected = ExecuteCommandException.class)
+    public void throwExecuteCommandExceptionWhenPullFileAndOtherException() throws Exception {
+        doThrow(new TimeoutException()).when(device)
+                .pullFile(anyString(), anyString());
+
+        deviceWrapper.pullFile("coverageCopy", "path");
     }
 }
