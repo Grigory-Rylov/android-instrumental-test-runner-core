@@ -67,9 +67,18 @@ public class DeviceCommandsRunnerTest {
         verify(command).execute(deviceWrapper);
     }
 
-    @Test
+    @Test(expected = ExecuteCommandException.class)
     public void logErrorWhenException() throws Exception {
         ExecuteCommandException exception = new ExecuteCommandException("Exception", new Throwable());
+        when(command.execute(deviceWrapper))
+                .thenThrow(exception);
+        runner.runCommands(devices);
+        verify(logger).e("DCR", "Execute command exception:", exception);
+    }
+
+    @Test(expected = ExecuteCommandException.class)
+    public void throwExecuteCommandExceptionWhenOtherException() throws Exception {
+        NullPointerException exception = new NullPointerException();
         when(command.execute(deviceWrapper))
                 .thenThrow(exception);
         runner.runCommands(devices);

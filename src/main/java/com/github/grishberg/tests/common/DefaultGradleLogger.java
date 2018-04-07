@@ -61,6 +61,6 @@ public class DefaultGradleLogger implements RunnerLogger {
 
     @Override
     public void e(String tag, String message, Throwable throwable) {
-        logger.error(tag + TAG_DIVIDER + message, throwable);
+        logger.error(String.format("%s: %s", tag, message), throwable);
     }
 }

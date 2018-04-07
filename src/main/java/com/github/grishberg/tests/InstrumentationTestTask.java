@@ -6,6 +6,7 @@ import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
 import com.github.grishberg.tests.adb.AdbWrapper;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
+import com.github.grishberg.tests.commands.ExecuteCommandException;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
@@ -54,7 +55,7 @@ public class InstrumentationTestTask extends DefaultTask {
     }
 
     @TaskAction
-    public void runTask() throws InterruptedException, IOException {
+    public void runTask() throws InterruptedException, IOException, ExecuteCommandException {
         logger.i(TAG, "InstrumentationTestTask.runTask");
 
         androidSdkPath = instrumentationInfo.getAndroidSdkPath();

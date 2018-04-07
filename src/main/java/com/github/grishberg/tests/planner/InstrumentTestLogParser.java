@@ -1,6 +1,7 @@
 package com.github.grishberg.tests.planner;
 
 import com.android.ddmlib.MultiLineReceiver;
+import org.gradle.api.GradleException;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -13,12 +14,15 @@ import java.util.List;
  */
 public class InstrumentTestLogParser extends MultiLineReceiver {
     private static final String INSTRUMENTATION_STATUS = "INSTRUMENTATION_STATUS: ";
+    private static final String INSTRUMENTATION_RESULT = "INSTRUMENTATION_RESULT: ";
     private static final String ID = "id";
     private static final String TEST = "test";
     private static final String CLASS = "class";
     private static final String ANNOTATIONS = "annotations";
     private static final String FEATURE = "feature";
     private static final String FLAGS = "flags";
+    private static final String SHORT_MSG = "shortMsg";
+    private static final String PROCESS_CRASHED = "Process crashed.";
     private ParserLogger logger;
     private final ArrayList<TestPlanElement> testPlanList = new ArrayList<>();
     private State state = new StartNewObject();
@@ -39,8 +43,11 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         if (logger != null) {
             logger.logLine(word);
         }
-
-        int startPos = word.indexOf(INSTRUMENTATION_STATUS);
+        int startPos = word.indexOf(INSTRUMENTATION_RESULT);
+        if (startPos >= 0) {
+            parseInstrumentationResult(word.substring(startPos + INSTRUMENTATION_STATUS.length()));
+        }
+        startPos = word.indexOf(INSTRUMENTATION_STATUS);
         if (startPos < 0) {
             return;
         }
@@ -81,6 +88,20 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         if (ANNOTATIONS.equals(words[0])) {
             List<String> annotations = parseAnnotations(words[1]);
             state.setAnnotations(annotations);
+        }
+    }
+
+    private void parseInstrumentationResult(String payload) {
+        String[] words = getSplitArray(payload);
+
+        if (SHORT_MSG.equals(words[0])) {
+            parseMessage(words[1]);
+        }
+    }
+
+    private void parseMessage(String message) {
+        if (PROCESS_CRASHED.equals(message)) {
+            throw new GradleException(message);
         }
     }
 

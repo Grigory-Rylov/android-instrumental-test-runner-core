@@ -1,9 +1,6 @@
 package com.github.grishberg.tests;
 
-import com.github.grishberg.tests.commands.DeviceRunnerCommand;
-import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
-import com.github.grishberg.tests.commands.SetAnimationSpeedCommand;
-import com.github.grishberg.tests.commands.SingleInstrumentalTestCommand;
+import com.github.grishberg.tests.commands.*;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import com.github.grishberg.tests.planner.TestPlanElement;
@@ -39,7 +36,7 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
     @Override
     public List<DeviceRunnerCommand> provideCommandsForDevice(ConnectedDeviceWrapper device,
                                                               InstrumentalTestPlanProvider testPlanProvider,
-                                                              Environment environment) {
+                                                              Environment environment) throws ExecuteCommandException {
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         commands.add(new SetAnimationSpeedCommand(0, 0, 0));
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);

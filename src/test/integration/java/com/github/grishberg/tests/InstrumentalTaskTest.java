@@ -18,9 +18,9 @@ public class InstrumentalTaskTest extends BaseTestCaseWithLogger {
     public void executeTask() throws Exception {
         InstrumentalPluginExtension ext = project.getExtensions().findByType(InstrumentalPluginExtension.class);
         ext.setFlavorName("TEST_FLAVOR");
-        ext.setApplicationId("com.grishberg.gpsexample");
+        ext.setApplicationId("com.github.grishberg.instrumentaltestsample");
         ext.setCoverageEnabled(true);
-        ext.setInstrumentalPackage("com.grishberg.gpsexample.test");
+        ext.setInstrumentalPackage("com.github.grishberg.instrumentaltestsample.test");
         ext.setInstrumentalRunner("android.support.test.runner.AndroidJUnitRunner");
 
         InstrumentationTestTask task = provideTask();

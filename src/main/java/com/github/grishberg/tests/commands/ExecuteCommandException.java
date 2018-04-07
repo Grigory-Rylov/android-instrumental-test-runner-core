@@ -8,7 +8,7 @@ public class ExecuteCommandException extends Exception {
         super(message, e);
     }
 
-    public ExecuteCommandException(Exception e) {
+    public ExecuteCommandException(Throwable e) {
         super(e);
     }
 }

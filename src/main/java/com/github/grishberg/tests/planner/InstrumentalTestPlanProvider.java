@@ -2,6 +2,7 @@ package com.github.grishberg.tests.planner;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.commands.ExecuteCommandException;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.gradle.api.Project;
 
@@ -31,7 +32,7 @@ public class InstrumentalTestPlanProvider {
     }
 
     public List<TestPlanElement> provideTestPlan(ConnectedDeviceWrapper device,
-                                                 Map<String, String> instrumentalArgs) {
+                                                 Map<String, String> instrumentalArgs) throws ExecuteCommandException {
         logger.i(TAG, "provideTestPlan for device {}", device.getName());
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");
@@ -56,7 +57,7 @@ public class InstrumentalTestPlanProvider {
         try {
             device.executeShellCommand(command.toString(), receiver, 0, TimeUnit.SECONDS);
         } catch (Exception e) {
-            logger.e(TAG, "InstrumentalTestPlanProvider.execute error:", e);
+            throw new ExecuteCommandException(e);
         }
 
         return receiver.getTestInstances();
@@ -66,7 +67,7 @@ public class InstrumentalTestPlanProvider {
      * @return test holder contains all test methods in project.
      */
     public InstrumentalTestHolder provideInstrumentalTests(ConnectedDeviceWrapper device,
-                                                           Map<String, String> instrumentalArgs) {
+                                                           Map<String, String> instrumentalArgs) throws ExecuteCommandException {
         // TODO: create fabric
         return new InstrumentalTestHolder(provideTestPlan(device, instrumentalArgs), packageTreeGenerator);
     }

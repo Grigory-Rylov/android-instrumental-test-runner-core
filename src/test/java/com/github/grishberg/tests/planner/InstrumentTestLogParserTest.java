@@ -1,6 +1,7 @@
 package com.github.grishberg.tests.planner;
 
 import com.github.grishberg.tests.planner.InstrumentTestLogParser.ParserLogger;
+import org.gradle.api.GradleException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,9 +70,15 @@ public class InstrumentTestLogParserTest {
 
         Assert.assertEquals(1, annotations.size());
         Assert.assertEquals(1, flags.size());
-        Assert.assertEquals("com.github.grishberg.annotaions.Feature",annotations.get(0));
-        Assert.assertEquals("flag1=value1",flags.get(0));
+        Assert.assertEquals("com.github.grishberg.annotaions.Feature", annotations.get(0));
+        Assert.assertEquals("flag1=value1", flags.get(0));
+    }
 
+    @Test(expected = GradleException.class)
+    public void parserAppCrash() {
+        String[] lines = new String[]{"INSTRUMENTATION_RESULT: shortMsg=Process crashed."};
+
+        parser.processNewLines(lines);
     }
 
     private static String[] getLinesForTest() {
