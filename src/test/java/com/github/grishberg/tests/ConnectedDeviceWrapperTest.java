@@ -4,7 +4,6 @@ import com.android.ddmlib.IDevice;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.utils.ILogger;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -15,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by grishberg on 22.03.18.
@@ -28,13 +28,14 @@ public class ConnectedDeviceWrapperTest {
     @Mock
     InstrumentalPluginExtension extension;
     @Mock
-    File coverageFile;
-    @Mock
     ILogger logger;
     private ConnectedDeviceWrapper deviceWrapper;
+    private File coverageFile = new File("coverage");
 
     @Before
     public void setUp() throws Exception {
+        when(device.getAvdName()).thenReturn("test_device");
+        when(extension.getApplicationId()).thenReturn("com.test.app");
         deviceWrapper = new ConnectedDeviceWrapper(device);
     }
 
@@ -81,7 +82,6 @@ public class ConnectedDeviceWrapperTest {
     }
 
     @Test
-    @Ignore
     public void pullCoverageFile() throws Exception {
         deviceWrapper.pullCoverageFile(extension, "coverageFilePrefix", "coverageFile",
                 coverageFile, logger);
