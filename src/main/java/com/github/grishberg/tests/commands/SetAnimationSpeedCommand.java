@@ -1,6 +1,7 @@
 package com.github.grishberg.tests.commands;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
+import com.github.grishberg.tests.TestRunnerContext;
 
 /**
  * Changes animation speed.
@@ -18,7 +19,8 @@ public class SetAnimationSpeedCommand implements DeviceRunnerCommand {
     }
 
     @Override
-    public DeviceCommandResult execute(ConnectedDeviceWrapper device) throws ExecuteCommandException {
+    public DeviceCommandResult execute(ConnectedDeviceWrapper device, TestRunnerContext context)
+            throws ExecuteCommandException {
         device.executeShellCommand(String.format("settings put global window_animation_scale %d",
                 windowAnimationScale));
         device.executeShellCommand(String.format("settings put global transition_animation_scale %d",

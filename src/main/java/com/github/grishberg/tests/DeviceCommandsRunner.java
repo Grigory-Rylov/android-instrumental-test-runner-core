@@ -17,25 +17,20 @@ class DeviceCommandsRunner {
     private static final String TAG = "DCR";
     private final InstrumentalTestPlanProvider testPlanProvider;
     private final DeviceRunnerCommandProvider commandProvider;
-    private Environment environment;
-    private final RunnerLogger logger;
     private boolean hasFailedTests;
     private Throwable commandException;
 
     DeviceCommandsRunner(InstrumentalTestPlanProvider testPlanProvider,
-                         DeviceRunnerCommandProvider commandProvider,
-                         Environment directoriesProvider,
-                         RunnerLogger logger) {
+                         DeviceRunnerCommandProvider commandProvider) {
         this.testPlanProvider = testPlanProvider;
         this.commandProvider = commandProvider;
-        this.environment = directoriesProvider;
-        this.logger = logger;
     }
 
-    boolean runCommands(ConnectedDeviceWrapper[] devices) throws InterruptedException,
+    boolean runCommands(ConnectedDeviceWrapper[] devices, final TestRunnerContext context) throws InterruptedException,
             ExecuteCommandException {
         final CountDownLatch deviceCounter = new CountDownLatch(devices.length);
-
+        final Environment environment = context.getEnvironment();
+        final RunnerLogger logger = context.getLogger();
         for (ConnectedDeviceWrapper device : devices) {
             new Thread(() -> {
                 try {
@@ -44,7 +39,7 @@ class DeviceCommandsRunner {
                     for (DeviceRunnerCommand command : commands) {
                         logger.d(TAG, "Before executing device = {} command = {}",
                                 device, command.toString());
-                        DeviceCommandResult result = command.execute(device);
+                        DeviceCommandResult result = command.execute(device, context);
                         logger.d(TAG, "After executing device = {} command = {}",
                                 device, command.toString());
                         if (result.isFailed()) {

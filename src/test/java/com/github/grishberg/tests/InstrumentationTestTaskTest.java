@@ -41,6 +41,8 @@ public class InstrumentationTestTaskTest {
     DeviceCommandsRunner runner;
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
+    @Mock
+    TestRunnerContext context;
 
     public InstrumentationTestTaskTest() {
         project.getPluginManager().apply(com.github.grishberg.tests.InstrumentalTestPlugin.class);
@@ -53,9 +55,8 @@ public class InstrumentationTestTaskTest {
     public void setUp() throws Exception {
         IDevice[] devices = new IDevice[]{device};
         when((adbWrapper.provideDevices())).thenReturn(devices);
-        when(deviceCommandsRunnerFabric.provideDeviceCommandRunner(any(DeviceRunnerCommandProvider.class),
-                any(Environment.class))).thenReturn(runner);
-        when(runner.runCommands(any(ConnectedDeviceWrapper[].class))).thenReturn(true);
+        when(deviceCommandsRunnerFabric.provideDeviceCommandRunner(any(DeviceRunnerCommandProvider.class))).thenReturn(runner);
+        when(runner.runCommands(any(ConnectedDeviceWrapper[].class), any(TestRunnerContext.class))).thenReturn(true);
         task.initAfterApply(adbWrapper, deviceCommandsRunnerFabric, logger);
     }
 
@@ -144,8 +145,6 @@ public class InstrumentationTestTaskTest {
 
         verify(adbWrapper).initWithAndroidSdk(ADB_PATH);
         verify(adbWrapper).waitForAdb();
-        verify(deviceCommandsRunnerFabric).provideDeviceCommandRunner(any(DeviceRunnerCommandProvider.class),
-                any(Environment.class));
-
+        verify(deviceCommandsRunnerFabric).provideDeviceCommandRunner(any(DeviceRunnerCommandProvider.class));
     }
 }

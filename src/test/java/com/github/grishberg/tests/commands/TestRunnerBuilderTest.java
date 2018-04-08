@@ -4,6 +4,7 @@ import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.gradle.api.Project;
@@ -16,6 +17,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Created by grishberg on 03.04.18.
@@ -35,13 +38,17 @@ public class TestRunnerBuilderTest {
     Environment environment;
     @Mock
     RunnerLogger logger;
+    @Mock
+    TestRunnerContext context;
 
     @Before
     public void setUp() throws Exception {
+        when(context.getEnvironment()).thenReturn(environment);
+        when(context.getInstrumentalInfo()).thenReturn(extension);
         extension.setApplicationId("com.test.packageId");
         extension.setInstrumentalPackage(TEST_PACKAGE);
         extension.setInstrumentalRunner(RUNNER_NAME);
-        builder = new TestRunnerBuilder(project, extension, args, deviceWrapper, environment, logger);
+        builder = new TestRunnerBuilder(project, args, deviceWrapper, context);
     }
 
     @Test

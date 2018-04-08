@@ -5,6 +5,7 @@ import com.android.ddmlib.testrunner.InstrumentationResultParser;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.gradle.api.Project;
 import org.junit.Before;
@@ -38,22 +39,27 @@ public class InstrumentalTestCommandTest {
     Environment environment;
     @Mock
     RunnerLogger logger;
+    @Mock
+    TestRunnerContext context;
+
     private InstrumentalPluginExtension ext = new InstrumentalPluginExtension();
     private InstrumentalTestCommand command;
     private HashMap<String, String> argsProvider = new HashMap<>();
 
     @Before
     public void setUp() throws Exception {
+        when(context.getInstrumentalInfo()).thenReturn(ext);
+        when(context.getEnvironment()).thenReturn(environment);
         when(deviceWrapper.getName()).thenReturn("test_device");
         when(deviceWrapper.getDevice()).thenReturn(device);
         ext.setInstrumentalPackage("com.app.test");
         ext.setApplicationId("test.appId");
-        command = new InstrumentalTestCommand(project, ext, argsProvider, environment, logger);
+        command = new InstrumentalTestCommand(project, argsProvider);
     }
 
     @Test
     public void executeWithoutCoverage() throws Exception {
-        DeviceCommandResult result = command.execute(deviceWrapper);
+        DeviceCommandResult result = command.execute(deviceWrapper, context);
 
         verifyDeviceExecuteCommand(CMD_WITHOUT_COVERAGE);
     }
@@ -61,7 +67,7 @@ public class InstrumentalTestCommandTest {
     @Test
     public void executeWithCoverage() throws Exception {
         ext.setCoverageEnabled(true);
-        DeviceCommandResult result = command.execute(deviceWrapper);
+        DeviceCommandResult result = command.execute(deviceWrapper, context);
 
         verifyDeviceExecuteCommand(CMD_WITH_COVERAGE);
     }

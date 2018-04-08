@@ -4,8 +4,8 @@ import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
-import com.github.grishberg.tests.common.RunnerLogger;
 import org.gradle.api.Project;
 
 import java.util.Map;
@@ -15,33 +15,25 @@ import java.util.Map;
  */
 public class InstrumentalTestCommand implements DeviceRunnerCommand {
     private final Project project;
-    private Environment environment;
-    private RunnerLogger logger;
-    private final InstrumentalPluginExtension instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
 
     public InstrumentalTestCommand(Project project,
-                                   InstrumentalPluginExtension instrumentalInfo,
-                                   Map<String, String> instrumentalArgs,
-                                   Environment environment,
-                                   RunnerLogger logger) {
+                                   Map<String, String> instrumentalArgs) {
         this.project = project;
-        this.environment = environment;
-        this.logger = logger;
-        this.instrumentationInfo = instrumentalInfo;
         this.instrumentationArgs = instrumentalArgs;
     }
 
     @Override
-    public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice) throws ExecuteCommandException {
+    public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice, TestRunnerContext context)
+            throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
+        Environment environment = context.getEnvironment();
+        InstrumentalPluginExtension instrumentationInfo = context.getInstrumentalInfo();
 
         TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(project,
-                instrumentationInfo,
                 instrumentationArgs,
                 targetDevice,
-                environment,
-                logger);
+                context);
 
         try {
             TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();

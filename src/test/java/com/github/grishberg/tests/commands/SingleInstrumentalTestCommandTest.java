@@ -6,6 +6,7 @@ import com.android.utils.ILogger;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.TestPlanElement;
 import org.gradle.api.Project;
@@ -43,6 +44,8 @@ public class SingleInstrumentalTestCommandTest {
     Environment environment;
     @Mock
     RunnerLogger logger;
+    @Mock
+    TestRunnerContext context;
     private SingleInstrumentalTestCommand testCommand;
     private HashMap<String, String> args = new HashMap<>();
     private InstrumentalPluginExtension ext = new InstrumentalPluginExtension();
@@ -50,19 +53,21 @@ public class SingleInstrumentalTestCommandTest {
 
     @Before
     public void setUp() throws Exception {
+        when(context.getLogger()).thenReturn(logger);
+        when(context.getInstrumentalInfo()).thenReturn(ext);
+        when(context.getEnvironment()).thenReturn(environment);
         when(deviceWrapper.getName()).thenReturn("test_device");
         when(deviceWrapper.getDevice()).thenReturn(device);
-        testCommand = new SingleInstrumentalTestCommand(project,
-                "test_prefix", ext, args, testElements, environment, logger);
+        testCommand = new SingleInstrumentalTestCommand(project, "test_prefix", args, testElements);
     }
 
     @Test
     public void initWithClass() throws Exception {
         testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
         SingleInstrumentalTestCommand cmd = new SingleInstrumentalTestCommand(project,
-                "test_prefix", ext, args, testElements, environment, logger);
+                "test_prefix", args, testElements);
 
-        cmd.execute(deviceWrapper);
+        cmd.execute(deviceWrapper, context);
 
         verifyExecuteDeviceCommand(TEST_COMMAND);
     }
@@ -72,9 +77,9 @@ public class SingleInstrumentalTestCommandTest {
         ext.setCoverageEnabled(true);
         testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
         SingleInstrumentalTestCommand cmd = new SingleInstrumentalTestCommand(project,
-                "test_prefix", ext, args, testElements, environment, logger);
+                "test_prefix", args, testElements);
 
-        cmd.execute(deviceWrapper);
+        cmd.execute(deviceWrapper, context);
 
         verifyExecuteDeviceCommand(TEST_COVERAGE_COMMAND);
     }
@@ -84,7 +89,7 @@ public class SingleInstrumentalTestCommandTest {
         ext.setCoverageEnabled(true);
         when(environment.getCoverageDir()).thenReturn(new File("/coverage"));
 
-        testCommand.execute(deviceWrapper);
+        testCommand.execute(deviceWrapper, context);
 
         verify(deviceWrapper).pullCoverageFile(
                 any(InstrumentalPluginExtension.class),
@@ -105,9 +110,9 @@ public class SingleInstrumentalTestCommandTest {
                         eq(TimeUnit.MILLISECONDS));
         testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
         testCommand = new SingleInstrumentalTestCommand(project,
-                "test_prefix", ext, args, testElements, environment, logger);
+                "test_prefix", args, testElements);
 
-        testCommand.execute(deviceWrapper);
+        testCommand.execute(deviceWrapper, context);
     }
 
     private void verifyExecuteDeviceCommand(String cmd) throws Exception {

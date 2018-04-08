@@ -32,7 +32,7 @@ class InstrumentalTestPlugin implements Plugin<Project> {
         PackageTreeGenerator packageTreeGenerator = new PackageTreeGenerator()
         InstrumentalTestPlanProvider testPlanProvider = new InstrumentalTestPlanProvider(
                 project, extension, packageTreeGenerator, logger)
-        DeviceCommandsRunnerFabric deviceCommandsRunnerFabric = new DeviceCommandsRunnerFabric(logger,
+        DeviceCommandsRunnerFabric deviceCommandsRunnerFabric = new DeviceCommandsRunnerFabric(
                 testPlanProvider)
         AdbWrapper adbWrapper = new AdbWrapper()
         task.initAfterApply(adbWrapper, deviceCommandsRunnerFabric, logger)

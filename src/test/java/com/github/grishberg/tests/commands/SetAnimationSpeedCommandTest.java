@@ -1,6 +1,7 @@
 package com.github.grishberg.tests.commands;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
+import com.github.grishberg.tests.TestRunnerContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -15,12 +16,14 @@ import static org.mockito.Mockito.verify;
 public class SetAnimationSpeedCommandTest {
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
+    @Mock
+    TestRunnerContext context;
 
     @Test
     public void execute() throws Exception {
         SetAnimationSpeedCommand command = new SetAnimationSpeedCommand(0, 1, 2);
 
-        command.execute(deviceWrapper);
+        command.execute(deviceWrapper, context);
 
         verify(deviceWrapper).executeShellCommand("settings put global window_animation_scale 0");
         verify(deviceWrapper).executeShellCommand("settings put global transition_animation_scale 1");

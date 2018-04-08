@@ -40,11 +40,7 @@ public class AllTestsInOneScopeCommandProvider implements DeviceRunnerCommandPro
         logger.i(TAG, "device = {}, args = {}",
                 device, instrumentalArgs);
 
-        commands.add(new InstrumentalTestCommand(project,
-                instrumentationInfo,
-                instrumentalArgs,
-                environment,
-                logger));
+        commands.add(new InstrumentalTestCommand(project, instrumentalArgs));
         return commands;
     }
 }

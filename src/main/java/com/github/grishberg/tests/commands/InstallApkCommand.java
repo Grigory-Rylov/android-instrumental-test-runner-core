@@ -1,7 +1,8 @@
 package com.github.grishberg.tests.commands;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
-import org.gradle.api.logging.Logger;
+import com.github.grishberg.tests.TestRunnerContext;
+import com.github.grishberg.tests.common.RunnerLogger;
 
 import java.io.File;
 import java.util.Locale;
@@ -10,26 +11,27 @@ import java.util.Locale;
  * Installs apk file to current device.
  */
 public class InstallApkCommand implements DeviceRunnerCommand {
-    private final Logger logger;
+    private static final String TAG = InstallApkCommand.class.getSimpleName();
     private final File apkFile;
 
-    public InstallApkCommand(Logger logger, File apkFile) {
-        this.logger = logger;
+    public InstallApkCommand(File apkFile) {
         this.apkFile = apkFile;
     }
 
     @Override
-    public DeviceCommandResult execute(ConnectedDeviceWrapper device) throws ExecuteCommandException {
+    public DeviceCommandResult execute(ConnectedDeviceWrapper device, TestRunnerContext runnerContext)
+            throws ExecuteCommandException {
+        RunnerLogger logger = runnerContext.getLogger();
         DeviceCommandResult result = new DeviceCommandResult();
         Exception lastException = null;
         for (int i = 0; i < 3; i++) {
             try {
                 String extraArgument = "";
-                logger.info("InstallApkCommand: install file {}", apkFile.getName());
+                logger.i(TAG, "InstallApkCommand: install file {}", apkFile.getName());
                 device.installPackage(apkFile.getAbsolutePath(), true, extraArgument);
                 break;
             } catch (Exception e) {
-                logger.error("InstallApkCommand: ", e);
+                logger.e(TAG, "InstallApkCommand: ", e);
                 lastException = e;
             }
         }

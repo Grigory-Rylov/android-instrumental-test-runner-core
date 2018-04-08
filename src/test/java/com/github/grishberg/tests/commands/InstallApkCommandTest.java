@@ -1,7 +1,8 @@
 package com.github.grishberg.tests.commands;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
-import org.gradle.api.logging.Logger;
+import com.github.grishberg.tests.TestRunnerContext;
+import com.github.grishberg.tests.common.RunnerLogger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.File;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by grishberg on 31.03.18.
@@ -18,22 +20,26 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class InstallApkCommandTest {
     @Mock
-    Logger logger;
+    RunnerLogger logger;
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
+    @Mock
+    TestRunnerContext context;
     private File apkFile = new File("/apk");
     private InstallApkCommand command;
 
     @Before
     public void setUp() throws Exception {
-        command = new InstallApkCommand(logger, apkFile);
+        when(context.getLogger()).thenReturn(logger);
+        command = new InstallApkCommand(apkFile);
     }
 
     @Test
     public void execute() throws Exception {
-        command.execute(deviceWrapper);
+        command.execute(deviceWrapper, context);
 
-        verify(logger).info("InstallApkCommand: install file {}", apkFile.getName());
+        verify(logger).i(InstallApkCommand.class.getSimpleName(),
+                "InstallApkCommand: install file {}", apkFile.getName());
         verify(deviceWrapper).installPackage(apkFile.getAbsolutePath(), true, "");
     }
 }

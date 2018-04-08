@@ -4,6 +4,7 @@ import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.TestPlanElement;
@@ -22,24 +23,15 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     private static final String PACKAGE = "package";
     private final Project project;
     private String testName;
-    private final InstrumentalPluginExtension instrumentationInfo;
     private final Map<String, String> instrumentationArgs;
-    private Environment environment;
-    private RunnerLogger logger;
 
     public SingleInstrumentalTestCommand(Project project,
                                          String testReportSuffix,
-                                         InstrumentalPluginExtension instrumentalInfo,
                                          Map<String, String> instrumentalArgs,
-                                         List<TestPlanElement> testForExecution,
-                                         Environment environment,
-                                         RunnerLogger logger) {
+                                         List<TestPlanElement> testForExecution) {
         this.project = project;
         this.testName = testReportSuffix;
-        this.instrumentationInfo = instrumentalInfo;
         this.instrumentationArgs = new HashMap<>(instrumentalArgs);
-        this.environment = environment;
-        this.logger = logger;
 
         initTargetTestArgs(testForExecution);
     }
@@ -72,15 +64,17 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     }
 
     @Override
-    public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice) throws ExecuteCommandException {
+    public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice, TestRunnerContext context)
+            throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
+        InstrumentalPluginExtension instrumentationInfo = context.getInstrumentalInfo();
+        Environment environment = context.getEnvironment();
+        RunnerLogger logger = context.getLogger();
 
         TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(project,
-                instrumentationInfo,
                 instrumentationArgs,
                 targetDevice,
-                environment,
-                logger);
+                context);
 
         String singleTestMethodPrefix = String.format("%s#%s", targetDevice.getName(), testName);
 

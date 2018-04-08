@@ -2,10 +2,7 @@ package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.utils.ILogger;
-import com.github.grishberg.tests.ConnectedDeviceWrapper;
-import com.github.grishberg.tests.Environment;
-import com.github.grishberg.tests.InstrumentalPluginExtension;
-import com.github.grishberg.tests.RunTestLogger;
+import com.github.grishberg.tests.*;
 import com.github.grishberg.tests.commands.reports.*;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.gradle.api.Project;
@@ -22,11 +19,13 @@ class TestRunnerBuilder {
     private final RunTestLogger runTestLogger;
 
     TestRunnerBuilder(Project project,
-                      InstrumentalPluginExtension instrumentationInfo,
                       Map<String, String> instrumentationArgs,
                       ConnectedDeviceWrapper targetDevice,
-                      Environment environment,
-                      RunnerLogger logger) {
+                      TestRunnerContext context) {
+        InstrumentalPluginExtension instrumentationInfo = context.getInstrumentalInfo();
+        Environment environment = context.getEnvironment();
+        RunnerLogger logger = context.getLogger();
+
         runner = new RemoteAndroidTestRunner(
                 instrumentationInfo.getInstrumentalPackage(),
                 instrumentationInfo.getInstrumentalRunner(),
@@ -41,7 +40,8 @@ class TestRunnerBuilder {
             runner.addInstrumentationArg("coverageFile", coverageFile);
         }
 
-        ScreenShotMaker screenShotMaker = getScreenShotMaker(instrumentationInfo, targetDevice, environment, logger);
+        ScreenShotMaker screenShotMaker = getScreenShotMaker(context.getScreenshotRelation(),
+                instrumentationInfo, targetDevice, environment, logger);
         LogcatSaver logcatSaver = getLogcatSaver(instrumentationInfo, targetDevice, environment, logger);
 
         runTestLogger = new RunTestLogger(logger);
@@ -56,12 +56,14 @@ class TestRunnerBuilder {
         testRunListener.setReportDir(environment.getResultsDir());
     }
 
-    private ScreenShotMaker getScreenShotMaker(InstrumentalPluginExtension instrumentationInfo,
+    private ScreenShotMaker getScreenShotMaker(Map<String, String> screenshotMap,
+                                               InstrumentalPluginExtension instrumentationInfo,
                                                ConnectedDeviceWrapper targetDevice,
                                                Environment environment,
                                                RunnerLogger logger) {
         if (instrumentationInfo.isMakeScreenshotsWhenFail()) {
-            return new ScreenShotMakerImpl(environment.getReportsDir(), targetDevice, logger);
+            return new ScreenShotMakerImpl(screenshotMap, environment.getReportsDir(), targetDevice,
+                    logger);
         }
         return new EmptyScreenShotMaker();
     }

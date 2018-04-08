@@ -16,18 +16,15 @@ import java.util.Map;
 public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
     private static final String TAG = DefaultCommandProvider.class.getSimpleName();
     private final Project project;
-    private final InstrumentalPluginExtension instrumentationInfo;
     private final InstrumentationArgsProvider argsProvider;
     private final CommandsForAnnotationProvider commandsForAnnotationProvider;
     private final RunnerLogger logger;
 
     DefaultCommandProvider(Project project,
-                           InstrumentalPluginExtension instrumentalInfo,
                            InstrumentationArgsProvider argsProvider,
                            CommandsForAnnotationProvider commandsForAnnotationProvider,
                            RunnerLogger logger) {
         this.project = project;
-        this.instrumentationInfo = instrumentalInfo;
         this.argsProvider = argsProvider;
         this.commandsForAnnotationProvider = commandsForAnnotationProvider;
         this.logger = logger;
@@ -53,11 +50,8 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
                 if (!planList.isEmpty()) {
                     commands.add(new SingleInstrumentalTestCommand(project,
                             String.format("test_%d", testIndex++),
-                            instrumentationInfo,
                             instrumentalArgs,
-                            planList,
-                            environment,
-                            logger));
+                            planList));
                     planList.clear();
                 }
 
@@ -69,11 +63,8 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
         if (!planList.isEmpty()) {
             commands.add(new SingleInstrumentalTestCommand(project,
                     String.format("test_%d", testIndex),
-                    instrumentationInfo,
                     instrumentalArgs,
-                    planList,
-                    environment,
-                    logger));
+                    planList));
         }
         commands.add(new SetAnimationSpeedCommand(1, 1, 1));
         return commands;

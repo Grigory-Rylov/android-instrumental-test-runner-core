@@ -2,6 +2,7 @@ package com.github.grishberg.tests.commands;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,17 +25,21 @@ public class ClearCommandTest {
     InstrumentalPluginExtension ext;
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
+    @Mock
+    TestRunnerContext context;
     private ClearCommand clearCommand;
 
     @Before
     public void setUp() throws Exception {
+        when(context.getInstrumentalInfo()).thenReturn(ext);
+        when(context.getLogger()).thenReturn(logger);
         when(ext.getApplicationId()).thenReturn("appId");
-        clearCommand = new ClearCommand(logger, ext);
+        clearCommand = new ClearCommand();
     }
 
     @Test
     public void execute() throws Exception {
-        clearCommand.execute(deviceWrapper);
+        clearCommand.execute(deviceWrapper, context);
 
         Mockito.verify(deviceWrapper).executeShellCommand("pm clear appId");
         verify(logger).i(ClearCommand.class.getSimpleName(), "ClearCommand for package {}", "appId");

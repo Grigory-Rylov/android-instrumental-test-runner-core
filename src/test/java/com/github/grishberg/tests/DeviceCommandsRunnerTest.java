@@ -38,6 +38,8 @@ public class DeviceCommandsRunnerTest {
     DeviceRunnerCommand command;
     @Mock
     DeviceCommandResult result;
+    @Mock
+    TestRunnerContext context;
     private List<DeviceRunnerCommand> commands;
     private ConnectedDeviceWrapper[] devices;
     private DeviceCommandsRunner runner;
@@ -46,42 +48,44 @@ public class DeviceCommandsRunnerTest {
     public void setUp() throws Exception {
         commands = new ArrayList<>();
         commands.add(command);
+        when(context.getLogger()).thenReturn(logger);
+        when(context.getEnvironment()).thenReturn(environment);
         when(commandProvider.provideCommandsForDevice(deviceWrapper, planProvider, environment))
                 .thenReturn(commands);
-        when(command.execute(deviceWrapper)).thenReturn(result);
+        when(command.execute(deviceWrapper, context)).thenReturn(result);
         devices = new ConnectedDeviceWrapper[1];
         devices[0] = deviceWrapper;
-        runner = new DeviceCommandsRunner(planProvider, commandProvider, environment, logger);
+        runner = new DeviceCommandsRunner(planProvider, commandProvider);
     }
 
     @Test
     public void runCommands() throws Exception {
-        Assert.assertTrue(runner.runCommands(devices));
-        verify(command).execute(deviceWrapper);
+        Assert.assertTrue(runner.runCommands(devices, context));
+        verify(command).execute(deviceWrapper, context);
     }
 
     @Test
     public void runCommandsReturnFalseWhenHasFailedTests() throws Exception {
         when(result.isFailed()).thenReturn(true);
-        Assert.assertFalse(runner.runCommands(devices));
-        verify(command).execute(deviceWrapper);
+        Assert.assertFalse(runner.runCommands(devices, context));
+        verify(command).execute(deviceWrapper, context);
     }
 
     @Test(expected = ExecuteCommandException.class)
     public void logErrorWhenException() throws Exception {
         ExecuteCommandException exception = new ExecuteCommandException("Exception", new Throwable());
-        when(command.execute(deviceWrapper))
+        when(command.execute(deviceWrapper, context))
                 .thenThrow(exception);
-        runner.runCommands(devices);
+        runner.runCommands(devices, context);
         verify(logger).e("DCR", "Execute command exception:", exception);
     }
 
     @Test(expected = ExecuteCommandException.class)
     public void throwExecuteCommandExceptionWhenOtherException() throws Exception {
         NullPointerException exception = new NullPointerException();
-        when(command.execute(deviceWrapper))
+        when(command.execute(deviceWrapper, context))
                 .thenThrow(exception);
-        runner.runCommands(devices);
+        runner.runCommands(devices, context);
         verify(logger).e("DCR", "Execute command exception:", exception);
     }
 }

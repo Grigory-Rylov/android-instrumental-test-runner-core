@@ -50,8 +50,10 @@ public class DefaultCommandProviderTest {
     TestPlanElement element;
     @Mock
     TestPlanElement elementWithAnnotation;
+    @Mock
+    TestRunnerContext context;
     private DefaultCommandProvider provider;
-    private List<DeviceRunnerCommand> clearCommand = Arrays.asList(new ClearCommand(logger, extension));
+    private List<DeviceRunnerCommand> clearCommand = Arrays.asList(new ClearCommand());
 
     @Before
     public void setUp() throws Exception {
@@ -68,7 +70,7 @@ public class DefaultCommandProviderTest {
         List<TestPlanElement> testPlanElements = Arrays.asList(element);
         when(planProvider.provideTestPlan(deviceWrapper, ARGS)).thenReturn(testPlanElements);
         when(argsProvider.provideInstrumentationArgs(deviceWrapper)).thenReturn(ARGS);
-        provider = new DefaultCommandProvider(project, extension, argsProvider,
+        provider = new DefaultCommandProvider(project, argsProvider,
                 commandsForAnnotationProvider, logger);
     }
 
@@ -90,7 +92,7 @@ public class DefaultCommandProviderTest {
     public void provideCommandsForDeviceWithAnnotations() throws Exception {
         List<String> annotations = Arrays.asList(ANNOTATION);
         when(element.getAnnotations()).thenReturn(annotations);
-        List<DeviceRunnerCommand> clearCommand = Arrays.asList(new ClearCommand(logger, extension));
+        List<DeviceRunnerCommand> clearCommand = Arrays.asList(new ClearCommand());
         when(commandsForAnnotationProvider.provideCommand(annotations))
                 .thenReturn(clearCommand);
         List<DeviceRunnerCommand> commandList = provider.provideCommandsForDevice(deviceWrapper,

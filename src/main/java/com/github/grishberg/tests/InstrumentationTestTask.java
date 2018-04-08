@@ -18,6 +18,8 @@ import org.gradle.internal.logging.ConsoleRenderer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.github.grishberg.tests.common.FileHelper.cleanFolder;
 
@@ -71,9 +73,13 @@ public class InstrumentationTestTask extends DefaultTask {
         Environment environment = new Environment(getResultsDir(),
                 getReportsDir(), getCoverageDir());
         DeviceCommandsRunner runner = deviceCommandsRunnerFabric
-                .provideDeviceCommandRunner(commandProvider, environment);
+                .provideDeviceCommandRunner(commandProvider);
 
-        generateHtmlReport(runner.runCommands(provideDevices()));
+        HashMap<String, String> screenshotRelations = new HashMap<>();
+        TestRunnerContext context = new TestRunnerContext(instrumentationInfo,
+                environment, screenshotRelations, logger);
+        boolean success = runner.runCommands(provideDevices(), context);
+        generateHtmlReport(success, screenshotRelations);
     }
 
     private void prepareOutputFolders() throws IOException {
@@ -82,8 +88,9 @@ public class InstrumentationTestTask extends DefaultTask {
         cleanFolder(getCoverageDir());
     }
 
-    private void generateHtmlReport(boolean success) {
-        TestReport report = new TestReport(ReportType.SINGLE_FLAVOR, getResultsDir(), getReportsDir());
+    private void generateHtmlReport(boolean success, Map<String, String> screenshotMap) {
+        TestReport report = new TestReport(ReportType.SINGLE_FLAVOR, getResultsDir(), getReportsDir()/*,
+                screenshotMap*/);
         report.generateReport();
         if (!success) {
             String reportUrl = (new ConsoleRenderer())
@@ -114,8 +121,7 @@ public class InstrumentationTestTask extends DefaultTask {
             throw new GradleException("Need to set InstrumentationInfo");
         }
         if (commandsForAnnotationProvider == null) {
-            commandsForAnnotationProvider = new DefaultCommandsForAnnotationProvider(logger,
-                    instrumentationInfo);
+            commandsForAnnotationProvider = new DefaultCommandsForAnnotationProvider();
 
             logger.i(TAG, "Init: commandsForAnnotationProvider is empty, use DefaultCommandsForAnnotationProvider");
         }
@@ -126,7 +132,6 @@ public class InstrumentationTestTask extends DefaultTask {
         if (commandProvider == null) {
             logger.i(TAG, "command provider is empty, use DefaultCommandProvider");
             commandProvider = new DefaultCommandProvider(getProject(),
-                    instrumentationInfo,
                     instrumentationArgsProvider, commandsForAnnotationProvider, logger);
         }
     }
