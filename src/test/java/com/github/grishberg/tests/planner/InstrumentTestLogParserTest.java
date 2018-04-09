@@ -1,7 +1,7 @@
 package com.github.grishberg.tests.planner;
 
+import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.InstrumentTestLogParser.ParserLogger;
-import org.gradle.api.GradleException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class InstrumentTestLogParserTest {
-    public static final String TEST_LINE = "test line";
+    private static final String TEST_LINE = "test line";
     private InstrumentTestLogParser parser = new InstrumentTestLogParser();
 
     @Test
@@ -74,10 +74,19 @@ public class InstrumentTestLogParserTest {
         Assert.assertEquals("flag1=value1", flags.get(0));
     }
 
-    @Test(expected = GradleException.class)
+    @Test(expected = ProcessCrashedException.class)
     public void parserAppCrash() {
-        String[] lines = new String[]{"INSTRUMENTATION_RESULT: shortMsg=Process crashed."};
+        String[] lines = new String[]{"INSTRUMENTATION_RESULT: shortMsg=Process crashed.",
+                "INSTRUMENTATION_CODE: 0"};
 
+        parser.processNewLines(lines);
+    }
+
+    @Test(expected = ProcessCrashedException.class)
+    public void parserAppCrashWithLongMsg() {
+        String[] lines = new String[]{"INSTRUMENTATION_RESULT: shortMsg=java.lang.ClassNotFoundException",
+                "INSTRUMENTATION_RESULT: longMsg=java.lang.ClassNotFoundException: Didn't find class \"com.dtmilano.android.uiautomatorhelper.UiAutomatorHelperTestRunner\" on path: DexPathList[[zip file \"/system/framework/android.test.runner.jar\", zip file \"/data/app/com.dtmilano.android.culebratester.test-1/base.apk\", zip file \"/data/app/com.dtmilano.android.culebratester-1/base.apk\"],nativeLibraryDirectories=[/data/app/com.dtmilano.android.culebratester.test-1/lib/arm, /data/app/com.dtmilano.android.culebratester-1/lib/arm, /vendor/lib, /system/lib]",
+                "INSTRUMENTATION_CODE: 0"};
         parser.processNewLines(lines);
     }
 

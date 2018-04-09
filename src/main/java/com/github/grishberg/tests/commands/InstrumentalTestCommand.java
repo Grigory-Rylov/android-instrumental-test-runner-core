@@ -52,7 +52,6 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
                         testRunnerBuilder.getRunTestLogger());
             }
         } catch (Exception e) {
-            project.getLogger().error("InstrumentalTestCommand.execute: Exception", e);
             throw new ExecuteCommandException("InstrumentalTestCommand.execute failed:", e);
         }
         return result;

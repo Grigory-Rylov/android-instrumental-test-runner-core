@@ -1,7 +1,7 @@
 package com.github.grishberg.tests.planner;
 
 import com.android.ddmlib.MultiLineReceiver;
-import org.gradle.api.GradleException;
+import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -15,6 +15,7 @@ import java.util.List;
 public class InstrumentTestLogParser extends MultiLineReceiver {
     private static final String INSTRUMENTATION_STATUS = "INSTRUMENTATION_STATUS: ";
     private static final String INSTRUMENTATION_RESULT = "INSTRUMENTATION_RESULT: ";
+    private static final String INSTRUMENTATION_CODE = "INSTRUMENTATION_CODE: ";
     private static final String ID = "id";
     private static final String TEST = "test";
     private static final String CLASS = "class";
@@ -22,6 +23,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     private static final String FEATURE = "feature";
     private static final String FLAGS = "flags";
     private static final String SHORT_MSG = "shortMsg";
+    private static final String LONG_MSG = "longMsg";
     private static final String PROCESS_CRASHED = "Process crashed.";
     private ParserLogger logger;
     private final ArrayList<TestPlanElement> testPlanList = new ArrayList<>();
@@ -46,7 +48,15 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         int startPos = word.indexOf(INSTRUMENTATION_RESULT);
         if (startPos >= 0) {
             parseInstrumentationResult(word.substring(startPos + INSTRUMENTATION_STATUS.length()));
+            return;
         }
+
+        startPos = word.indexOf(INSTRUMENTATION_CODE);
+        if (startPos >= 0) {
+            state.setCode(word.substring(startPos + INSTRUMENTATION_CODE.length()));
+            return;
+        }
+
         startPos = word.indexOf(INSTRUMENTATION_STATUS);
         if (startPos < 0) {
             return;
@@ -92,16 +102,23 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     }
 
     private void parseInstrumentationResult(String payload) {
+        if (state instanceof StartNewObject) {
+            state = new ProcessCrashedState();
+        }
         String[] words = getSplitArray(payload);
 
         if (SHORT_MSG.equals(words[0])) {
-            parseMessage(words[1]);
+            state.setShortMessage(words[1]);
+        }
+
+        if (LONG_MSG.equals(words[0])) {
+            state.setLongMessage(words[1]);
         }
     }
 
     private void parseMessage(String message) {
         if (PROCESS_CRASHED.equals(message)) {
-            throw new GradleException(message);
+            throw new ProcessCrashedException(message);
         }
     }
 
@@ -151,6 +168,12 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         void setFeature(@Nonnull String feature);
 
         void setFlags(List<String> flags);
+
+        void setShortMessage(String shortMsg);
+
+        void setLongMessage(String longMsg);
+
+        void setCode(String code);
     }
 
     private class StartNewObject implements State {
@@ -194,9 +217,16 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
 
         @Override
-        public void storeValuesIfNeeded() {
-            /* not used */
-        }
+        public void storeValuesIfNeeded() { /* not used */ }
+
+        @Override
+        public void setShortMessage(String shortMsg) { /* not used */ }
+
+        @Override
+        public void setLongMessage(String longMsg) { /* not used */ }
+
+        @Override
+        public void setCode(String code) { /* not used */ }
 
         private void changeStateIfNeeded() {
             if (testId != null && testMethodName != null && testClassName != null) {
@@ -281,6 +311,60 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
 
         @Override
         public void setClassName(String className) {/* not used */}
+
+        @Override
+        public void setShortMessage(String shortMsg) { /* not used */ }
+
+        @Override
+        public void setLongMessage(String longMsg) { /* not used */ }
+
+        @Override
+        public void setCode(String code) { /* not used */ }
+    }
+
+    private class ProcessCrashedState implements State {
+        private String shortMessage = "";
+        private String longMessage;
+
+        @Override
+        public void storeValuesIfNeeded() { /* not used */ }
+
+        @Override
+        public void setAnnotations(List<String> annotations) { /* not used */ }
+
+        @Override
+        public void setTestId(String testId) { /* not used */ }
+
+        @Override
+        public void setTestMethod(String testMethod) { /* not used */ }
+
+        @Override
+        public void setClassName(String className) { /* not used */ }
+
+        @Override
+        public void setFeature(@Nonnull String feature) { /* not used */ }
+
+        @Override
+        public void setFlags(List<String> flags) { /* not used */ }
+
+        @Override
+        public void setShortMessage(String shortMsg) {
+            shortMessage = shortMsg;
+        }
+
+        @Override
+        public void setLongMessage(String longMsg) {
+            longMessage = longMsg;
+        }
+
+        @Override
+        public void setCode(String code) {
+            if ("0".equals(code)) {
+                throw new ProcessCrashedException(
+                        longMessage != null ? longMessage : shortMessage
+                );
+            }
+        }
     }
 
     public interface ParserLogger {

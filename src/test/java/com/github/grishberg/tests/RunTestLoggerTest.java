@@ -1,6 +1,7 @@
 package com.github.grishberg.tests;
 
 import com.github.grishberg.tests.common.RunnerLogger;
+import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,5 +75,10 @@ public class RunTestLoggerTest {
     public void verbose_dontLogWhenFormatIsNull() throws Exception {
         logger.verbose(null, 1, "test");
         verify(runnerLogger, never()).i(anyString(), anyString());
+    }
+
+    @Test(expected = ProcessCrashedException.class)
+    public void throwIfProcessCrashed() {
+        logger.warning("Failed %s due to %s", "test", "'Process crashed'");
     }
 }

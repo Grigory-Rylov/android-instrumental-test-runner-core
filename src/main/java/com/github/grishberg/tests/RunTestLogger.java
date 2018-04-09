@@ -2,6 +2,7 @@ package com.github.grishberg.tests;
 
 import com.android.utils.ILogger;
 import com.github.grishberg.tests.common.RunnerLogger;
+import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 
 /**
  * Created by grishberg on 29.10.17.
@@ -27,7 +28,15 @@ public class RunTestLogger implements ILogger {
         if (msgFormat == null) {
             return;
         }
-        logger.w(TAG, String.format(msgFormat, args));
+        String message = String.format(msgFormat, args);
+        logger.w(TAG, message);
+        throwExceptionIfProcessCrashed(message);
+    }
+
+    private void throwExceptionIfProcessCrashed(String message) {
+        if (message.contains("Process crashed")) {
+            throw new ProcessCrashedException("Process crashed");
+        }
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.ExecuteCommandException;
 import com.github.grishberg.tests.common.RunnerLogger;
+import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 
 import java.util.List;
@@ -59,6 +60,9 @@ class DeviceCommandsRunner {
             logger.e(TAG, "Found exception while executing commands.");
             if (commandException instanceof ExecuteCommandException) {
                 throw (ExecuteCommandException) commandException;
+            }
+            if (commandException instanceof ProcessCrashedException) {
+                throw (ProcessCrashedException) commandException;
             }
             throw new ExecuteCommandException(commandException);
         }

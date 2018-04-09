@@ -94,7 +94,6 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                         testRunnerBuilder.getRunTestLogger());
             }
         } catch (Exception e) {
-            logger.e(TAG, "InstrumentalTestCommand.execute: Exception", e);
             throw new ExecuteCommandException("SingleInstrumentalTestCommand.execute failed:", e);
         }
         return result;

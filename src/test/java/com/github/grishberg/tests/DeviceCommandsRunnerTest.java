@@ -5,6 +5,7 @@ import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.ExecuteCommandException;
 import com.github.grishberg.tests.common.RunnerLogger;
+import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.junit.Assert;
 import org.junit.Before;
@@ -83,6 +84,15 @@ public class DeviceCommandsRunnerTest {
     @Test(expected = ExecuteCommandException.class)
     public void throwExecuteCommandExceptionWhenOtherException() throws Exception {
         NullPointerException exception = new NullPointerException();
+        when(command.execute(deviceWrapper, context))
+                .thenThrow(exception);
+        runner.runCommands(devices, context);
+        verify(logger).e("DCR", "Execute command exception:", exception);
+    }
+
+    @Test(expected = ProcessCrashedException.class)
+    public void throwProcessCrashedExceptionWhenProcessCrashed() throws Exception {
+        ProcessCrashedException exception = new ProcessCrashedException("test process crashed");
         when(command.execute(deviceWrapper, context))
                 .thenThrow(exception);
         runner.runCommands(devices, context);
