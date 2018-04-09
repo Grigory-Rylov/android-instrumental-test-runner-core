@@ -2,6 +2,7 @@ package com.github.grishberg.tests;
 
 import com.android.build.gradle.internal.test.report.ReportType;
 import com.android.build.gradle.internal.test.report.TestReport;
+import com.android.build.gradle.internal.test.report.TestReportExt;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
 import com.github.grishberg.tests.adb.AdbWrapper;
@@ -89,8 +90,8 @@ public class InstrumentationTestTask extends DefaultTask {
     }
 
     private void generateHtmlReport(boolean success, Map<String, String> screenshotMap) {
-        TestReport report = new TestReport(ReportType.SINGLE_FLAVOR, getResultsDir(), getReportsDir()/*,
-                screenshotMap*/);
+        TestReport report = new TestReportExt(ReportType.SINGLE_FLAVOR, getResultsDir(),
+                getReportsDir(), screenshotMap);
         report.generateReport();
         if (!success) {
             String reportUrl = (new ConsoleRenderer())

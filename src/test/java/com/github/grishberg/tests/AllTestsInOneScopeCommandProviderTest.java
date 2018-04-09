@@ -42,7 +42,7 @@ public class AllTestsInOneScopeCommandProviderTest {
     @Before
     public void setUp() throws Exception {
         when(argsProvider.provideInstrumentationArgs(deviceWrapper)).thenReturn(ARGS);
-        provider = new AllTestsInOneScopeCommandProvider(project, extension, argsProvider, logger);
+        provider = new AllTestsInOneScopeCommandProvider(project, argsProvider, logger);
     }
 
     @Test

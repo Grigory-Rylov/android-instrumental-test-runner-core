@@ -17,16 +17,13 @@ import java.util.Map;
 public class AllTestsInOneScopeCommandProvider implements DeviceRunnerCommandProvider {
     private static final String TAG = AllTestsInOneScopeCommandProvider.class.getSimpleName();
     private final Project project;
-    private final InstrumentalPluginExtension instrumentationInfo;
     private final InstrumentationArgsProvider argsProvider;
     private final RunnerLogger logger;
 
     public AllTestsInOneScopeCommandProvider(Project project,
-                                             InstrumentalPluginExtension instrumentalInfo,
                                              InstrumentationArgsProvider argsProvider,
                                              RunnerLogger logger) {
         this.project = project;
-        this.instrumentationInfo = instrumentalInfo;
         this.argsProvider = argsProvider;
         this.logger = logger;
     }
