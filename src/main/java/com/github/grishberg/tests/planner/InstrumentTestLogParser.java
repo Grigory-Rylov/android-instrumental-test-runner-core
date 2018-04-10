@@ -116,12 +116,6 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
     }
 
-    private void parseMessage(String message) {
-        if (PROCESS_CRASHED.equals(message)) {
-            throw new ProcessCrashedException(message);
-        }
-    }
-
     private List<String> parseFlags(@Nonnull String flags) {
         ArrayList<String> result = new ArrayList<>();
         if (flags.indexOf(',') < 0) {

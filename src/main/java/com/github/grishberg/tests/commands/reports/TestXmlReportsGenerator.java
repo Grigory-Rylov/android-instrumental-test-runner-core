@@ -14,7 +14,6 @@ import java.util.Map;
 public class TestXmlReportsGenerator extends CustomTestRunListener {
     private final String deviceName;
     private final String projectName;
-    private final String flavorName;
     private final String testPrefix;
     private final ScreenShotMaker screenShotMaker;
     private final LogcatSaver logcatSaver;
@@ -29,7 +28,6 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
         super(deviceName, projectName, flavorName, logger);
         this.deviceName = deviceName;
         this.projectName = projectName;
-        this.flavorName = flavorName;
         this.testPrefix = testPrefix;
         this.screenShotMaker = screenShotMaker;
         this.logcatSaver = logcatSaver;
@@ -38,8 +36,7 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
     @Override
     protected File getResultFile(File reportDir) throws IOException {
         return new File(reportDir,
-                "TEST-" + deviceName + "-" + projectName + "-" +
-                        flavorName + testPrefix + ".xml");
+                "TEST-" + deviceName + "-" + projectName + "-" + testPrefix + ".xml");
     }
 
     @Override

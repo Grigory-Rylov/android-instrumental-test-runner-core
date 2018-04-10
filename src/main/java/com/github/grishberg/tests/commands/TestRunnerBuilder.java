@@ -19,6 +19,7 @@ class TestRunnerBuilder {
     private final RunTestLogger runTestLogger;
 
     TestRunnerBuilder(Project project,
+                      String testGroupPrefix,
                       Map<String, String> instrumentationArgs,
                       ConnectedDeviceWrapper targetDevice,
                       TestRunnerContext context) {
@@ -49,7 +50,7 @@ class TestRunnerBuilder {
         testRunListener = new TestXmlReportsGenerator(targetDevice.getName(),
                 project.getName(),
                 instrumentationInfo.getFlavorName(),
-                "",
+                testGroupPrefix,
                 runTestLogger,
                 screenShotMaker,
                 logcatSaver);

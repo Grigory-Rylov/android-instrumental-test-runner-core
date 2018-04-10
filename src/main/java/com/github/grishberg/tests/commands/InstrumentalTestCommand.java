@@ -31,6 +31,7 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
         InstrumentalPluginExtension instrumentationInfo = context.getInstrumentalInfo();
 
         TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(project,
+                "",
                 instrumentationArgs,
                 targetDevice,
                 context);

@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 public class TestRunnerBuilderTest {
     private static final String TEST_PACKAGE = "com.test.testpackage";
     private static final String RUNNER_NAME = "SampleRunner";
+    private static final String TEST_NAME = "test-name";
     private InstrumentalPluginExtension extension = new InstrumentalPluginExtension();
     private TestRunnerBuilder builder;
     private Map<String, String> args = new HashMap<>();
@@ -48,7 +49,7 @@ public class TestRunnerBuilderTest {
         extension.setApplicationId("com.test.packageId");
         extension.setInstrumentalPackage(TEST_PACKAGE);
         extension.setInstrumentalRunner(RUNNER_NAME);
-        builder = new TestRunnerBuilder(project, args, deviceWrapper, context);
+        builder = new TestRunnerBuilder(project, TEST_NAME, args, deviceWrapper, context);
     }
 
     @Test

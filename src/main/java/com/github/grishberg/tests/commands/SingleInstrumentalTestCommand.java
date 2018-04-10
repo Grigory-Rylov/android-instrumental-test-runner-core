@@ -6,7 +6,6 @@ import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
-import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.TestPlanElement;
 import org.gradle.api.Project;
 
@@ -18,7 +17,6 @@ import java.util.Map;
  * Executes instrumentation test for single test method.
  */
 public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
-    private static final String TAG = SingleInstrumentalTestCommand.class.getSimpleName();
     private static final String CLASS = "class";
     private static final String PACKAGE = "package";
     private final Project project;
@@ -69,9 +67,9 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         DeviceCommandResult result = new DeviceCommandResult();
         InstrumentalPluginExtension instrumentationInfo = context.getInstrumentalInfo();
         Environment environment = context.getEnvironment();
-        RunnerLogger logger = context.getLogger();
 
         TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(project,
+                testName,
                 instrumentationArgs,
                 targetDevice,
                 context);

@@ -47,7 +47,7 @@ public class TestXmlReportsGeneratorTest {
     @Test
     public void getResultFile() throws Exception {
         File file = generator.getResultFile(new File("/report"));
-        Assert.assertEquals(new File("/report/TEST-DevName-ProjectName-FlavorNameTestPrefix.xml"), file);
+        Assert.assertEquals(new File("/report/TEST-DevName-ProjectName-TestPrefix.xml"), file);
     }
 
     @Test

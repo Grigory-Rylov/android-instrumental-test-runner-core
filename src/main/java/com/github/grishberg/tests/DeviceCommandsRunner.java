@@ -57,7 +57,6 @@ class DeviceCommandsRunner {
         }
         deviceCounter.await();
         if (commandException != null) {
-            logger.e(TAG, "Found exception while executing commands.");
             if (commandException instanceof ExecuteCommandException) {
                 throw (ExecuteCommandException) commandException;
             }

@@ -26,10 +26,8 @@ public class ScreenShotMakerImpl implements ScreenShotMaker {
         this.logger = logger;
 
         screenshotDir = new File(reportsDir, SCREENSHOT_DIR);
-        if (!screenshotDir.exists()) {
-            if (!screenshotDir.mkdirs()) {
-                logger.e(TAG, "ScreenShotMakerImpl: cant make dir " + screenshotDir);
-            }
+        if (!screenshotDir.exists() && !screenshotDir.mkdirs()) {
+            logger.e(TAG, "ScreenShotMakerImpl: cant make dir " + screenshotDir);
         }
     }
 
