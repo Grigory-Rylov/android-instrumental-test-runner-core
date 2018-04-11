@@ -37,6 +37,8 @@ public class InstrumentalTestPlanProvider {
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");
 
+        args.putAll(getArgsFromCli());
+
         InstrumentTestLogParser receiver = new InstrumentTestLogParser();
         receiver.setLogger(new TestLogParserLogger());
         StringBuilder command = new StringBuilder("am instrument -r -w");
@@ -61,6 +63,15 @@ public class InstrumentalTestPlanProvider {
         }
 
         return receiver.getTestInstances();
+    }
+
+    private Map<String, String> getArgsFromCli() {
+        HashMap<String, String> result = new HashMap<>();
+        if (project.hasProperty("testClass")) {
+            Object aClass = project.getProperties().get("testClass");
+            result.put("class", (String) aClass);
+        }
+        return result;
     }
 
     /**
