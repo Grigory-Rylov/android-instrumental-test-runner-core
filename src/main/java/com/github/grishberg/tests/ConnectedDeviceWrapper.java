@@ -45,6 +45,13 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
         return name;
     }
 
+    /**
+     * @return device density.
+     */
+    public int getDensity() {
+        return device.getDensity();
+    }
+
     public IDevice getDevice() {
         return device;
     }
