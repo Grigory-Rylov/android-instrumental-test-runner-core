@@ -6,6 +6,7 @@ import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.TimeoutException;
 import com.android.utils.ILogger;
 import com.github.grishberg.tests.commands.ExecuteCommandException;
+import com.github.grishberg.tests.common.RunnerLogger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +35,8 @@ public class ConnectedDeviceWrapperTest {
     InstrumentalPluginExtension extension;
     @Mock
     ILogger logger;
+    @Mock
+    RunnerLogger runnerLogger;
     private ConnectedDeviceWrapper deviceWrapper;
     private File coverageFile = new File("coverage");
 
@@ -41,7 +44,7 @@ public class ConnectedDeviceWrapperTest {
     public void setUp() throws Exception {
         when(device.getAvdName()).thenReturn("test_device");
         when(extension.getApplicationId()).thenReturn("com.test.app");
-        deviceWrapper = new ConnectedDeviceWrapper(device);
+        deviceWrapper = new ConnectedDeviceWrapper(device, runnerLogger);
     }
 
     @Test

@@ -106,7 +106,7 @@ public class InstrumentationTestTask extends DefaultTask {
         IDevice[] devices = adbWrapper.provideDevices();
         ConnectedDeviceWrapper[] deviceWrappers = new ConnectedDeviceWrapper[devices.length];
         for (int i = 0; i < devices.length; i++) {
-            deviceWrappers[i] = new ConnectedDeviceWrapper(devices[i]);
+            deviceWrappers[i] = new ConnectedDeviceWrapper(devices[i], logger);
         }
         return deviceWrappers;
     }

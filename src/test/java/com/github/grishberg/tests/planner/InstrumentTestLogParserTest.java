@@ -1,5 +1,6 @@
 package com.github.grishberg.tests.planner;
 
+import com.github.grishberg.tests.TestUtils;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.InstrumentTestLogParser.ParserLogger;
 import org.junit.Assert;
@@ -7,10 +8,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.mock;
@@ -26,18 +23,9 @@ public class InstrumentTestLogParserTest {
 
     @Test
     public void parseAmInstrumentOutput() throws Exception {
-        String fileName = "am_instrument_output.txt";
+        String fileName = "for_test/am_instrument_output.txt";
 
-        ArrayList<String> lines = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(
-                        new FileInputStream(fileName), "UTF-8"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                lines.add(line);
-            }
-        }
+        List<String> lines = TestUtils.readFile(fileName);
         parser.processNewLines(lines.toArray(new String[lines.size()]));
 
         List<TestPlanElement> testInstances = parser.getTestInstances();

@@ -3,6 +3,8 @@ package com.github.grishberg.tests;
 import com.android.ddmlib.*;
 import com.android.utils.ILogger;
 import com.github.grishberg.tests.commands.ExecuteCommandException;
+import com.github.grishberg.tests.common.RunnerLogger;
+import com.github.grishberg.tests.common.ScreenSizeParser;
 import com.github.grishberg.tests.exceptions.PullCoverageException;
 import org.gradle.internal.impldep.org.apache.maven.wagon.CommandExecutionException;
 
@@ -15,12 +17,18 @@ import java.util.concurrent.TimeUnit;
  * Wraps {@link IDevice} interface.
  */
 public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellExecuter {
+    private static final String TAG = ConnectedDeviceWrapper.class.getSimpleName();
     public static final String COVERAGE_FILE_NAME = "coverage.ec";
+    private static final String SHELL_COMMAND_FOR_SCREEN_SIZE = "dumpsys window";
     private final IDevice device;
+    private final RunnerLogger logger;
     private String name;
+    private int deviceWidth = -1;
+    private int deviceHeight = -1;
 
-    public ConnectedDeviceWrapper(IDevice device) {
+    public ConnectedDeviceWrapper(IDevice device, RunnerLogger logger) {
         this.device = device;
+        this.logger = logger;
     }
 
     @Override
@@ -50,6 +58,57 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
      */
     public int getDensity() {
         return device.getDensity();
+    }
+
+    private void calculateScreenSize() {
+        try {
+            String screenSize = executeShellCommandAndReturnOutput(SHELL_COMMAND_FOR_SCREEN_SIZE);
+            int[] size = ScreenSizeParser.parseScreenSize(screenSize);
+            deviceWidth = size[0];
+            deviceHeight = size[1];
+        } catch (ExecuteCommandException e) {
+            logger.e(TAG, "calculateScreenSize error: ", e);
+        }
+    }
+
+    /**
+     * @return device screen width.
+     */
+    public int getWidth() {
+        if (deviceWidth < 0) {
+            calculateScreenSize();
+        }
+        return deviceWidth;
+    }
+
+    /**
+     * @return device screen height.
+     */
+    public int getHeigth() {
+        if (deviceHeight < 0) {
+            calculateScreenSize();
+        }
+        return deviceHeight;
+    }
+
+    /**
+     * @return device screen width in dp
+     */
+    public int getWidthInDp() {
+        if (deviceWidth < 0) {
+            calculateScreenSize();
+        }
+        return deviceWidth / getDensity() / 160;
+    }
+
+    /**
+     * @return device screen width in dp
+     */
+    public int getHeightInDp() {
+        if (deviceHeight < 0) {
+            calculateScreenSize();
+        }
+        return deviceHeight / getDensity() / 160;
     }
 
     public IDevice getDevice() {

@@ -3,3 +3,12 @@
 
 ### Added
 ConnectedDeviceWrapper.getDensity()
+
+
+## [0.9.8] - 2018-04-28
+
+### Added
+ConnectedDeviceWrapper.getWidth() - screen width in px
+ConnectedDeviceWrapper.getWidthInDp() - screen width in dp
+ConnectedDeviceWrapper.getHeight() - screen height in px
+ConnectedDeviceWrapper.getHeightInDp() - screen height in dp
