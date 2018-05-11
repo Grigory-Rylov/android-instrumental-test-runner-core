@@ -47,10 +47,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
 
     @Override
     public String getName() {
-        if (name == null) {
-            name = device.getAvdName();
-        }
-        return name;
+        return device.getName();
     }
 
     /**

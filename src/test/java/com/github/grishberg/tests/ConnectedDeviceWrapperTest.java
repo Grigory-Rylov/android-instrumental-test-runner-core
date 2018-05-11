@@ -42,7 +42,7 @@ public class ConnectedDeviceWrapperTest {
 
     @Before
     public void setUp() throws Exception {
-        when(device.getAvdName()).thenReturn("test_device");
+        when(device.getName()).thenReturn("test_device");
         when(extension.getApplicationId()).thenReturn("com.test.app");
         deviceWrapper = new ConnectedDeviceWrapper(device, runnerLogger);
     }
@@ -62,7 +62,7 @@ public class ConnectedDeviceWrapperTest {
     @Test
     public void getName() throws Exception {
         deviceWrapper.getName();
-        verify(device).getAvdName();
+        verify(device).getName();
     }
 
     @Test
