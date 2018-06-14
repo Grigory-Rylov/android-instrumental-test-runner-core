@@ -24,7 +24,6 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     private static final String FLAGS = "flags";
     private static final String SHORT_MSG = "shortMsg";
     private static final String LONG_MSG = "longMsg";
-    private static final String PROCESS_CRASHED = "Process crashed.";
     private ParserLogger logger;
     private final ArrayList<TestPlanElement> testPlanList = new ArrayList<>();
     private State state = new StartNewObject();

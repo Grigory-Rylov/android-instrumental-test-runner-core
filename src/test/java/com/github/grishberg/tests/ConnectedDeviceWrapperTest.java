@@ -7,19 +7,22 @@ import com.android.ddmlib.TimeoutException;
 import com.android.utils.ILogger;
 import com.github.grishberg.tests.commands.ExecuteCommandException;
 import com.github.grishberg.tests.common.RunnerLogger;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.*;
 
 /**
@@ -37,6 +40,7 @@ public class ConnectedDeviceWrapperTest {
     ILogger logger;
     @Mock
     RunnerLogger runnerLogger;
+    private IShellOutputReceiver receiver;
     private ConnectedDeviceWrapper deviceWrapper;
     private File coverageFile = new File("coverage");
 
@@ -44,6 +48,18 @@ public class ConnectedDeviceWrapperTest {
     public void setUp() throws Exception {
         when(device.getName()).thenReturn("test_device");
         when(extension.getApplicationId()).thenReturn("com.test.app");
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                receiver = invocation.getArgument(1);
+                byte[] bytes = getDumpsysContent().getBytes();
+                receiver.addOutput(bytes, 0, bytes.length);
+                return null;
+            }
+        }).when(device).executeShellCommand(eq("dumpsys window"),
+                any(IShellOutputReceiver.class),
+                anyLong(),
+                any(TimeUnit.class));
         deviceWrapper = new ConnectedDeviceWrapper(device, runnerLogger);
     }
 
@@ -120,7 +136,7 @@ public class ConnectedDeviceWrapperTest {
 
     @Test
     public void returnDeviceWhenAsked() {
-        Assert.assertEquals(device, deviceWrapper.getDevice());
+        assertEquals(device, deviceWrapper.getDevice());
     }
 
     @Test(expected = ExecuteCommandException.class)
@@ -129,5 +145,39 @@ public class ConnectedDeviceWrapperTest {
                 .pullFile(anyString(), anyString());
 
         deviceWrapper.pullFile("coverageCopy", "path");
+    }
+
+    @Test
+    public void testGetDensity() {
+        deviceWrapper.getDensity();
+        verify(device).getDensity();
+    }
+
+    @Test
+    public void testGetWidth() {
+        assertEquals(2048, deviceWrapper.getWidth());
+    }
+
+    @Test
+    public void testGetHeight() {
+        assertEquals(1440, deviceWrapper.getHeight());
+    }
+
+    @Test
+    public void testGetWidthInDp() {
+        when(device.getDensity()).thenReturn(320);
+        assertEquals(1024, deviceWrapper.getWidthInDp());
+    }
+
+    @Test
+    public void testGetHeightInDp() {
+        when(device.getDensity()).thenReturn(320);
+        assertEquals(720, deviceWrapper.getHeightInDp());
+    }
+
+
+    private String getDumpsysContent() throws Exception {
+        String fileName = "for_test/dumpsys_window.txt";
+        return String.join("/n", TestUtils.readFile(fileName));
     }
 }

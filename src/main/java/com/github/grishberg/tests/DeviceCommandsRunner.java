@@ -56,6 +56,11 @@ class DeviceCommandsRunner {
             }).start();
         }
         deviceCounter.await();
+        throwExceptionIfNeeded();
+        return !hasFailedTests;
+    }
+
+    private void throwExceptionIfNeeded() throws ExecuteCommandException {
         if (commandException != null) {
             if (commandException instanceof ExecuteCommandException) {
                 throw (ExecuteCommandException) commandException;
@@ -65,6 +70,5 @@ class DeviceCommandsRunner {
             }
             throw new ExecuteCommandException(commandException);
         }
-        return !hasFailedTests;
     }
 }

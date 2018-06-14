@@ -7,10 +7,14 @@ import java.util.regex.Pattern;
  * Created by grishberg on 28.04.18.
  */
 public class ScreenSizeParser {
+    private ScreenSizeParser() {
+        /* do nothin */
+    }
+
     public static int[] parseScreenSize(String dumpsisWindow) {
         int width = 0;
         int height = 0;
-        String pattern = "mCur=\\(\\d*,\\d*\\)-\\((\\d*),(\\d*)\\)";
+        String pattern = "mSystem=\\(\\d*,\\d*\\)-\\((\\d*),(\\d*)\\)";
 
         // Create a Pattern object
         Pattern r = Pattern.compile(pattern);
