@@ -91,21 +91,21 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     /**
      * @return device screen width in dp
      */
-    public int getWidthInDp() {
+    public long getWidthInDp() {
         if (deviceWidth < 0) {
             calculateScreenSize();
         }
-        return deviceWidth / getDensity() / 160;
+        return Math.round((float) deviceWidth / (getDensity() / 160.));
     }
 
     /**
      * @return device screen width in dp
      */
-    public int getHeightInDp() {
+    public long getHeightInDp() {
         if (deviceHeight < 0) {
             calculateScreenSize();
         }
-        return deviceHeight / getDensity() / 160;
+        return Math.round((float) deviceHeight / (getDensity() / 160.));
     }
 
     public IDevice getDevice() {

@@ -1,3 +1,7 @@
+## [0.9.10] - 2018-06-14
+### Fixed
+ConnectedDeviceWrapper.getWidthInDp() - screen width in dp (was zero)
+
 ## [0.9.9] - 2018-05-1
 ### Fixed
 ConnectedDeviceWrapper.getName() for real devices don't return null.
