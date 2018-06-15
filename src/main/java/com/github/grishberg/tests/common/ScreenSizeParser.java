@@ -7,6 +7,10 @@ import java.util.regex.Pattern;
  * Created by grishberg on 28.04.18.
  */
 public class ScreenSizeParser {
+    private ScreenSizeParser() {
+        /* do nothin */
+    }
+
     public static int[] parseScreenSize(String dumpsisWindow) {
         int width = 0;
         int height = 0;

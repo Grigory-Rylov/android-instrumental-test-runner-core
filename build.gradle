@@ -18,7 +18,7 @@ plugins {
 }
 
 group 'com.github.grishberg'
-version '0.9.10'
+version '1.0.0'
 
 apply plugin: 'kotlin'
 
@@ -46,9 +46,14 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.16.0'
     compile gradleApi()
     compile localGroovy()
-    compile 'com.github.grishberg:test-report:1.0'
+    compile 'com.github.grishberg:test-report:1.1'
     // https://mvnrepository.com/artifact/com.android.tools.ddms/ddmlib
     compile group: 'com.android.tools.ddms', name: 'ddmlib', version: '26.0.1'
+}
+
+compileGroovy {
+    dependsOn tasks.getByPath('compileKotlin')
+    classpath += files(compileKotlin.destinationDir)
 }
 
 // sources for unit and integration

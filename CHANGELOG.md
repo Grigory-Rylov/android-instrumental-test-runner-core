@@ -1,3 +1,7 @@
+## [1.0.0] - 2018-06-15
+### Added
+Html-report supports ignored tests
+
 ## [0.9.10] - 2018-06-14
 ### Fixed
 ConnectedDeviceWrapper.getWidthInDp() - screen width in dp (was zero)

@@ -22,7 +22,6 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     private static final String SHELL_COMMAND_FOR_SCREEN_SIZE = "dumpsys window";
     private final IDevice device;
     private final RunnerLogger logger;
-    private String name;
     private int deviceWidth = -1;
     private int deviceHeight = -1;
 
@@ -81,7 +80,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     /**
      * @return device screen height.
      */
-    public int getHeigth() {
+    public int getHeight() {
         if (deviceHeight < 0) {
             calculateScreenSize();
         }
