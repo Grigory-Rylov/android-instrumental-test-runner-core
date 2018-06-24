@@ -79,8 +79,12 @@ public class InstrumentationTestTask extends DefaultTask {
         HashMap<String, String> screenshotRelations = new HashMap<>();
         TestRunnerContext context = new TestRunnerContext(instrumentationInfo,
                 environment, screenshotRelations, logger);
-        boolean success = runner.runCommands(provideDevices(), context);
-        generateHtmlReport(success, screenshotRelations);
+        boolean success = false;
+        try {
+            success = runner.runCommands(provideDevices(), context);
+        } finally {
+            generateHtmlReport(success, screenshotRelations);
+        }
     }
 
     private void prepareOutputFolders() throws IOException {

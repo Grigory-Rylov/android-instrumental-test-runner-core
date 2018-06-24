@@ -70,6 +70,9 @@ public class InstrumentalTestPlanProvider {
         if (project.hasProperty("testClass")) {
             Object aClass = project.getProperties().get("testClass");
             result.put("class", (String) aClass);
+        } else if (project.hasProperty("testPackage")) {
+            Object aPackage = project.getProperties().get("testPackage");
+            result.put("package", (String) aPackage);
         }
         return result;
     }

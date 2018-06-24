@@ -1,3 +1,10 @@
+## [1.0.1] - 2018-06-24
+### Fixed
+Generate report even if process crashed.
+
+### Added
+testPackage <some.package> - param for launching tests form <some.package>
+
 ## [1.0.0] - 2018-06-15
 ### Added
 Html-report supports ignored tests

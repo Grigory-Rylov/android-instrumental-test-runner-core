@@ -38,10 +38,10 @@ class DeviceCommandsRunner {
                     List<DeviceRunnerCommand> commands = commandProvider.provideCommandsForDevice(device,
                             testPlanProvider, environment);
                     for (DeviceRunnerCommand command : commands) {
-                        logger.d(TAG, "Before executing device = {} command = {}",
+                        logger.i(TAG, "Before executing device = {} command = {}",
                                 device, command.toString());
                         DeviceCommandResult result = command.execute(device, context);
-                        logger.d(TAG, "After executing device = {} command = {}",
+                        logger.i(TAG, "After executing device = {} command = {}",
                                 device, command.toString());
                         if (result.isFailed()) {
                             hasFailedTests = true;
