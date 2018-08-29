@@ -1,5 +1,6 @@
 package com.github.grishberg.tests;
 
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import org.junit.Before;
@@ -80,5 +81,13 @@ public class RunTestLoggerTest {
     @Test(expected = ProcessCrashedException.class)
     public void throwIfProcessCrashed() {
         logger.warning("Failed %s due to %s", "test", "'Process crashed'");
+    }
+
+    @Test
+    public void testCornerCaseFormatting() {
+        String deviceName = "SM-G530H - 5.0.2";
+        TestIdentifier test = new TestIdentifier("SomeClass","someTest");
+        logger.warning("\n%1$s > %2$s[%3$s] \033[31mFAILED \033[0m",
+                test.getClassName(), test.getTestName(), deviceName);
     }
 }

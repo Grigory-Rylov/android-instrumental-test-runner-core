@@ -4,7 +4,6 @@ import com.android.build.gradle.internal.test.report.ReportType;
 import com.android.build.gradle.internal.test.report.TestReport;
 import com.android.build.gradle.internal.test.report.TestReportExt;
 import com.android.ddmlib.AndroidDebugBridge;
-import com.android.ddmlib.IDevice;
 import com.github.grishberg.tests.adb.AdbWrapper;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.ExecuteCommandException;
@@ -20,6 +19,7 @@ import org.gradle.internal.logging.ConsoleRenderer;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.github.grishberg.tests.common.FileHelper.cleanFolder;
@@ -62,13 +62,9 @@ public class InstrumentationTestTask extends DefaultTask {
         logger.i(TAG, "InstrumentationTestTask.runTask");
 
         androidSdkPath = instrumentationInfo.getAndroidSdkPath();
-
         init();
-
-        adbWrapper.initWithAndroidSdk(androidSdkPath);
-
+        adbWrapper.init(androidSdkPath, logger);
         prepareOutputFolders();
-
         adbWrapper.waitForAdb();
 
         Environment environment = new Environment(getResultsDir(),
@@ -81,10 +77,17 @@ public class InstrumentationTestTask extends DefaultTask {
                 environment, screenshotRelations, logger);
         boolean success = false;
         try {
-            success = runner.runCommands(provideDevices(), context);
+            success = runner.runCommands(getDeviceList(), context);
         } finally {
             generateHtmlReport(success, screenshotRelations);
         }
+    }
+
+    /**
+     * @return List of available devices.
+     */
+    public List<ConnectedDeviceWrapper> getDeviceList() {
+        return adbWrapper.provideDevices();
     }
 
     private void prepareOutputFolders() throws IOException {
@@ -106,15 +109,6 @@ public class InstrumentationTestTask extends DefaultTask {
         }
     }
 
-    private ConnectedDeviceWrapper[] provideDevices() {
-        IDevice[] devices = adbWrapper.provideDevices();
-        ConnectedDeviceWrapper[] deviceWrappers = new ConnectedDeviceWrapper[devices.length];
-        for (int i = 0; i < devices.length; i++) {
-            deviceWrappers[i] = new ConnectedDeviceWrapper(devices[i], logger);
-        }
-        return deviceWrappers;
-    }
-
     private void init() {
         AndroidDebugBridge.initIfNeeded(false);
         if (androidSdkPath == null) {
@@ -132,7 +126,7 @@ public class InstrumentationTestTask extends DefaultTask {
         }
         if (instrumentationArgsProvider == null) {
             instrumentationArgsProvider = new DefaultInstrumentationArgsProvider();
-            logger.i(TAG, "initWithAndroidSdk: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
+            logger.i(TAG, "init: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
         }
         if (commandProvider == null) {
             logger.i(TAG, "command provider is empty, use DefaultCommandProvider");

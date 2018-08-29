@@ -1,3 +1,7 @@
+## [1.0.2] - 2018-08-29
+### Added
+InstrumentalTestTask.getDevicesList() - provides list of available ConnectedDeviceWrapper
+
 ## [1.0.1] - 2018-06-24
 ### Fixed
 Generate report even if process crashed.

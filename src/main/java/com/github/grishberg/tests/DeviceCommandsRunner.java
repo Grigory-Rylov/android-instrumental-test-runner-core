@@ -27,9 +27,9 @@ class DeviceCommandsRunner {
         this.commandProvider = commandProvider;
     }
 
-    boolean runCommands(ConnectedDeviceWrapper[] devices, final TestRunnerContext context) throws InterruptedException,
+    boolean runCommands(List<ConnectedDeviceWrapper> devices, final TestRunnerContext context) throws InterruptedException,
             ExecuteCommandException {
-        final CountDownLatch deviceCounter = new CountDownLatch(devices.length);
+        final CountDownLatch deviceCounter = new CountDownLatch(devices.size());
         final Environment environment = context.getEnvironment();
         final RunnerLogger logger = context.getLogger();
         for (ConnectedDeviceWrapper device : devices) {

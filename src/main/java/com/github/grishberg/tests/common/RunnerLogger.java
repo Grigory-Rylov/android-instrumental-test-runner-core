@@ -19,4 +19,30 @@ public interface RunnerLogger {
     void e(String tag, String message, Throwable throwable);
 
     void w(String tag, String msgFormat, Object... args);
+
+    class Stub implements RunnerLogger {
+        @Override
+        public void w(String tag, String message) { /* stub */ }
+
+        @Override
+        public void i(String tag, String message) { /* stub */ }
+
+        @Override
+        public void i(String tag, String msgFormat, Object... args) { /* stub */ }
+
+        @Override
+        public void d(String tag, String message) { /* stub */ }
+
+        @Override
+        public void d(String tag, String msgFormat, Object... args) { /* stub */ }
+
+        @Override
+        public void e(String tag, String message) { /* stub */ }
+
+        @Override
+        public void e(String tag, String message, Throwable throwable) { /* stub */ }
+
+        @Override
+        public void w(String tag, String msgFormat, Object... args) { /* stub */ }
+    }
 }

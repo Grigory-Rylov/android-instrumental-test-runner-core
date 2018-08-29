@@ -1,6 +1,5 @@
 package com.github.grishberg.tests;
 
-import com.android.ddmlib.IDevice;
 import com.github.grishberg.tests.adb.AdbWrapper;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.common.RunnerLogger;
@@ -14,8 +13,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -25,7 +27,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class InstrumentationTestTaskTest {
     private static final String TEST_DIR = "/test_dir";
-    public static final String ADB_PATH = "/adb_path";
+    private static final String ADB_PATH = "/adb_path";
     private final Project project = ProjectBuilder.builder().build();
     private InstrumentationTestTask task;
     private InstrumentalPluginExtension ext;
@@ -36,13 +38,9 @@ public class InstrumentationTestTaskTest {
     @Mock
     RunnerLogger logger;
     @Mock
-    IDevice device;
-    @Mock
     DeviceCommandsRunner runner;
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
-    @Mock
-    TestRunnerContext context;
 
     public InstrumentationTestTaskTest() {
         project.getPluginManager().apply(com.github.grishberg.tests.InstrumentalTestPlugin.class);
@@ -53,10 +51,10 @@ public class InstrumentationTestTaskTest {
 
     @Before
     public void setUp() throws Exception {
-        IDevice[] devices = new IDevice[]{device};
-        when((adbWrapper.provideDevices())).thenReturn(devices);
+        List<ConnectedDeviceWrapper> devicesList = Arrays.asList(deviceWrapper);
+        when((adbWrapper.provideDevices())).thenReturn(devicesList);
         when(deviceCommandsRunnerFabric.provideDeviceCommandRunner(any(DeviceRunnerCommandProvider.class))).thenReturn(runner);
-        when(runner.runCommands(any(ConnectedDeviceWrapper[].class), any(TestRunnerContext.class))).thenReturn(true);
+        when(runner.runCommands(eq(devicesList), any(TestRunnerContext.class))).thenReturn(true);
         task.initAfterApply(adbWrapper, deviceCommandsRunnerFabric, logger);
     }
 
@@ -143,7 +141,7 @@ public class InstrumentationTestTaskTest {
     public void runTest() throws Exception {
         task.runTask();
 
-        verify(adbWrapper).initWithAndroidSdk(ADB_PATH);
+        verify(adbWrapper).init(ADB_PATH, logger);
         verify(adbWrapper).waitForAdb();
         verify(deviceCommandsRunnerFabric).provideDeviceCommandRunner(any(DeviceRunnerCommandProvider.class));
     }

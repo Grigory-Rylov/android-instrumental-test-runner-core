@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Mockito.verify;
@@ -42,7 +43,7 @@ public class DeviceCommandsRunnerTest {
     @Mock
     TestRunnerContext context;
     private List<DeviceRunnerCommand> commands;
-    private ConnectedDeviceWrapper[] devices;
+    private List<ConnectedDeviceWrapper> devices;
     private DeviceCommandsRunner runner;
 
     @Before
@@ -54,8 +55,7 @@ public class DeviceCommandsRunnerTest {
         when(commandProvider.provideCommandsForDevice(deviceWrapper, planProvider, environment))
                 .thenReturn(commands);
         when(command.execute(deviceWrapper, context)).thenReturn(result);
-        devices = new ConnectedDeviceWrapper[1];
-        devices[0] = deviceWrapper;
+        devices = Arrays.asList(deviceWrapper);
         runner = new DeviceCommandsRunner(planProvider, commandProvider);
     }
 
