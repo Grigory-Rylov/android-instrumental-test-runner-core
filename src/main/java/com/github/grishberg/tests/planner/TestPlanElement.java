@@ -37,6 +37,24 @@ public class TestPlanElement {
                 NodeType.CLASS : NodeType.METHOD;
     }
 
+    /**
+     * Clone instance of srcElement.
+     */
+    public TestPlanElement(TestPlanElement srcElement) {
+        this.testId = srcElement.testId;
+        this.methodName = srcElement.methodName;
+        this.className = srcElement.className;
+        this.annotations = new ArrayList<>(srcElement.annotations);
+        this.feature = srcElement.feature;
+        this.flags = new ArrayList<>(srcElement.flags);
+        if (srcElement.parent != null) {
+            this.parent = new TestPlanElement(srcElement.parent);
+        }
+        this.type = srcElement.type;
+        this.excluded = false;
+        this.hasExcluded = false;
+    }
+
     void addAnnotations(List<String> annotations) {
         if (annotations == null) {
             return;
