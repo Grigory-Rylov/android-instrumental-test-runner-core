@@ -230,4 +230,25 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
             return false;
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ConnectedDeviceWrapper)) {
+            return false;
+        }
+        ConnectedDeviceWrapper otherDevice = (ConnectedDeviceWrapper) obj;
+        String objectSerialNumber = otherDevice.getSerialNumber();
+        String serialNumber = device.getSerialNumber();
+        if (objectSerialNumber != null && serialNumber != null) {
+            return objectSerialNumber.equals(serialNumber);
+        }
+        if (serialNumber == null && objectSerialNumber == null) {
+            String name = device.getName();
+            String otherName = otherDevice.getName();
+            if (name != null) {
+                return name.equals(otherName);
+            }
+        }
+        return false;
+    }
 }

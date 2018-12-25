@@ -18,6 +18,7 @@ import org.mockito.stubbing.Answer;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -175,6 +176,21 @@ public class ConnectedDeviceWrapperTest {
         assertEquals(720, deviceWrapper.getHeightInDp());
     }
 
+    @Test
+    public void devicesAreEqualsWhenSerialNumbersAreEquals() {
+        ConnectedDeviceWrapper otherDevice = mock(ConnectedDeviceWrapper.class);
+        when(otherDevice.getSerialNumber()).thenReturn("123");
+        when(device.getSerialNumber()).thenReturn("123");
+        assertTrue(deviceWrapper.equals(otherDevice));
+    }
+
+    @Test
+    public void devicesAreEqualsWhenSerialNumberIsEmptyAndNamesAreEquals() {
+        ConnectedDeviceWrapper otherDevice = mock(ConnectedDeviceWrapper.class);
+        when(otherDevice.getName()).thenReturn("abc");
+        when(device.getName()).thenReturn("abc");
+        assertTrue(deviceWrapper.equals(otherDevice));
+    }
 
     private String getDumpsysContent() throws Exception {
         String fileName = "for_test/dumpsys_window.txt";
