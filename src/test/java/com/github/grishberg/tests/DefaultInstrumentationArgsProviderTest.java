@@ -12,7 +12,10 @@ public class DefaultInstrumentationArgsProviderTest {
     @Test
     public void testArgsProvider() {
         ConnectedDeviceWrapper deviceWrapper = mock(ConnectedDeviceWrapper.class);
-        DefaultInstrumentationArgsProvider provider = new DefaultInstrumentationArgsProvider();
+        InstrumentalPluginExtension instrumentalInfo = mock(InstrumentalPluginExtension.class);
+        AbsShardingArguments sharding = mock(AbsShardingArguments.class);
+        DefaultInstrumentationArgsProvider provider =
+                new DefaultInstrumentationArgsProvider(instrumentalInfo, sharding);
         Assert.assertTrue(provider.provideInstrumentationArgs(deviceWrapper).isEmpty());
     }
 }

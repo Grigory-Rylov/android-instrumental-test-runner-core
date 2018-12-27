@@ -43,6 +43,7 @@ public class InstrumentationTestTask extends DefaultTask {
     private DeviceCommandsRunnerFabric deviceCommandsRunnerFabric;
     private AdbWrapper adbWrapper;
     private RunnerLogger logger;
+    private AbsShardingArguments shardStrategy;
 
     public InstrumentationTestTask() {
         instrumentationInfo = getProject().getExtensions()
@@ -125,7 +126,11 @@ public class InstrumentationTestTask extends DefaultTask {
             logger.i(TAG, "Init: commandsForAnnotationProvider is empty, use DefaultCommandsForAnnotationProvider");
         }
         if (instrumentationArgsProvider == null) {
-            instrumentationArgsProvider = new DefaultInstrumentationArgsProvider();
+            if (shardStrategy == null) {
+                shardStrategy = new DefaultShardingArguments(adbWrapper, logger);
+            }
+            instrumentationArgsProvider = new DefaultInstrumentationArgsProvider(
+                    instrumentationInfo, shardStrategy);
             logger.i(TAG, "init: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
         }
         if (commandProvider == null) {
@@ -168,6 +173,16 @@ public class InstrumentationTestTask extends DefaultTask {
     @Input
     public void setReportsDir(File reportsDir) {
         this.reportsDir = reportsDir;
+    }
+
+    /**
+     * Sets shard strategy for DefaultInstrumentationArgsProvider.
+     * If you use your own implementation of InstrumentationArgsProvider,
+     * then write your own shard arguments generation logic.
+     */
+    @Input
+    public void setShardStrategy(AbsShardingArguments shardStrategy) {
+        this.shardStrategy = shardStrategy;
     }
 
     public File getCoverageDir() {

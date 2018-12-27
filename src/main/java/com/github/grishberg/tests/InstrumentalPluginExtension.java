@@ -17,6 +17,7 @@ public class InstrumentalPluginExtension {
     boolean coverageEnabled;
     boolean makeScreenshotsWhenFail;
     boolean saveLogcat;
+    boolean shardEnabled;
     Closure<Map<String, String>> instrumentationArgsProvider;
 
     public void setFlavorName(String flavorName) {
@@ -97,5 +98,16 @@ public class InstrumentalPluginExtension {
 
     public void setSaveLogcat(boolean saveLogcat) {
         this.saveLogcat = saveLogcat;
+    }
+
+    /**
+     * @return true when need to enable sharding for all available devices.
+     */
+    public boolean isShardEnabled() {
+        return shardEnabled;
+    }
+
+    public void setShardEnabled(boolean shardEnabled) {
+        this.shardEnabled = shardEnabled;
     }
 }
