@@ -51,4 +51,11 @@ public class TestPlanElementTest {
         Assert.assertFalse(new TestPlanElement("id1", "test1", "com.test.TestClass1")
                 .equals(new TestPlanElement("id2", "test1", "com.test.TestClass1")));
     }
+
+    @Test
+    public void testCopyConstructor() {
+        TestPlanElement element1 = new TestPlanElement("id1", "test1", "com.test.TestClass1");
+        TestPlanElement element2 = new TestPlanElement(element1);
+        Assert.assertTrue(element1.equals(element2));
+    }
 }

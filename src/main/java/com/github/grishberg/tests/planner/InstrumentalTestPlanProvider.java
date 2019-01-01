@@ -81,9 +81,9 @@ public class InstrumentalTestPlanProvider {
      * @return test holder contains all test methods in project.
      */
     public InstrumentalTestHolder provideInstrumentalTests(ConnectedDeviceWrapper device,
-                                                           Map<String, String> instrumentalArgs) throws ExecuteCommandException {
+                                                               Map<String, String> instrumentalArgs) throws ExecuteCommandException {
         // TODO: create fabric
-        return new InstrumentalTestHolder(provideTestPlan(device, instrumentalArgs), packageTreeGenerator);
+        return new InstrumentalTestHolderImpl(provideTestPlan(device, instrumentalArgs), packageTreeGenerator);
     }
 
     private class TestLogParserLogger implements InstrumentTestLogParser.ParserLogger {

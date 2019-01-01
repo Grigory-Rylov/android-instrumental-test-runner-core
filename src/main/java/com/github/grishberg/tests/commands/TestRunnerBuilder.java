@@ -12,17 +12,17 @@ import java.util.Map;
 /**
  * Helper class builds RemoteAndroidTestRunner.
  */
-class TestRunnerBuilder {
+public class TestRunnerBuilder {
     private final RemoteAndroidTestRunner runner;
     private final String coverageFile;
     private final TestXmlReportsGenerator testRunListener;
     private final RunTestLogger runTestLogger;
 
-    TestRunnerBuilder(Project project,
-                      String testGroupPrefix,
-                      Map<String, String> instrumentationArgs,
-                      ConnectedDeviceWrapper targetDevice,
-                      TestRunnerContext context) {
+    public TestRunnerBuilder(Project project,
+                             String testGroupPrefix,
+                             Map<String, String> instrumentationArgs,
+                             ConnectedDeviceWrapper targetDevice,
+                             TestRunnerContext context) {
         InstrumentalPluginExtension instrumentationInfo = context.getInstrumentalInfo();
         Environment environment = context.getEnvironment();
         RunnerLogger logger = context.getLogger();

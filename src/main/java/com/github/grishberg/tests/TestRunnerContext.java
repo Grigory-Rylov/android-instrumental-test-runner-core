@@ -1,6 +1,8 @@
 package com.github.grishberg.tests;
 
+import com.github.grishberg.tests.commands.TestRunnerBuilder;
 import com.github.grishberg.tests.common.RunnerLogger;
+import org.gradle.api.Project;
 
 import java.util.Map;
 
@@ -37,5 +39,16 @@ public class TestRunnerContext {
 
     public RunnerLogger getLogger() {
         return logger;
+    }
+
+    public TestRunnerBuilder createTestRunnerBuilder(Project project,
+                                                     String testName,
+                                                     Map<String, String> instrumentationArgs,
+                                                     ConnectedDeviceWrapper targetDevice) {
+        return new TestRunnerBuilder(project,
+                testName,
+                instrumentationArgs,
+                targetDevice,
+                this);
     }
 }

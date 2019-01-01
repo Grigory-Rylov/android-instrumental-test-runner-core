@@ -8,6 +8,9 @@ import com.github.grishberg.tests.adb.AdbWrapper;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.ExecuteCommandException;
 import com.github.grishberg.tests.common.RunnerLogger;
+import com.github.grishberg.tests.sharding.DefaultDeviceTypeAdapter;
+import com.github.grishberg.tests.sharding.DeviceTypeAdapter;
+import com.github.grishberg.tests.sharding.ShardArgumentsImpl;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Nullable;
@@ -43,7 +46,7 @@ public class InstrumentationTestTask extends DefaultTask {
     private DeviceCommandsRunnerFabric deviceCommandsRunnerFabric;
     private AdbWrapper adbWrapper;
     private RunnerLogger logger;
-    private AbsShardingArguments shardStrategy;
+    private DeviceTypeAdapter deviceTypeAdapter;
 
     public InstrumentationTestTask() {
         instrumentationInfo = getProject().getExtensions()
@@ -126,11 +129,11 @@ public class InstrumentationTestTask extends DefaultTask {
             logger.i(TAG, "Init: commandsForAnnotationProvider is empty, use DefaultCommandsForAnnotationProvider");
         }
         if (instrumentationArgsProvider == null) {
-            if (shardStrategy == null) {
-                shardStrategy = new DefaultShardingArguments(adbWrapper, logger);
+            if (deviceTypeAdapter == null) {
+                deviceTypeAdapter = new DefaultDeviceTypeAdapter();
             }
             instrumentationArgsProvider = new DefaultInstrumentationArgsProvider(
-                    instrumentationInfo, shardStrategy);
+                    instrumentationInfo, new ShardArgumentsImpl(adbWrapper, logger, deviceTypeAdapter));
             logger.i(TAG, "init: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
         }
         if (commandProvider == null) {
@@ -176,13 +179,13 @@ public class InstrumentationTestTask extends DefaultTask {
     }
 
     /**
-     * Sets shard strategy for DefaultInstrumentationArgsProvider.
+     * Sets shard device type adapter for DefaultInstrumentationArgsProvider.
      * If you use your own implementation of InstrumentationArgsProvider,
      * then write your own shard arguments generation logic.
      */
     @Input
-    public void setShardStrategy(AbsShardingArguments shardStrategy) {
-        this.shardStrategy = shardStrategy;
+    public void setDeviceTypeAdapter(DeviceTypeAdapter deviceTypeAdapter) {
+        this.deviceTypeAdapter = deviceTypeAdapter;
     }
 
     public File getCoverageDir() {

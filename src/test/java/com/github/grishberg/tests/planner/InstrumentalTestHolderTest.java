@@ -17,14 +17,14 @@ import static com.github.grishberg.tests.planner.PlannerCommon.provideTestPlanEl
  */
 @RunWith(MockitoJUnitRunner.class)
 public class InstrumentalTestHolderTest {
-    private InstrumentalTestHolder holder;
+    private InstrumentalTestHolderImpl holder;
     private PackageTreeGenerator generator = new PackageTreeGenerator();
     private ArrayList<TestPlanElement> list = provideTestPlanElements();
 
     @Before
     public void setUp() throws Exception {
 
-        holder = new InstrumentalTestHolder(list, generator);
+        holder = new InstrumentalTestHolderImpl(list, generator);
     }
 
     @Test

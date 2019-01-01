@@ -6,6 +6,7 @@ import com.android.utils.ILogger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -17,6 +18,7 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
     private final String testPrefix;
     private final ScreenShotMaker screenShotMaker;
     private final LogcatSaver logcatSaver;
+    private TestIdentifier currentTest;
 
     public TestXmlReportsGenerator(String deviceName,
                                    String projectName,
@@ -40,6 +42,18 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
     }
 
     @Override
+    public void testStarted(TestIdentifier test) {
+        super.testStarted(test);
+        currentTest = test;
+    }
+
+    @Override
+    public void testStarted(TestIdentifier test, long startTime) {
+        super.testStarted(test, startTime);
+        currentTest = test;
+    }
+
+    @Override
     public void testFailed(TestIdentifier test, String trace) {
         super.testFailed(test, trace);
         screenShotMaker.makeScreenshot(test.getClassName(), test.getTestName());
@@ -49,5 +63,10 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
     public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
         super.testRunEnded(elapsedTime, runMetrics);
         logcatSaver.saveLogcat("logcat");
+    }
+
+    public void failLastTest(String trace) {
+        testFailed(currentTest, trace);
+        super.testEnded(currentTest, 0, new HashMap<>());
     }
 }

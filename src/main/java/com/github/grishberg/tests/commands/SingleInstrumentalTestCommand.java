@@ -6,7 +6,9 @@ import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalPluginExtension;
 import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
+import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.TestPlanElement;
+
 import org.gradle.api.Project;
 
 import java.util.HashMap;
@@ -68,17 +70,15 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         InstrumentalPluginExtension instrumentationInfo = context.getInstrumentalInfo();
         Environment environment = context.getEnvironment();
 
-        TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(project,
+        TestRunnerBuilder testRunnerBuilder = context.createTestRunnerBuilder(project,
                 testName,
                 instrumentationArgs,
-                targetDevice,
-                context);
+                targetDevice);
 
         String singleTestMethodPrefix = String.format("%s#%s", targetDevice.getName(), testName);
+        TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();
 
         try {
-            TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();
-
             testRunnerBuilder.getTestRunner().run(testRunListener);
 
             TestRunResult runResult = testRunListener.getRunResult();
@@ -91,6 +91,10 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                         environment.getCoverageDir(),
                         testRunnerBuilder.getRunTestLogger());
             }
+        } catch (ProcessCrashedException e) {
+            testRunListener.failLastTest("Process was crashed. See logcat to details.");
+            testRunListener.testRunEnded(0, new HashMap<>());
+            throw new ExecuteCommandException("SingleInstrumentalTestCommand.execute failed:", e);
         } catch (Exception e) {
             throw new ExecuteCommandException("SingleInstrumentalTestCommand.execute failed:", e);
         }

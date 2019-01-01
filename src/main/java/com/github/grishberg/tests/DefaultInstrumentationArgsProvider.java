@@ -1,5 +1,7 @@
 package com.github.grishberg.tests;
 
+import com.github.grishberg.tests.sharding.ShardArguments;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,10 +10,10 @@ import java.util.Map;
  */
 public class DefaultInstrumentationArgsProvider implements InstrumentationArgsProvider {
     private InstrumentalPluginExtension pluginExtension;
-    private final ShardingArguments testShard;
+    private final com.github.grishberg.tests.sharding.ShardArguments testShard;
 
     public DefaultInstrumentationArgsProvider(InstrumentalPluginExtension pluginExtension,
-                                              ShardingArguments testShard) {
+                                              ShardArguments testShard) {
         this.pluginExtension = pluginExtension;
         this.testShard = testShard;
     }
@@ -20,7 +22,7 @@ public class DefaultInstrumentationArgsProvider implements InstrumentationArgsPr
     public Map<String, String> provideInstrumentationArgs(ConnectedDeviceWrapper device) {
         HashMap<String, String> arguments = new HashMap<>();
         if (pluginExtension.isShardEnabled()) {
-            testShard.addShardingArguments(device, arguments);
+            return testShard.createShardArguments(device);
         }
         return arguments;
     }
