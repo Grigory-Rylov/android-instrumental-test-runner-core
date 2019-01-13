@@ -9,10 +9,10 @@ import java.util.Map;
  * Created by grishberg on 20.10.17.
  */
 public class DefaultInstrumentationArgsProvider implements InstrumentationArgsProvider {
-    private InstrumentalPluginExtension pluginExtension;
+    private InstrumentalExtension pluginExtension;
     private final com.github.grishberg.tests.sharding.ShardArguments testShard;
 
-    public DefaultInstrumentationArgsProvider(InstrumentalPluginExtension pluginExtension,
+    public DefaultInstrumentationArgsProvider(InstrumentalExtension pluginExtension,
                                               ShardArguments testShard) {
         this.pluginExtension = pluginExtension;
         this.testShard = testShard;

@@ -36,7 +36,7 @@ public class ConnectedDeviceWrapperTest {
     @Mock
     IShellOutputReceiver shellOutputReceiver;
     @Mock
-    InstrumentalPluginExtension extension;
+    InstrumentalExtension extension;
     @Mock
     ILogger logger;
     @Mock

@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Extension for sending arguments to plugin.
  */
-public class InstrumentalPluginExtension {
+public class InstrumentalExtension {
     String flavorName;
     String androidSdkPath;
     String applicationId;

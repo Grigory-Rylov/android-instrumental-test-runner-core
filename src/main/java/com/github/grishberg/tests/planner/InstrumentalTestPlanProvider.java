@@ -1,10 +1,9 @@
 package com.github.grishberg.tests.planner;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
-import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.InstrumentalExtension;
 import com.github.grishberg.tests.commands.ExecuteCommandException;
 import com.github.grishberg.tests.common.RunnerLogger;
-import org.gradle.api.Project;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,16 +15,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class InstrumentalTestPlanProvider {
     private static final String TAG = InstrumentalTestPlanProvider.class.getSimpleName();
-    private final InstrumentalPluginExtension instrumentationInfo;
-    private final Project project;
+    private final InstrumentalExtension instrumentationInfo;
+    private final Map<String, String> propertiesMap;
     private final PackageTreeGenerator packageTreeGenerator;
     private RunnerLogger logger;
 
-    public InstrumentalTestPlanProvider(Project project,
-                                        InstrumentalPluginExtension instrumentationInfo,
+    public InstrumentalTestPlanProvider(Map<String, String> propertiesMap,
+                                        InstrumentalExtension instrumentationInfo,
                                         PackageTreeGenerator packageTreeGenerator,
                                         RunnerLogger logger) {
-        this.project = project;
+        this.propertiesMap = propertiesMap;
         this.instrumentationInfo = instrumentationInfo;
         this.packageTreeGenerator = packageTreeGenerator;
         this.logger = logger;
@@ -40,7 +39,7 @@ public class InstrumentalTestPlanProvider {
         args.putAll(getArgsFromCli());
 
         InstrumentTestLogParser receiver = new InstrumentTestLogParser();
-        receiver.setLogger(new TestLogParserLogger());
+        receiver.setLogger(new TestLogParserLogger(logger));
         StringBuilder command = new StringBuilder("am instrument -r -w");
 
         args.put("listener", instrumentationInfo.getInstrumentListener());
@@ -67,11 +66,11 @@ public class InstrumentalTestPlanProvider {
 
     private Map<String, String> getArgsFromCli() {
         HashMap<String, String> result = new HashMap<>();
-        if (project.hasProperty("testClass")) {
-            Object aClass = project.getProperties().get("testClass");
+        if (propertiesMap.get("testClass") != null) {
+            Object aClass = propertiesMap.get("testClass");
             result.put("class", (String) aClass);
-        } else if (project.hasProperty("testPackage")) {
-            Object aPackage = project.getProperties().get("testPackage");
+        } else if (propertiesMap.get("testPackage") != null) {
+            Object aPackage = propertiesMap.get("testPackage");
             result.put("package", (String) aPackage);
         }
         return result;
@@ -81,15 +80,21 @@ public class InstrumentalTestPlanProvider {
      * @return test holder contains all test methods in project.
      */
     public InstrumentalTestHolder provideInstrumentalTests(ConnectedDeviceWrapper device,
-                                                               Map<String, String> instrumentalArgs) throws ExecuteCommandException {
+                                                           Map<String, String> instrumentalArgs) throws ExecuteCommandException {
         // TODO: create fabric
         return new InstrumentalTestHolderImpl(provideTestPlan(device, instrumentalArgs), packageTreeGenerator);
     }
 
     private class TestLogParserLogger implements InstrumentTestLogParser.ParserLogger {
+        private final RunnerLogger logger;
+
+        private TestLogParserLogger(RunnerLogger logger) {
+            this.logger = logger;
+        }
+
         @Override
         public void logLine(String line) {
-            project.getLogger().info(line);
+            logger.i(TAG, line);
         }
     }
 }

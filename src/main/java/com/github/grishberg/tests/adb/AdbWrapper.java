@@ -4,7 +4,7 @@ import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.common.RunnerLogger;
-import org.gradle.api.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

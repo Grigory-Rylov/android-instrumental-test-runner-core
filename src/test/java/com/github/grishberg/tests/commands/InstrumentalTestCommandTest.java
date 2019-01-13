@@ -4,10 +4,9 @@ import com.android.ddmlib.IDevice;
 import com.android.ddmlib.testrunner.InstrumentationResultParser;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
-import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.InstrumentalExtension;
 import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.common.RunnerLogger;
-import org.gradle.api.Project;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,12 +28,13 @@ import static org.mockito.Mockito.when;
 public class InstrumentalTestCommandTest {
     private static final String CMD_WITHOUT_COVERAGE = "am instrument -w -r   com.app.test/android.test.InstrumentationTestRunner";
     private static final String CMD_WITH_COVERAGE = "am instrument -w -r   -e coverageFile /data/data/test.appId/coverage.ec -e coverage true com.app.test/android.test.InstrumentationTestRunner";
+    private static final String PROJECT_NAME = "test_project";
+
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
     IDevice device;
-    @Mock
-    Project project;
+
     @Mock
     Environment environment;
     @Mock
@@ -42,7 +42,7 @@ public class InstrumentalTestCommandTest {
     @Mock
     TestRunnerContext context;
 
-    private InstrumentalPluginExtension ext = new InstrumentalPluginExtension();
+    private InstrumentalExtension ext = new InstrumentalExtension();
     private InstrumentalTestCommand command;
     private HashMap<String, String> argsProvider = new HashMap<>();
 
@@ -54,7 +54,7 @@ public class InstrumentalTestCommandTest {
         when(deviceWrapper.getDevice()).thenReturn(device);
         ext.setInstrumentalPackage("com.app.test");
         ext.setApplicationId("test.appId");
-        command = new InstrumentalTestCommand(project, argsProvider);
+        command = new InstrumentalTestCommand(PROJECT_NAME, argsProvider);
     }
 
     @Test

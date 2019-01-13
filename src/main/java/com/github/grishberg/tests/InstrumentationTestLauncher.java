@@ -1,23 +1,16 @@
 package com.github.grishberg.tests;
 
-import com.android.build.gradle.internal.test.report.ReportType;
-import com.android.build.gradle.internal.test.report.TestReport;
-import com.android.build.gradle.internal.test.report.TestReportExt;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.github.grishberg.tests.adb.AdbWrapper;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.ExecuteCommandException;
+import com.github.grishberg.tests.common.BuildFileSystem;
+import com.github.grishberg.tests.common.BuildFileSystemImpl;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.sharding.DefaultDeviceTypeAdapter;
 import com.github.grishberg.tests.sharding.DeviceTypeAdapter;
 import com.github.grishberg.tests.sharding.ShardArgumentsImpl;
-import org.gradle.api.DefaultTask;
-import org.gradle.api.GradleException;
-import org.gradle.api.Nullable;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.OutputDirectory;
-import org.gradle.api.tasks.TaskAction;
-import org.gradle.internal.logging.ConsoleRenderer;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,8 +23,8 @@ import static com.github.grishberg.tests.common.FileHelper.cleanFolder;
 /**
  * Main task for running instrumental tests.
  */
-public class InstrumentationTestTask extends DefaultTask {
-    private static final String TAG = InstrumentationTestTask.class.getSimpleName();
+public class InstrumentationTestLauncher {
+    private static final String TAG = InstrumentationTestLauncher.class.getSimpleName();
     private static final String DEFAULT_FLAVOR = "default_flavor";
     public static final String NAME = "instrumentalTests";
     @Nullable
@@ -41,16 +34,41 @@ public class InstrumentationTestTask extends DefaultTask {
     private File reportsDir;
     private DeviceRunnerCommandProvider commandProvider;
     private InstrumentationArgsProvider instrumentationArgsProvider;
-    private InstrumentalPluginExtension instrumentationInfo;
+    private InstrumentalExtension instrumentationInfo;
     private CommandsForAnnotationProvider commandsForAnnotationProvider;
     private DeviceCommandsRunnerFabric deviceCommandsRunnerFabric;
     private AdbWrapper adbWrapper;
     private RunnerLogger logger;
+    private String projectName;
+    private String buildDir;
     private DeviceTypeAdapter deviceTypeAdapter;
+    private BuildFileSystem buildFileSystem;
+    private HashMap<String, String> screenshotRelations = new HashMap<>();
 
-    public InstrumentationTestTask() {
-        instrumentationInfo = getProject().getExtensions()
-                .findByType(InstrumentalPluginExtension.class);
+    public InstrumentationTestLauncher(String projectName,
+                                       String buildDir,
+                                       InstrumentalExtension instrumentalExtension,
+                                       AdbWrapper adbWrapper,
+                                       DeviceCommandsRunnerFabric deviceCommandsRunnerFabric,
+                                       BuildFileSystem buildFileSystem,
+                                       RunnerLogger logger) {
+        this.projectName = projectName;
+        this.buildDir = buildDir;
+        instrumentationInfo = instrumentalExtension;
+        this.adbWrapper = adbWrapper;
+        this.deviceCommandsRunnerFabric = deviceCommandsRunnerFabric;
+        this.logger = logger;
+        this.buildFileSystem = buildFileSystem;
+    }
+
+    public InstrumentationTestLauncher(String projectName,
+                                       String buildDir,
+                                       InstrumentalExtension instrumentalExtension,
+                                       AdbWrapper adbWrapper,
+                                       DeviceCommandsRunnerFabric deviceCommandsRunnerFabric,
+                                       RunnerLogger logger) {
+        this(projectName, buildDir, instrumentalExtension, adbWrapper,
+                deviceCommandsRunnerFabric, new BuildFileSystemImpl(), logger);
     }
 
     void initAfterApply(AdbWrapper adbWrapper,
@@ -61,10 +79,17 @@ public class InstrumentationTestTask extends DefaultTask {
         this.logger = logger;
     }
 
-    @TaskAction
-    public void runTask() throws InterruptedException, IOException, ExecuteCommandException {
-        logger.i(TAG, "InstrumentationTestTask.runTask");
+    /**
+     * Launches tests.
+     *
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws ExecuteCommandException
+     */
+    public void launchTests() throws InterruptedException, IOException, ExecuteCommandException {
+        logger.i(TAG, "InstrumentationTestLauncher.launchTests");
 
+        screenshotRelations.clear();
         androidSdkPath = instrumentationInfo.getAndroidSdkPath();
         init();
         adbWrapper.init(androidSdkPath, logger);
@@ -76,41 +101,9 @@ public class InstrumentationTestTask extends DefaultTask {
         DeviceCommandsRunner runner = deviceCommandsRunnerFabric
                 .provideDeviceCommandRunner(commandProvider);
 
-        HashMap<String, String> screenshotRelations = new HashMap<>();
         TestRunnerContext context = new TestRunnerContext(instrumentationInfo,
                 environment, screenshotRelations, logger);
-        boolean success = false;
-        try {
-            success = runner.runCommands(getDeviceList(), context);
-        } finally {
-            generateHtmlReport(success, screenshotRelations);
-        }
-    }
-
-    /**
-     * @return List of available devices.
-     */
-    public List<ConnectedDeviceWrapper> getDeviceList() {
-        return adbWrapper.provideDevices();
-    }
-
-    private void prepareOutputFolders() throws IOException {
-        cleanFolder(getReportsDir());
-        cleanFolder(getResultsDir());
-        cleanFolder(getCoverageDir());
-    }
-
-    private void generateHtmlReport(boolean success, Map<String, String> screenshotMap) {
-        TestReport report = new TestReportExt(ReportType.SINGLE_FLAVOR, getResultsDir(),
-                getReportsDir(), screenshotMap);
-        report.generateReport();
-        if (!success) {
-            String reportUrl = (new ConsoleRenderer())
-                    .asClickableFileUrl(new File(getReportsDir(), "index.html"));
-            String message = String.format("There were failing tests. See the report at: %s",
-                    reportUrl);
-            throw new GradleException(message);
-        }
+        runner.runCommands(getDeviceList(), context);
     }
 
     private void init() {
@@ -121,7 +114,7 @@ public class InstrumentationTestTask extends DefaultTask {
             logger.i(TAG, "androidSdkPath = {}", androidSdkPath);
         }
         if (instrumentationInfo == null) {
-            throw new GradleException("Need to set InstrumentationInfo");
+            throw new RuntimeException("Need to set InstrumentationInfo");
         }
         if (commandsForAnnotationProvider == null) {
             commandsForAnnotationProvider = new DefaultCommandsForAnnotationProvider();
@@ -138,42 +131,56 @@ public class InstrumentationTestTask extends DefaultTask {
         }
         if (commandProvider == null) {
             logger.i(TAG, "command provider is empty, use DefaultCommandProvider");
-            commandProvider = new DefaultCommandProvider(getProject(),
+            commandProvider = new DefaultCommandProvider(projectName,
                     instrumentationArgsProvider, commandsForAnnotationProvider, logger);
         }
     }
 
-    @Input
-    public void setInstrumentationInfo(InstrumentalPluginExtension instrumentationInfo) {
+
+    private void prepareOutputFolders() throws IOException {
+        buildFileSystem.cleanFolder(getReportsDir());
+        buildFileSystem.cleanFolder(getResultsDir());
+        buildFileSystem.cleanFolder(getCoverageDir());
+    }
+
+    /**
+     * @return path relations between screenshots and failed tests.
+     */
+    public Map<String, String> getScreenshotRelations() {
+        return screenshotRelations;
+    }
+
+    /**
+     * @return List of available devices.
+     */
+    public List<ConnectedDeviceWrapper> getDeviceList() {
+        return adbWrapper.provideDevices();
+    }
+
+    public void setInstrumentationInfo(InstrumentalExtension instrumentationInfo) {
         this.instrumentationInfo = instrumentationInfo;
     }
 
-    @Input
     public void setInstrumentationArgsProvider(InstrumentationArgsProvider argsProvider) {
         this.instrumentationArgsProvider = argsProvider;
     }
 
-    @Input
     public void setCommandsForAnnotationProvider(CommandsForAnnotationProvider commandsProvider) {
         this.commandsForAnnotationProvider = commandsProvider;
     }
 
-    @Input
     public void setCommandProvider(DeviceRunnerCommandProvider commandProvider) {
         this.commandProvider = commandProvider;
     }
 
-    @Input
     public void setCoverageDir(File coverageDir) {
         this.coverageDir = coverageDir;
     }
 
-    @Input
     public void setResultsDir(File resultsDir) {
         this.resultsDir = resultsDir;
     }
 
-    @Input
     public void setReportsDir(File reportsDir) {
         this.reportsDir = reportsDir;
     }
@@ -183,7 +190,6 @@ public class InstrumentationTestTask extends DefaultTask {
      * If you use your own implementation of InstrumentationArgsProvider,
      * then write your own shard arguments generation logic.
      */
-    @Input
     public void setDeviceTypeAdapter(DeviceTypeAdapter deviceTypeAdapter) {
         this.deviceTypeAdapter = deviceTypeAdapter;
     }
@@ -192,7 +198,7 @@ public class InstrumentationTestTask extends DefaultTask {
         if (coverageDir == null) {
             String flavor = instrumentationInfo.getFlavorName() != null ?
                     instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
-            coverageDir = new File(getProject().getBuildDir(),
+            coverageDir = new File(buildDir,
                     String.format("outputs/androidTest/coverage/%s", flavor));
             logger.d(TAG, "Coverage dir is empty, generate default value {}", coverageDir);
         }
@@ -203,19 +209,18 @@ public class InstrumentationTestTask extends DefaultTask {
         if (resultsDir == null) {
             String flavor = instrumentationInfo.getFlavorName() != null ?
                     instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
-            resultsDir = new File(getProject().getBuildDir(),
+            resultsDir = new File(buildDir,
                     String.format("outputs/androidTest/%s", flavor));
             logger.d(TAG, "Results dir is empty, generate default value {}", resultsDir);
         }
         return resultsDir;
     }
 
-    @OutputDirectory
     public File getReportsDir() {
         if (reportsDir == null) {
             String flavor = instrumentationInfo.getFlavorName() != null ?
                     instrumentationInfo.getFlavorName() : DEFAULT_FLAVOR;
-            reportsDir = new File(getProject().getBuildDir(),
+            reportsDir = new File(buildDir,
                     String.format("outputs/reports/androidTest/%s", flavor));
             logger.d(TAG, "Reports dir is empty, generate default value {}", reportsDir);
         }

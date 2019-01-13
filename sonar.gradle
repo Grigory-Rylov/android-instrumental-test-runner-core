@@ -1,7 +1,9 @@
+//TODO: make core key
 def sonarKey = "com.github.grishberg:android-instrumental-test-runner"
 sonarqube {
     properties {
         property "sonar.projectKey", sonarKey
+        //TODO: android-instrumental-test-runner-core
         property "sonar.projectName", "android-instrumental-test-runner"
         property "sonar.projectVersion", "${project.version}"
         property "sonar.sources", "src/main/java"

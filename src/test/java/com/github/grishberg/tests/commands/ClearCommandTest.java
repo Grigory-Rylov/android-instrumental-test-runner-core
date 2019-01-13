@@ -1,7 +1,7 @@
 package com.github.grishberg.tests.commands;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
-import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.InstrumentalExtension;
 import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.junit.Before;
@@ -22,7 +22,7 @@ public class ClearCommandTest {
     @Mock
     RunnerLogger logger;
     @Mock
-    InstrumentalPluginExtension ext;
+    InstrumentalExtension ext;
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
     @Mock

@@ -2,7 +2,6 @@ package com.github.grishberg.tests;
 
 import com.github.grishberg.tests.commands.TestRunnerBuilder;
 import com.github.grishberg.tests.common.RunnerLogger;
-import org.gradle.api.Project;
 
 import java.util.Map;
 
@@ -10,12 +9,12 @@ import java.util.Map;
  * Provides data for test command execution.
  */
 public class TestRunnerContext {
-    private final InstrumentalPluginExtension instrumentalInfo;
+    private final InstrumentalExtension instrumentalInfo;
     private final Environment environment;
     private final Map<String, String> screenshotRelation;
     private final RunnerLogger logger;
 
-    public TestRunnerContext(InstrumentalPluginExtension instrumentalInfo,
+    public TestRunnerContext(InstrumentalExtension instrumentalInfo,
                              Environment environment,
                              Map<String, String> screenshotRelation,
                              RunnerLogger logger) {
@@ -25,7 +24,7 @@ public class TestRunnerContext {
         this.logger = logger;
     }
 
-    public InstrumentalPluginExtension getInstrumentalInfo() {
+    public InstrumentalExtension getInstrumentalInfo() {
         return instrumentalInfo;
     }
 
@@ -41,11 +40,11 @@ public class TestRunnerContext {
         return logger;
     }
 
-    public TestRunnerBuilder createTestRunnerBuilder(Project project,
+    public TestRunnerBuilder createTestRunnerBuilder(String projectName,
                                                      String testName,
                                                      Map<String, String> instrumentationArgs,
                                                      ConnectedDeviceWrapper targetDevice) {
-        return new TestRunnerBuilder(project,
+        return new TestRunnerBuilder(projectName,
                 testName,
                 instrumentationArgs,
                 targetDevice,

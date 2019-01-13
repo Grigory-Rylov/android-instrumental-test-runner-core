@@ -3,7 +3,6 @@ package com.github.grishberg.tests;
 import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
-import org.gradle.api.Project;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,11 +22,11 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class AllTestsInOneScopeCommandProviderTest {
     private static final HashMap<String, String> ARGS = new HashMap<>();
+    private static final String PROJECT_NAME = "test_project";
+
     AllTestsInOneScopeCommandProvider provider;
     @Mock
-    Project project;
-    @Mock
-    InstrumentalPluginExtension extension;
+    InstrumentalExtension extension;
     @Mock
     InstrumentationArgsProvider argsProvider;
     @Mock
@@ -42,7 +41,7 @@ public class AllTestsInOneScopeCommandProviderTest {
     @Before
     public void setUp() throws Exception {
         when(argsProvider.provideInstrumentationArgs(deviceWrapper)).thenReturn(ARGS);
-        provider = new AllTestsInOneScopeCommandProvider(project, argsProvider, logger);
+        provider = new AllTestsInOneScopeCommandProvider(PROJECT_NAME, argsProvider, logger);
     }
 
     @Test

@@ -4,7 +4,6 @@ import com.github.grishberg.tests.commands.*;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import com.github.grishberg.tests.planner.TestPlanElement;
-import org.gradle.api.Project;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,16 +14,16 @@ import java.util.Map;
  */
 public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
     private static final String TAG = DefaultCommandProvider.class.getSimpleName();
-    private final Project project;
+    private final String projectName;
     private final InstrumentationArgsProvider argsProvider;
     private final CommandsForAnnotationProvider commandsForAnnotationProvider;
     private final RunnerLogger logger;
 
-    DefaultCommandProvider(Project project,
+    DefaultCommandProvider(String projectName,
                            InstrumentationArgsProvider argsProvider,
                            CommandsForAnnotationProvider commandsForAnnotationProvider,
                            RunnerLogger logger) {
-        this.project = project;
+        this.projectName = projectName;
         this.argsProvider = argsProvider;
         this.commandsForAnnotationProvider = commandsForAnnotationProvider;
         this.logger = logger;
@@ -48,7 +47,7 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
                     .provideCommand(currentPlan.getAnnotations());
             if (!commandsForAnnotations.isEmpty()) {
                 if (!planList.isEmpty()) {
-                    commands.add(new SingleInstrumentalTestCommand(project,
+                    commands.add(new SingleInstrumentalTestCommand(projectName,
                             String.format("test_%d", testIndex++),
                             instrumentalArgs,
                             planList));
@@ -61,7 +60,7 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
         }
 
         if (!planList.isEmpty()) {
-            commands.add(new SingleInstrumentalTestCommand(project,
+            commands.add(new SingleInstrumentalTestCommand(projectName,
                     String.format("test_%d", testIndex),
                     instrumentalArgs,
                     planList));

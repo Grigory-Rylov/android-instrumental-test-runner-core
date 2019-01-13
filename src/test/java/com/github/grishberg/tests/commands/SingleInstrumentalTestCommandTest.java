@@ -6,13 +6,12 @@ import com.android.ddmlib.testrunner.TestRunResult;
 import com.android.utils.ILogger;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
-import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.InstrumentalExtension;
 import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.TestPlanElement;
-import org.gradle.api.Project;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,12 +37,11 @@ import static org.mockito.Mockito.*;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class SingleInstrumentalTestCommandTest {
+    private static final String PROJECT_NAME = "test_project";
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
     IDevice device;
-    @Mock
-    Project project;
     @Mock
     Environment environment;
     @Mock
@@ -64,7 +62,7 @@ public class SingleInstrumentalTestCommandTest {
     File coverageDir;
     private SingleInstrumentalTestCommand testCommand;
     private HashMap<String, String> args = new HashMap<>();
-    private InstrumentalPluginExtension ext = new InstrumentalPluginExtension();
+    private InstrumentalExtension ext = new InstrumentalExtension();
     private ArrayList<TestPlanElement> testElements = new ArrayList<>();
     private Map<String, String> instrumentationArgs;
 
@@ -86,13 +84,13 @@ public class SingleInstrumentalTestCommandTest {
         when(reportsGenerator.getRunResult()).thenReturn(testRunResult);
 
         when(deviceWrapper.getName()).thenReturn("test_device");
-        testCommand = new SingleInstrumentalTestCommand(project, "test_prefix", args, testElements);
+        testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME, "test_prefix", args, testElements);
     }
 
     @Test
     public void initWithClass() throws Exception {
         testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
-        SingleInstrumentalTestCommand cmd = new SingleInstrumentalTestCommand(project,
+        SingleInstrumentalTestCommand cmd = new SingleInstrumentalTestCommand(PROJECT_NAME,
                 "test_prefix", args, testElements);
 
         cmd.execute(deviceWrapper, context);
@@ -104,7 +102,7 @@ public class SingleInstrumentalTestCommandTest {
     public void testWhenCoverageEnabled() throws Exception {
         ext.setCoverageEnabled(true);
         testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
-        SingleInstrumentalTestCommand cmd = new SingleInstrumentalTestCommand(project,
+        SingleInstrumentalTestCommand cmd = new SingleInstrumentalTestCommand(PROJECT_NAME,
                 "test_prefix", args, testElements);
 
         cmd.execute(deviceWrapper, context);
@@ -124,7 +122,7 @@ public class SingleInstrumentalTestCommandTest {
         testCommand.execute(deviceWrapper, context);
 
         verify(deviceWrapper).pullCoverageFile(
-                any(InstrumentalPluginExtension.class),
+                any(InstrumentalExtension.class),
                 anyString(),
                 anyString(),
                 any(File.class),
@@ -136,7 +134,7 @@ public class SingleInstrumentalTestCommandTest {
         Mockito.doThrow(new IOException(new Throwable())).when(testRunner)
                 .run(reportsGenerator);
         testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
-        testCommand = new SingleInstrumentalTestCommand(project,
+        testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME,
                 "test_prefix", args, testElements);
 
         testCommand.execute(deviceWrapper, context);
@@ -148,7 +146,7 @@ public class SingleInstrumentalTestCommandTest {
                 .run(reportsGenerator);
 
         testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
-        testCommand = new SingleInstrumentalTestCommand(project,
+        testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME,
                 "test_prefix", args, testElements);
 
         testCommand.execute(deviceWrapper, context);

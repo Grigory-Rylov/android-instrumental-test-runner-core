@@ -16,7 +16,7 @@ public class DefaultInstrumentationArgsProviderTest {
     @Test
     public void dontProvideShardArgsByDefault() {
         ConnectedDeviceWrapper deviceWrapper = mock(ConnectedDeviceWrapper.class);
-        InstrumentalPluginExtension instrumentalInfo = mock(InstrumentalPluginExtension.class);
+        InstrumentalExtension instrumentalInfo = mock(InstrumentalExtension.class);
         ShardArguments shardArguments = mock(ShardArguments.class);
         DefaultInstrumentationArgsProvider provider =
                 new DefaultInstrumentationArgsProvider(instrumentalInfo, shardArguments);
@@ -26,7 +26,7 @@ public class DefaultInstrumentationArgsProviderTest {
     @Test
     public void provideShardArgsWhenEnabled() {
         ConnectedDeviceWrapper deviceWrapper = mock(ConnectedDeviceWrapper.class);
-        InstrumentalPluginExtension instrumentalInfo = mock(InstrumentalPluginExtension.class);
+        InstrumentalExtension instrumentalInfo = mock(InstrumentalExtension.class);
         when(instrumentalInfo.isShardEnabled()).thenReturn(true);
         ShardArguments sharding = mock(ShardArguments.class);
         HashMap<String, String> res = new HashMap<>();

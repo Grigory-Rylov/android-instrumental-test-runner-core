@@ -5,7 +5,6 @@ import com.android.utils.ILogger;
 import com.github.grishberg.tests.*;
 import com.github.grishberg.tests.commands.reports.*;
 import com.github.grishberg.tests.common.RunnerLogger;
-import org.gradle.api.Project;
 
 import java.util.Map;
 
@@ -18,12 +17,12 @@ public class TestRunnerBuilder {
     private final TestXmlReportsGenerator testRunListener;
     private final RunTestLogger runTestLogger;
 
-    public TestRunnerBuilder(Project project,
+    public TestRunnerBuilder(String projectName,
                              String testGroupPrefix,
                              Map<String, String> instrumentationArgs,
                              ConnectedDeviceWrapper targetDevice,
                              TestRunnerContext context) {
-        InstrumentalPluginExtension instrumentationInfo = context.getInstrumentalInfo();
+        InstrumentalExtension instrumentationInfo = context.getInstrumentalInfo();
         Environment environment = context.getEnvironment();
         RunnerLogger logger = context.getLogger();
 
@@ -48,7 +47,7 @@ public class TestRunnerBuilder {
         runTestLogger = new RunTestLogger(logger);
 
         testRunListener = new TestXmlReportsGenerator(targetDevice.getName(),
-                project.getName(),
+                projectName,
                 instrumentationInfo.getFlavorName(),
                 testGroupPrefix,
                 runTestLogger,
@@ -58,7 +57,7 @@ public class TestRunnerBuilder {
     }
 
     private ScreenShotMaker getScreenShotMaker(Map<String, String> screenshotMap,
-                                               InstrumentalPluginExtension instrumentationInfo,
+                                               InstrumentalExtension instrumentationInfo,
                                                ConnectedDeviceWrapper targetDevice,
                                                Environment environment,
                                                RunnerLogger logger) {
@@ -69,7 +68,7 @@ public class TestRunnerBuilder {
         return new EmptyScreenShotMaker();
     }
 
-    private LogcatSaver getLogcatSaver(InstrumentalPluginExtension instrumentationInfo,
+    private LogcatSaver getLogcatSaver(InstrumentalExtension instrumentationInfo,
                                        ConnectedDeviceWrapper targetDevice,
                                        Environment environment,
                                        RunnerLogger logger) {

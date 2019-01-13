@@ -6,7 +6,6 @@ import com.github.grishberg.tests.commands.ExecuteCommandException;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.common.ScreenSizeParser;
 import com.github.grishberg.tests.exceptions.PullCoverageException;
-import org.gradle.internal.impldep.org.apache.maven.wagon.CommandExecutionException;
 
 import java.io.File;
 import java.io.IOException;
@@ -152,7 +151,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
      * @param logger              logger.
      * @throws PullCoverageException
      */
-    public void pullCoverageFile(InstrumentalPluginExtension instrumentationInfo,
+    public void pullCoverageFile(InstrumentalExtension instrumentationInfo,
                                  String coverageFilePrefix,
                                  String coverageFile,
                                  File outCoverageDir,

@@ -1,9 +1,8 @@
 package com.github.grishberg.tests.planner;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
-import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.InstrumentalExtension;
 import com.github.grishberg.tests.common.RunnerLogger;
-import org.gradle.api.Project;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.*;
@@ -22,23 +22,24 @@ import static org.mockito.Mockito.*;
 public class InstrumentalTestPlanProviderTest {
     private static final String RUN_LOG_COMMAND = "am instrument -r -w -e log true -e listener test_listener TestAppPackage/TestRunner";
     private static final String RUN_LOG_COMMAND_WITH_ARG = "am instrument -r -w -e log true -e listener test_listener -e class com.test.SpecialTest TestAppPackage/TestRunner";
+
     private InstrumentalTestPlanProvider provider;
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
-    @Mock
-    Project project;
-    InstrumentalPluginExtension extension = new InstrumentalPluginExtension();
+    InstrumentalExtension extension = new InstrumentalExtension();
     @Mock
     PackageTreeGenerator treeGenerator;
     @Mock
     RunnerLogger logger;
+    @Mock
+    Map<String, String> paramsMap;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         extension.setInstrumentListener("test_listener");
         extension.setInstrumentalRunner("TestRunner");
         extension.setInstrumentalPackage("TestAppPackage");
-        provider = new InstrumentalTestPlanProvider(project, extension, treeGenerator, logger);
+        provider = new InstrumentalTestPlanProvider(paramsMap, extension, treeGenerator, logger);
     }
 
     @Test
@@ -53,10 +54,7 @@ public class InstrumentalTestPlanProviderTest {
 
     @Test
     public void sendAdditionalArgTestClass() throws Exception {
-        when(project.hasProperty("testClass")).thenReturn(true);
-        HashMap stringHashMap = new HashMap<String, Object>();
-        stringHashMap.put("testClass", "com.test.SpecialTest");
-        when(project.getProperties()).thenReturn(stringHashMap);
+        when(paramsMap.get("testClass")).thenReturn("com.test.SpecialTest");
         HashMap<String, String> args = new HashMap<>();
 
         provider.provideTestPlan(deviceWrapper, args);

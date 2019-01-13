@@ -1,7 +1,7 @@
 package com.github.grishberg.tests.commands;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
-import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.InstrumentalExtension;
 import com.github.grishberg.tests.TestRunnerContext;
 
 /**
@@ -13,7 +13,7 @@ public class ClearCommand implements DeviceRunnerCommand {
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper device, TestRunnerContext context)
             throws ExecuteCommandException {
-        InstrumentalPluginExtension instrumentalInfo = context.getInstrumentalInfo();
+        InstrumentalExtension instrumentalInfo = context.getInstrumentalInfo();
         context.getLogger().i(TAG, "ClearCommand for package {}",
                 instrumentalInfo.getApplicationId());
         StringBuilder command = new StringBuilder("pm clear ");

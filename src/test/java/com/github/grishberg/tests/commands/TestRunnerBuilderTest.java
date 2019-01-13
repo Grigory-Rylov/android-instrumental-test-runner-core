@@ -3,11 +3,10 @@ package com.github.grishberg.tests.commands;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
-import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.InstrumentalExtension;
 import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
-import org.gradle.api.Project;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,13 +27,12 @@ public class TestRunnerBuilderTest {
     private static final String TEST_PACKAGE = "com.test.testpackage";
     private static final String RUNNER_NAME = "SampleRunner";
     private static final String TEST_NAME = "test-name";
-    private InstrumentalPluginExtension extension = new InstrumentalPluginExtension();
+    private static final String PROJECT_NAME = "test_project";
+    private InstrumentalExtension extension = new InstrumentalExtension();
     private TestRunnerBuilder builder;
     private Map<String, String> args = new HashMap<>();
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
-    @Mock
-    Project project;
     @Mock
     Environment environment;
     @Mock
@@ -49,11 +47,11 @@ public class TestRunnerBuilderTest {
         extension.setApplicationId("com.test.packageId");
         extension.setInstrumentalPackage(TEST_PACKAGE);
         extension.setInstrumentalRunner(RUNNER_NAME);
-        builder = new TestRunnerBuilder(project, TEST_NAME, args, deviceWrapper, context);
+        builder = new TestRunnerBuilder(PROJECT_NAME, TEST_NAME, args, deviceWrapper, context);
     }
 
     @Test
-    public void getTestRunner() throws Exception {
+    public void getTestRunner() {
         RemoteAndroidTestRunner testRunner = builder.getTestRunner();
         Assert.assertNotNull(testRunner);
         Assert.assertEquals(TEST_PACKAGE, testRunner.getPackageName());

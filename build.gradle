@@ -24,7 +24,7 @@ apply plugin: 'kotlin'
 
 ext {
     PUBLISH_GROUP_ID = group
-    PUBLISH_ARTIFACT_ID = 'android-instrumental-test-runner'
+    PUBLISH_ARTIFACT_ID = 'android-instrumental-test-runner-core'
     PUBLISH_VERSION = version
 }
 
@@ -45,7 +45,6 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile 'org.mockito:mockito-core:2.16.0'
     testCompile "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
-    compile gradleApi()
     compile localGroovy()
     compile 'com.github.grishberg:test-report:1.1'
     // https://mvnrepository.com/artifact/com.android.tools.ddms/ddmlib

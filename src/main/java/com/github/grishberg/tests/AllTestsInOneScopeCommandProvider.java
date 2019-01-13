@@ -5,7 +5,6 @@ import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.InstrumentalTestCommand;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
-import org.gradle.api.Project;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,14 +15,14 @@ import java.util.Map;
  */
 public class AllTestsInOneScopeCommandProvider implements DeviceRunnerCommandProvider {
     private static final String TAG = AllTestsInOneScopeCommandProvider.class.getSimpleName();
-    private final Project project;
+    private final String projectName;
     private final InstrumentationArgsProvider argsProvider;
     private final RunnerLogger logger;
 
-    public AllTestsInOneScopeCommandProvider(Project project,
+    public AllTestsInOneScopeCommandProvider(String projectName,
                                              InstrumentationArgsProvider argsProvider,
                                              RunnerLogger logger) {
-        this.project = project;
+        this.projectName = projectName;
         this.argsProvider = argsProvider;
         this.logger = logger;
     }
@@ -37,7 +36,7 @@ public class AllTestsInOneScopeCommandProvider implements DeviceRunnerCommandPro
         logger.i(TAG, "device = {}, args = {}",
                 device, instrumentalArgs);
 
-        commands.add(new InstrumentalTestCommand(project, instrumentalArgs));
+        commands.add(new InstrumentalTestCommand(projectName, instrumentalArgs));
         return commands;
     }
 }

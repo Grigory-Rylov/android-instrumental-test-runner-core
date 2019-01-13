@@ -3,10 +3,9 @@ package com.github.grishberg.tests.commands;
 import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
-import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.InstrumentalExtension;
 import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
-import org.gradle.api.Project;
 
 import java.util.Map;
 
@@ -14,12 +13,12 @@ import java.util.Map;
  * Executes instrumental tests on connected device.
  */
 public class InstrumentalTestCommand implements DeviceRunnerCommand {
-    private final Project project;
+    private final String projectName;
     private final Map<String, String> instrumentationArgs;
 
-    public InstrumentalTestCommand(Project project,
+    public InstrumentalTestCommand(String projectName,
                                    Map<String, String> instrumentalArgs) {
-        this.project = project;
+        this.projectName = projectName;
         this.instrumentationArgs = instrumentalArgs;
     }
 
@@ -28,9 +27,9 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
             throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
         Environment environment = context.getEnvironment();
-        InstrumentalPluginExtension instrumentationInfo = context.getInstrumentalInfo();
+        InstrumentalExtension instrumentationInfo = context.getInstrumentalInfo();
 
-        TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(project,
+        TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(projectName,
                 "",
                 instrumentationArgs,
                 targetDevice,

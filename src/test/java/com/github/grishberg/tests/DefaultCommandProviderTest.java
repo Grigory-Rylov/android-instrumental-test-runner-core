@@ -7,7 +7,6 @@ import com.github.grishberg.tests.commands.SingleInstrumentalTestCommand;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import com.github.grishberg.tests.planner.TestPlanElement;
-import org.gradle.api.Project;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,10 +29,10 @@ import static org.mockito.Mockito.when;
 public class DefaultCommandProviderTest {
     private static final HashMap<String, String> ARGS = new HashMap<>();
     private static final String ANNOTATION = "TestAnnotation";
+    private static final String PROJECT_NAME = "test_project";
+
     @Mock
-    Project project;
-    @Mock
-    InstrumentalPluginExtension extension;
+    InstrumentalExtension extension;
     @Mock
     InstrumentationArgsProvider argsProvider;
     @Mock
@@ -70,7 +69,7 @@ public class DefaultCommandProviderTest {
         List<TestPlanElement> testPlanElements = Arrays.asList(element);
         when(planProvider.provideTestPlan(deviceWrapper, ARGS)).thenReturn(testPlanElements);
         when(argsProvider.provideInstrumentationArgs(deviceWrapper)).thenReturn(ARGS);
-        provider = new DefaultCommandProvider(project, argsProvider,
+        provider = new DefaultCommandProvider(PROJECT_NAME, argsProvider,
                 commandsForAnnotationProvider, logger);
     }
 

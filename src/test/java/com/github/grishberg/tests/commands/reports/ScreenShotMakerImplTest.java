@@ -2,8 +2,6 @@ package com.github.grishberg.tests.commands.reports;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.common.RunnerLogger;
-import org.gradle.api.Project;
-import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,13 +23,14 @@ import static org.mockito.Mockito.when;
 public class ScreenShotMakerImplTest {
     private static final String REPORTS = "reports";
     private static final String SCREENSHOT_NAME = "test_device-com.test.TestClass-test1.png";
-    private final Project project = ProjectBuilder.builder().build();
+    private static final String PROJECT_BUILD_DIR = "out";
+    private static final String PROJECT_NAME = "test_project";
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
     RunnerLogger logger;
     private ScreenShotMakerImpl screenShotMaker;
-    private File reportsDir = new File(project.getBuildDir(), REPORTS);
+    private File reportsDir = new File(PROJECT_BUILD_DIR, REPORTS);
     private HashMap<String, String> screenshotRelations = new HashMap<>();
 
     @Before

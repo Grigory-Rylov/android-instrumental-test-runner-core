@@ -3,13 +3,11 @@ package com.github.grishberg.tests.commands;
 import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
-import com.github.grishberg.tests.InstrumentalPluginExtension;
+import com.github.grishberg.tests.InstrumentalExtension;
 import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.TestPlanElement;
-
-import org.gradle.api.Project;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,15 +19,15 @@ import java.util.Map;
 public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     private static final String CLASS = "class";
     private static final String PACKAGE = "package";
-    private final Project project;
+    private final String projectName;
     private String testName;
     private final Map<String, String> instrumentationArgs;
 
-    public SingleInstrumentalTestCommand(Project project,
+    public SingleInstrumentalTestCommand(String projectName,
                                          String testReportSuffix,
                                          Map<String, String> instrumentalArgs,
                                          List<TestPlanElement> testForExecution) {
-        this.project = project;
+        this.projectName = projectName;
         this.testName = testReportSuffix;
         this.instrumentationArgs = new HashMap<>(instrumentalArgs);
 
@@ -67,10 +65,10 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice, TestRunnerContext context)
             throws ExecuteCommandException {
         DeviceCommandResult result = new DeviceCommandResult();
-        InstrumentalPluginExtension instrumentationInfo = context.getInstrumentalInfo();
+        InstrumentalExtension instrumentationInfo = context.getInstrumentalInfo();
         Environment environment = context.getEnvironment();
 
-        TestRunnerBuilder testRunnerBuilder = context.createTestRunnerBuilder(project,
+        TestRunnerBuilder testRunnerBuilder = context.createTestRunnerBuilder(projectName,
                 testName,
                 instrumentationArgs,
                 targetDevice);
