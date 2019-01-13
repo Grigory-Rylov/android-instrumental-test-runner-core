@@ -3,7 +3,7 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.github.grishberg%3Aandroid-instrumental-test-runner&metric=coverage)](https://sonarcloud.io/api/project_badges/measure?project=com.github.grishberg%3Aandroid-instrumental-test-runner&metric=coverage)
 [![Download](https://api.bintray.com/packages/grigory-rylov/gradle/android-instrumental-test-runner/images/download.svg) ](https://bintray.com/grigory-rylov/gradle/android-instrumental-test-runner/_latestVersion)
 
-# android-instrumentation-test-runner
+# android-instrumentation-test-runner-core
 Runner for espresso tests
 
 To use add https://github.com/Grishberg/InstrumentationTestsAnnotationPrinter to target android project
