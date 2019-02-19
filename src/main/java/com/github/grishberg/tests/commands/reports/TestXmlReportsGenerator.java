@@ -69,4 +69,11 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
         testFailed(currentTest, trace);
         super.testEnded(currentTest, 0, new HashMap<>());
     }
+
+    /**
+     * @return current executed test.
+     */
+    public TestIdentifier getCurrentTest() {
+        return currentTest;
+    }
 }

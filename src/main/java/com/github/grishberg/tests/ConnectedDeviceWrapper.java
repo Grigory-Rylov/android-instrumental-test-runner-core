@@ -189,7 +189,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
      * Execute adb shell command on device.
      *
      * @param command adb shell command for execution.
-     * @throws CommandExecutionException
+     * @throws ExecuteCommandException
      */
     public void executeShellCommand(String command) throws ExecuteCommandException {
         try {

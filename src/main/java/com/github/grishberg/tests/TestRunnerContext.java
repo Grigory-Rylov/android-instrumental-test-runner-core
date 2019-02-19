@@ -13,6 +13,7 @@ public class TestRunnerContext {
     private final Environment environment;
     private final Map<String, String> screenshotRelation;
     private final RunnerLogger logger;
+    private ProcessCrashHandler processCrashHandler = ProcessCrashHandler.STUB.INSTANCE;
 
     public TestRunnerContext(InstrumentalExtension instrumentalInfo,
                              Environment environment,
@@ -49,5 +50,13 @@ public class TestRunnerContext {
                 instrumentationArgs,
                 targetDevice,
                 this);
+    }
+
+    void setProcessCrashHandler(ProcessCrashHandler handler) {
+        processCrashHandler = handler;
+    }
+
+    public ProcessCrashHandler getProcessCrashedHandler() {
+        return processCrashHandler;
     }
 }
