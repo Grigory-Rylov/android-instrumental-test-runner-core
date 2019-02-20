@@ -5,7 +5,7 @@ import com.android.ddmlib.IDevice;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.TimeoutException;
 import com.android.utils.ILogger;
-import com.github.grishberg.tests.commands.ExecuteCommandException;
+import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.junit.Before;
 import org.junit.Test;
@@ -140,7 +140,7 @@ public class ConnectedDeviceWrapperTest {
         assertEquals(device, deviceWrapper.getDevice());
     }
 
-    @Test(expected = ExecuteCommandException.class)
+    @Test(expected = CommandExecutionException.class)
     public void throwExecuteCommandExceptionWhenPullFileAndOtherException() throws Exception {
         doThrow(new TimeoutException()).when(device)
                 .pullFile(anyString(), anyString());

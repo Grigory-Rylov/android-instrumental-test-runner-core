@@ -128,7 +128,7 @@ public class SingleInstrumentalTestCommandTest {
                 any(ILogger.class));
     }
 
-    @Test(expected = ExecuteCommandException.class)
+    @Test(expected = CommandExecutionException.class)
     public void throwExecuteCommandExceptionWhenSomeDeviceException() throws Exception {
         Mockito.doThrow(new IOException(new Throwable())).when(testRunner)
                 .run(reportsGenerator);
@@ -136,7 +136,7 @@ public class SingleInstrumentalTestCommandTest {
         testCommand.execute(deviceWrapper, context);
     }
 
-    @Test(expected = ExecuteCommandException.class)
+    @Test(expected = CommandExecutionException.class)
     public void failTestWhenProcessCrashed() throws Exception {
         Mockito.doThrow(new ProcessCrashedException("Process crashed")).when(testRunner)
                 .run(reportsGenerator);
@@ -146,7 +146,7 @@ public class SingleInstrumentalTestCommandTest {
         verify(reportsGenerator).failLastTest("Process was crashed. See logcat to details.");
     }
 
-    @Test(expected = ExecuteCommandException.class)
+    @Test(expected = CommandExecutionException.class)
     public void callTestRunEndedFromReporterWhenProcessCrashed() throws Exception {
         Mockito.doThrow(new ProcessCrashedException("Process crashed")).when(testRunner)
                 .run(reportsGenerator);
@@ -156,7 +156,7 @@ public class SingleInstrumentalTestCommandTest {
         verify(reportsGenerator).testRunEnded(anyInt(), any());
     }
 
-    @Test(expected = ExecuteCommandException.class)
+    @Test(expected = CommandExecutionException.class)
     public void handleProcessCrashedWhenProcessCrashed() throws Exception {
         Mockito.doThrow(new ProcessCrashedException("Process crashed")).when(testRunner)
                 .run(reportsGenerator);

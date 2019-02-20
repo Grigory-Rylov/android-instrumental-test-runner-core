@@ -1,7 +1,7 @@
 package com.github.grishberg.tests.commands.reports;
 
 import com.github.grishberg.tests.DeviceShellExecuter;
-import com.github.grishberg.tests.commands.ExecuteCommandException;
+import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.RunnerLogger;
 
 import java.io.BufferedWriter;
@@ -33,7 +33,7 @@ public class LogcatSaverImpl implements LogcatSaver {
         try {
             logger.i(TAG, "clearLogcat");
             device.executeShellCommand("logcat -c");
-        } catch (ExecuteCommandException e) {
+        } catch (CommandExecutionException e) {
             logger.e(TAG, "clearLogcat exception", e);
         }
     }
@@ -44,17 +44,17 @@ public class LogcatSaverImpl implements LogcatSaver {
             logger.i(TAG, "saveLogcat for {}", testName);
             String logcat = device.executeShellCommandAndReturnOutput("logcat -v threadtime -d");
             saveToFile(testName, logcat);
-        } catch (ExecuteCommandException e) {
+        } catch (CommandExecutionException e) {
             logger.e(TAG, "clearLogcat exception", e);
         }
     }
 
-    private void saveToFile(String testName, String logcat) throws ExecuteCommandException {
+    private void saveToFile(String testName, String logcat) throws CommandExecutionException {
         File outFile = new File(logcatDir, String.format("%s-%s.log", device.getName(), testName));
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outFile))) {
             writer.write(logcat);
         } catch (Exception e) {
-            throw new ExecuteCommandException(e);
+            throw new CommandExecutionException(e);
         }
     }
 }

@@ -3,7 +3,7 @@ package com.github.grishberg.tests;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.github.grishberg.tests.adb.AdbWrapper;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
-import com.github.grishberg.tests.commands.ExecuteCommandException;
+import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.BuildFileSystem;
 import com.github.grishberg.tests.common.BuildFileSystemImpl;
 import com.github.grishberg.tests.common.RunnerLogger;
@@ -83,9 +83,9 @@ public class InstrumentationTestLauncher {
      *
      * @throws InterruptedException
      * @throws IOException
-     * @throws ExecuteCommandException
+     * @throws CommandExecutionException
      */
-    public void launchTests() throws InterruptedException, IOException, ExecuteCommandException {
+    public void launchTests() throws InterruptedException, IOException, CommandExecutionException {
         logger.i(TAG, "InstrumentationTestLauncher.launchTests");
 
         screenshotRelations.clear();

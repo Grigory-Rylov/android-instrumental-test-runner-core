@@ -12,7 +12,7 @@ public class ClearCommand implements DeviceRunnerCommand {
 
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper device, TestRunnerContext context)
-            throws ExecuteCommandException {
+            throws CommandExecutionException {
         InstrumentalExtension instrumentalInfo = context.getInstrumentalInfo();
         context.getLogger().i(TAG, "ClearCommand for package {}",
                 instrumentalInfo.getApplicationId());

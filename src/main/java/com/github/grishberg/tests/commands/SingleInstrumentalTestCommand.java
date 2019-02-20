@@ -64,7 +64,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
 
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice, TestRunnerContext context)
-            throws ExecuteCommandException {
+            throws CommandExecutionException {
         DeviceCommandResult result = new DeviceCommandResult();
         InstrumentalExtension instrumentationInfo = context.getInstrumentalInfo();
         Environment environment = context.getEnvironment();
@@ -97,9 +97,9 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
             testRunListener.failLastTest(failMessage);
             testRunListener.testRunEnded(0, new HashMap<>());
 
-            throw new ExecuteCommandException("SingleInstrumentalTestCommand.execute failed:", e);
+            throw new CommandExecutionException("SingleInstrumentalTestCommand.execute failed:", e);
         } catch (Exception e) {
-            throw new ExecuteCommandException("SingleInstrumentalTestCommand.execute failed:", e);
+            throw new CommandExecutionException("SingleInstrumentalTestCommand.execute failed:", e);
         }
         return result;
     }

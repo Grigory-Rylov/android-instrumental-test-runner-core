@@ -20,7 +20,7 @@ public class InstallApkCommand implements DeviceRunnerCommand {
 
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper device, TestRunnerContext runnerContext)
-            throws ExecuteCommandException {
+            throws CommandExecutionException {
         RunnerLogger logger = runnerContext.getLogger();
         DeviceCommandResult result = new DeviceCommandResult();
         Exception lastException = null;
@@ -36,7 +36,7 @@ public class InstallApkCommand implements DeviceRunnerCommand {
             }
         }
         if (lastException != null) {
-            throw new ExecuteCommandException(String.format(Locale.US,
+            throw new CommandExecutionException(String.format(Locale.US,
                     "Exception while install app apk on device [%s]",
                     device.getSerialNumber()), lastException);
         }

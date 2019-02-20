@@ -24,7 +24,7 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
 
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice, TestRunnerContext context)
-            throws ExecuteCommandException {
+            throws CommandExecutionException {
         DeviceCommandResult result = new DeviceCommandResult();
         Environment environment = context.getEnvironment();
         InstrumentalExtension instrumentationInfo = context.getInstrumentalInfo();
@@ -52,7 +52,7 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
                         testRunnerBuilder.getRunTestLogger());
             }
         } catch (Exception e) {
-            throw new ExecuteCommandException("InstrumentalTestCommand.execute failed:", e);
+            throw new CommandExecutionException("InstrumentalTestCommand.execute failed:", e);
         }
         return result;
     }

@@ -32,7 +32,7 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
     @Override
     public List<DeviceRunnerCommand> provideCommandsForDevice(ConnectedDeviceWrapper device,
                                                               InstrumentalTestPlanProvider testPlanProvider,
-                                                              Environment environment) throws ExecuteCommandException {
+                                                              Environment environment) throws CommandExecutionException {
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         commands.add(new SetAnimationSpeedCommand(0, 0, 0));
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);

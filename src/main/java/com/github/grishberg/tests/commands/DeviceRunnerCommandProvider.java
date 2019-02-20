@@ -12,5 +12,5 @@ import java.util.List;
 public interface DeviceRunnerCommandProvider {
     List<DeviceRunnerCommand> provideCommandsForDevice(ConnectedDeviceWrapper device,
                                                        InstrumentalTestPlanProvider testPlanProvider,
-                                                       Environment environment) throws ExecuteCommandException;
+                                                       Environment environment) throws CommandExecutionException;
 }
