@@ -8,5 +8,5 @@ import com.github.grishberg.tests.TestRunnerContext;
  */
 public interface DeviceRunnerCommand {
     DeviceCommandResult execute(ConnectedDeviceWrapper device, TestRunnerContext context)
-            throws ExecuteCommandException;
+            throws CommandExecutionException;
 }

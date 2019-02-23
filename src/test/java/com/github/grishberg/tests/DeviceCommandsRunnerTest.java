@@ -3,7 +3,7 @@ package com.github.grishberg.tests;
 import com.github.grishberg.tests.commands.DeviceCommandResult;
 import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
-import com.github.grishberg.tests.commands.ExecuteCommandException;
+import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
@@ -72,16 +72,16 @@ public class DeviceCommandsRunnerTest {
         verify(command).execute(deviceWrapper, context);
     }
 
-    @Test(expected = ExecuteCommandException.class)
+    @Test(expected = CommandExecutionException.class)
     public void logErrorWhenException() throws Exception {
-        ExecuteCommandException exception = new ExecuteCommandException("Exception", new Throwable());
+        CommandExecutionException exception = new CommandExecutionException("Exception", new Throwable());
         when(command.execute(deviceWrapper, context))
                 .thenThrow(exception);
         runner.runCommands(devices, context);
         verify(logger).e("DCR", "Execute command exception:", exception);
     }
 
-    @Test(expected = ExecuteCommandException.class)
+    @Test(expected = CommandExecutionException.class)
     public void throwExecuteCommandExceptionWhenOtherException() throws Exception {
         NullPointerException exception = new NullPointerException();
         when(command.execute(deviceWrapper, context))

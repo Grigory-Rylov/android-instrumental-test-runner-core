@@ -3,7 +3,7 @@ package com.github.grishberg.tests;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.github.grishberg.tests.adb.AdbWrapper;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
-import com.github.grishberg.tests.commands.ExecuteCommandException;
+import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.BuildFileSystem;
 import com.github.grishberg.tests.common.BuildFileSystemImpl;
 import com.github.grishberg.tests.common.RunnerLogger;
@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.github.grishberg.tests.common.FileHelper.cleanFolder;
 
 /**
  * Main task for running instrumental tests.
@@ -44,6 +42,7 @@ public class InstrumentationTestLauncher {
     private DeviceTypeAdapter deviceTypeAdapter;
     private BuildFileSystem buildFileSystem;
     private HashMap<String, String> screenshotRelations = new HashMap<>();
+    private ProcessCrashHandler processCrashedHandler;
 
     public InstrumentationTestLauncher(String projectName,
                                        String buildDir,
@@ -84,9 +83,9 @@ public class InstrumentationTestLauncher {
      *
      * @throws InterruptedException
      * @throws IOException
-     * @throws ExecuteCommandException
+     * @throws CommandExecutionException
      */
-    public void launchTests() throws InterruptedException, IOException, ExecuteCommandException {
+    public void launchTests() throws InterruptedException, IOException, CommandExecutionException {
         logger.i(TAG, "InstrumentationTestLauncher.launchTests");
 
         screenshotRelations.clear();
@@ -103,6 +102,9 @@ public class InstrumentationTestLauncher {
 
         TestRunnerContext context = new TestRunnerContext(instrumentationInfo,
                 environment, screenshotRelations, logger);
+        if (processCrashedHandler != null) {
+            context.setProcessCrashHandler(processCrashedHandler);
+        }
         runner.runCommands(getDeviceList(), context);
     }
 
@@ -135,7 +137,6 @@ public class InstrumentationTestLauncher {
                     instrumentationArgsProvider, commandsForAnnotationProvider, logger);
         }
     }
-
 
     private void prepareOutputFolders() throws IOException {
         buildFileSystem.cleanFolder(getReportsDir());
@@ -229,5 +230,12 @@ public class InstrumentationTestLauncher {
 
     public void setRunnerLogger(RunnerLogger logger) {
         this.logger = logger;
+    }
+
+    /**
+     * Sets process crashed handler.
+     */
+    public void setProcessCrashedHandler(ProcessCrashHandler handler) {
+        this.processCrashedHandler = handler;
     }
 }

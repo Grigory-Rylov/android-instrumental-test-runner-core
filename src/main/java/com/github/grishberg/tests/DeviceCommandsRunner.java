@@ -3,7 +3,7 @@ package com.github.grishberg.tests;
 import com.github.grishberg.tests.commands.DeviceCommandResult;
 import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
-import com.github.grishberg.tests.commands.ExecuteCommandException;
+import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
@@ -28,7 +28,7 @@ class DeviceCommandsRunner {
     }
 
     boolean runCommands(List<ConnectedDeviceWrapper> devices, final TestRunnerContext context) throws InterruptedException,
-            ExecuteCommandException {
+            CommandExecutionException {
         final CountDownLatch deviceCounter = new CountDownLatch(devices.size());
         final Environment environment = context.getEnvironment();
         final RunnerLogger logger = context.getLogger();
@@ -60,15 +60,15 @@ class DeviceCommandsRunner {
         return !hasFailedTests;
     }
 
-    private void throwExceptionIfNeeded() throws ExecuteCommandException {
+    private void throwExceptionIfNeeded() throws CommandExecutionException {
         if (commandException != null) {
-            if (commandException instanceof ExecuteCommandException) {
-                throw (ExecuteCommandException) commandException;
+            if (commandException instanceof CommandExecutionException) {
+                throw (CommandExecutionException) commandException;
             }
             if (commandException instanceof ProcessCrashedException) {
                 throw (ProcessCrashedException) commandException;
             }
-            throw new ExecuteCommandException(commandException);
+            throw new CommandExecutionException(commandException);
         }
     }
 }

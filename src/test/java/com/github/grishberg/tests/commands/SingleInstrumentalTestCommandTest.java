@@ -2,12 +2,10 @@ package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.ddmlib.testrunner.TestRunResult;
 import com.android.utils.ILogger;
-import com.github.grishberg.tests.ConnectedDeviceWrapper;
-import com.github.grishberg.tests.Environment;
-import com.github.grishberg.tests.InstrumentalExtension;
-import com.github.grishberg.tests.TestRunnerContext;
+import com.github.grishberg.tests.*;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
@@ -38,6 +36,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class SingleInstrumentalTestCommandTest {
     private static final String PROJECT_NAME = "test_project";
+    private static final String TEST_CLASS = "com.test.TestClass";
+    private static final String TEST_NAME = "test1";
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
@@ -60,16 +60,20 @@ public class SingleInstrumentalTestCommandTest {
     ILogger iLogger;
     @Mock
     File coverageDir;
+    @Mock
+    ProcessCrashHandler processCrashedHandler;
     private SingleInstrumentalTestCommand testCommand;
     private HashMap<String, String> args = new HashMap<>();
     private InstrumentalExtension ext = new InstrumentalExtension();
     private ArrayList<TestPlanElement> testElements = new ArrayList<>();
     private Map<String, String> instrumentationArgs;
+    private TestIdentifier currentTest = new TestIdentifier(TEST_CLASS, TEST_NAME);
 
     @Before
     public void setUp() {
         when(context.getInstrumentalInfo()).thenReturn(ext);
         when(context.getEnvironment()).thenReturn(environment);
+        when(context.getProcessCrashedHandler()).thenReturn(processCrashedHandler);
         when(environment.getCoverageDir()).thenReturn(coverageDir);
         doAnswer((Answer<TestRunnerBuilder>) invocation -> {
             instrumentationArgs = invocation.getArgument(2);
@@ -82,18 +86,16 @@ public class SingleInstrumentalTestCommandTest {
         when(testRunnerBuilder.getCoverageFile()).thenReturn("coverage_file");
 
         when(reportsGenerator.getRunResult()).thenReturn(testRunResult);
+        when(reportsGenerator.getCurrentTest()).thenReturn(currentTest);
 
         when(deviceWrapper.getName()).thenReturn("test_device");
+        testElements.add(new TestPlanElement("", TEST_NAME, TEST_CLASS));
         testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME, "test_prefix", args, testElements);
     }
 
     @Test
     public void initWithClass() throws Exception {
-        testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
-        SingleInstrumentalTestCommand cmd = new SingleInstrumentalTestCommand(PROJECT_NAME,
-                "test_prefix", args, testElements);
-
-        cmd.execute(deviceWrapper, context);
+        testCommand.execute(deviceWrapper, context);
 
         Assert.assertEquals("com.test.TestClass#test1", instrumentationArgs.get("class"));
     }
@@ -101,11 +103,8 @@ public class SingleInstrumentalTestCommandTest {
     @Test
     public void testWhenCoverageEnabled() throws Exception {
         ext.setCoverageEnabled(true);
-        testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
-        SingleInstrumentalTestCommand cmd = new SingleInstrumentalTestCommand(PROJECT_NAME,
-                "test_prefix", args, testElements);
 
-        cmd.execute(deviceWrapper, context);
+        testCommand.execute(deviceWrapper, context);
 
         verify(deviceWrapper).pullCoverageFile(ext,
                 "test_device#test_prefix",
@@ -129,28 +128,40 @@ public class SingleInstrumentalTestCommandTest {
                 any(ILogger.class));
     }
 
-    @Test(expected = ExecuteCommandException.class)
+    @Test(expected = CommandExecutionException.class)
     public void throwExecuteCommandExceptionWhenSomeDeviceException() throws Exception {
         Mockito.doThrow(new IOException(new Throwable())).when(testRunner)
                 .run(reportsGenerator);
-        testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
-        testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME,
-                "test_prefix", args, testElements);
 
         testCommand.execute(deviceWrapper, context);
     }
 
-    @Test(expected = ExecuteCommandException.class)
+    @Test(expected = CommandExecutionException.class)
     public void failTestWhenProcessCrashed() throws Exception {
         Mockito.doThrow(new ProcessCrashedException("Process crashed")).when(testRunner)
                 .run(reportsGenerator);
 
-        testElements.add(new TestPlanElement("", "test1", "com.test.TestClass"));
-        testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME,
-                "test_prefix", args, testElements);
+        testCommand.execute(deviceWrapper, context);
+
+        verify(reportsGenerator).failLastTest("Process was crashed. See logcat to details.");
+    }
+
+    @Test(expected = CommandExecutionException.class)
+    public void callTestRunEndedFromReporterWhenProcessCrashed() throws Exception {
+        Mockito.doThrow(new ProcessCrashedException("Process crashed")).when(testRunner)
+                .run(reportsGenerator);
 
         testCommand.execute(deviceWrapper, context);
-        verify(reportsGenerator).failLastTest("Process was crashed. See logcat to details.");
+
         verify(reportsGenerator).testRunEnded(anyInt(), any());
+    }
+
+    @Test(expected = CommandExecutionException.class)
+    public void handleProcessCrashedWhenProcessCrashed() throws Exception {
+        Mockito.doThrow(new ProcessCrashedException("Process crashed")).when(testRunner)
+                .run(reportsGenerator);
+
+        testCommand.execute(deviceWrapper, context);
+        verify(processCrashedHandler).provideFailMessageOnProcessCrashed(deviceWrapper, currentTest);
     }
 }

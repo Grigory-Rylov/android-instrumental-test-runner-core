@@ -20,7 +20,7 @@ public class SetAnimationSpeedCommand implements DeviceRunnerCommand {
 
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper device, TestRunnerContext context)
-            throws ExecuteCommandException {
+            throws CommandExecutionException {
         device.executeShellCommand(String.format("settings put global window_animation_scale %d",
                 windowAnimationScale));
         device.executeShellCommand(String.format("settings put global transition_animation_scale %d",

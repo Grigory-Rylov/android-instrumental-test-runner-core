@@ -2,7 +2,7 @@ package com.github.grishberg.tests.planner;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalExtension;
-import com.github.grishberg.tests.commands.ExecuteCommandException;
+import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.RunnerLogger;
 
 import java.util.HashMap;
@@ -31,7 +31,7 @@ public class InstrumentalTestPlanProvider {
     }
 
     public List<TestPlanElement> provideTestPlan(ConnectedDeviceWrapper device,
-                                                 Map<String, String> instrumentalArgs) throws ExecuteCommandException {
+                                                 Map<String, String> instrumentalArgs) throws CommandExecutionException {
         logger.i(TAG, "provideTestPlan for device {}", device.getName());
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");
@@ -58,7 +58,7 @@ public class InstrumentalTestPlanProvider {
         try {
             device.executeShellCommand(command.toString(), receiver, 0, TimeUnit.SECONDS);
         } catch (Exception e) {
-            throw new ExecuteCommandException(e);
+            throw new CommandExecutionException(e);
         }
 
         return receiver.getTestInstances();
@@ -80,7 +80,7 @@ public class InstrumentalTestPlanProvider {
      * @return test holder contains all test methods in project.
      */
     public InstrumentalTestHolder provideInstrumentalTests(ConnectedDeviceWrapper device,
-                                                           Map<String, String> instrumentalArgs) throws ExecuteCommandException {
+                                                           Map<String, String> instrumentalArgs) throws CommandExecutionException {
         // TODO: create fabric
         return new InstrumentalTestHolderImpl(provideTestPlan(device, instrumentalArgs), packageTreeGenerator);
     }

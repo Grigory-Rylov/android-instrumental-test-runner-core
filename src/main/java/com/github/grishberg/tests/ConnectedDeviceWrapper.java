@@ -2,7 +2,7 @@ package com.github.grishberg.tests;
 
 import com.android.ddmlib.*;
 import com.android.utils.ILogger;
-import com.github.grishberg.tests.commands.ExecuteCommandException;
+import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.common.ScreenSizeParser;
 import com.github.grishberg.tests.exceptions.PullCoverageException;
@@ -61,7 +61,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
             int[] size = ScreenSizeParser.parseScreenSize(screenSize);
             deviceWidth = size[0];
             deviceHeight = size[1];
-        } catch (ExecuteCommandException e) {
+        } catch (CommandExecutionException e) {
             logger.e(TAG, "calculateScreenSize error: ", e);
         }
     }
@@ -120,11 +120,11 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     }
 
     @Override
-    public void pullFile(String temporaryCoverageCopy, String path) throws ExecuteCommandException {
+    public void pullFile(String temporaryCoverageCopy, String path) throws CommandExecutionException {
         try {
             device.pullFile(temporaryCoverageCopy, path);
         } catch (Exception e) {
-            throw new ExecuteCommandException("pullFile exception:", e);
+            throw new CommandExecutionException("pullFile exception:", e);
         }
     }
 
@@ -191,22 +191,22 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
      * @param command adb shell command for execution.
      * @throws CommandExecutionException
      */
-    public void executeShellCommand(String command) throws ExecuteCommandException {
+    public void executeShellCommand(String command) throws CommandExecutionException {
         try {
             executeShellCommand(command, new CollectingOutputReceiver(), 5L, TimeUnit.MINUTES);
         } catch (Exception e) {
-            throw new ExecuteCommandException("executeShellCommand exception:", e);
+            throw new CommandExecutionException("executeShellCommand exception:", e);
         }
     }
 
     @Override
-    public String executeShellCommandAndReturnOutput(String command) throws ExecuteCommandException {
+    public String executeShellCommandAndReturnOutput(String command) throws CommandExecutionException {
         try {
             CollectingOutputReceiver receiver = new CollectingOutputReceiver();
             executeShellCommand(command, receiver, 5L, TimeUnit.MINUTES);
             return receiver.getOutput();
         } catch (Exception e) {
-            throw new ExecuteCommandException("executeShellCommand exception:", e);
+            throw new CommandExecutionException("executeShellCommand exception:", e);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.github.grishberg.tests.commands;
 
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
@@ -63,7 +64,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
 
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice, TestRunnerContext context)
-            throws ExecuteCommandException {
+            throws CommandExecutionException {
         DeviceCommandResult result = new DeviceCommandResult();
         InstrumentalExtension instrumentationInfo = context.getInstrumentalInfo();
         Environment environment = context.getEnvironment();
@@ -90,11 +91,15 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                         testRunnerBuilder.getRunTestLogger());
             }
         } catch (ProcessCrashedException e) {
-            testRunListener.failLastTest("Process was crashed. See logcat to details.");
+            TestIdentifier currentTest = testRunListener.getCurrentTest();
+            String failMessage = context.getProcessCrashedHandler()
+                    .provideFailMessageOnProcessCrashed(targetDevice, currentTest);
+            testRunListener.failLastTest(failMessage);
             testRunListener.testRunEnded(0, new HashMap<>());
-            throw new ExecuteCommandException("SingleInstrumentalTestCommand.execute failed:", e);
+
+            throw new CommandExecutionException("SingleInstrumentalTestCommand.execute failed:", e);
         } catch (Exception e) {
-            throw new ExecuteCommandException("SingleInstrumentalTestCommand.execute failed:", e);
+            throw new CommandExecutionException("SingleInstrumentalTestCommand.execute failed:", e);
         }
         return result;
     }
