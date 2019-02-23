@@ -1,10 +1,7 @@
 package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.testrunner.TestRunResult;
-import com.github.grishberg.tests.ConnectedDeviceWrapper;
-import com.github.grishberg.tests.Environment;
-import com.github.grishberg.tests.InstrumentalExtension;
-import com.github.grishberg.tests.TestRunnerContext;
+import com.github.grishberg.tests.*;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 
 import java.util.Map;
@@ -15,11 +12,19 @@ import java.util.Map;
 public class InstrumentalTestCommand implements DeviceRunnerCommand {
     private final String projectName;
     private final Map<String, String> instrumentationArgs;
+    private XmlReportGeneratorDelegate xmlReportGeneratorDelegate;
 
     public InstrumentalTestCommand(String projectName,
                                    Map<String, String> instrumentalArgs) {
+        this(projectName, instrumentalArgs, XmlReportGeneratorDelegate.STUB.INSTANCE);
+    }
+
+    public InstrumentalTestCommand(String projectName,
+                                   Map<String, String> instrumentalArgs,
+                                   XmlReportGeneratorDelegate xmlReportGeneratorDelegate) {
         this.projectName = projectName;
         this.instrumentationArgs = instrumentalArgs;
+        this.xmlReportGeneratorDelegate = xmlReportGeneratorDelegate;
     }
 
     @Override
@@ -33,7 +38,8 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
                 "",
                 instrumentationArgs,
                 targetDevice,
-                context);
+                context,
+                xmlReportGeneratorDelegate);
 
         try {
             TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();

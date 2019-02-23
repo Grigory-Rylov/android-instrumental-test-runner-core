@@ -3,6 +3,9 @@ package com.github.grishberg.tests.commands.reports;
 import com.android.builder.internal.testing.CustomTestRunListener;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.utils.ILogger;
+import com.github.grishberg.tests.XmlReportGeneratorDelegate;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +21,7 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
     private final String testPrefix;
     private final ScreenShotMaker screenShotMaker;
     private final LogcatSaver logcatSaver;
+    private XmlReportGeneratorDelegate xmlReportDelegate;
     private TestIdentifier currentTest;
 
     public TestXmlReportsGenerator(String deviceName,
@@ -26,13 +30,15 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
                                    String testPrefix,
                                    ILogger logger,
                                    ScreenShotMaker screenShotMaker,
-                                   LogcatSaver logcatSaver) {
+                                   LogcatSaver logcatSaver,
+                                   XmlReportGeneratorDelegate xmlReportDelegate) {
         super(deviceName, projectName, flavorName, logger);
         this.deviceName = deviceName;
         this.projectName = projectName;
         this.testPrefix = testPrefix;
         this.screenShotMaker = screenShotMaker;
         this.logcatSaver = logcatSaver;
+        this.xmlReportDelegate = xmlReportDelegate;
     }
 
     @Override
@@ -75,5 +81,13 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
      */
     public TestIdentifier getCurrentTest() {
         return currentTest;
+    }
+
+    @Override
+    protected Map<String, String> getPropertiesAttributes() {
+        Map<String, String> propertiesAttributes =
+                Maps.newLinkedHashMap(super.getPropertiesAttributes());
+        propertiesAttributes.putAll(xmlReportDelegate.provideProperties());
+        return ImmutableMap.copyOf(propertiesAttributes);
     }
 }

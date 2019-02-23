@@ -44,12 +44,14 @@ public class TestRunnerContext {
     public TestRunnerBuilder createTestRunnerBuilder(String projectName,
                                                      String testName,
                                                      Map<String, String> instrumentationArgs,
-                                                     ConnectedDeviceWrapper targetDevice) {
+                                                     ConnectedDeviceWrapper targetDevice,
+                                                     XmlReportGeneratorDelegate xmlDelegate) {
         return new TestRunnerBuilder(projectName,
                 testName,
                 instrumentationArgs,
                 targetDevice,
-                this);
+                this,
+                xmlDelegate);
     }
 
     void setProcessCrashHandler(ProcessCrashHandler handler) {

@@ -1,10 +1,7 @@
 package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
-import com.github.grishberg.tests.ConnectedDeviceWrapper;
-import com.github.grishberg.tests.Environment;
-import com.github.grishberg.tests.InstrumentalExtension;
-import com.github.grishberg.tests.TestRunnerContext;
+import com.github.grishberg.tests.*;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.junit.Assert;
@@ -17,6 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -47,7 +45,8 @@ public class TestRunnerBuilderTest {
         extension.setApplicationId("com.test.packageId");
         extension.setInstrumentalPackage(TEST_PACKAGE);
         extension.setInstrumentalRunner(RUNNER_NAME);
-        builder = new TestRunnerBuilder(PROJECT_NAME, TEST_NAME, args, deviceWrapper, context);
+        builder = new TestRunnerBuilder(PROJECT_NAME, TEST_NAME, args, deviceWrapper, context,
+                mock(XmlReportGeneratorDelegate.class));
     }
 
     @Test
