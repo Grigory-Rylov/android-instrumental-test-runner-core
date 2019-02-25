@@ -21,7 +21,8 @@ public class TestRunnerBuilder {
                              String testGroupPrefix,
                              Map<String, String> instrumentationArgs,
                              ConnectedDeviceWrapper targetDevice,
-                             TestRunnerContext context) {
+                             TestRunnerContext context,
+                             XmlReportGeneratorDelegate xmlDelegate) {
         InstrumentalExtension instrumentationInfo = context.getInstrumentalInfo();
         Environment environment = context.getEnvironment();
         RunnerLogger logger = context.getLogger();
@@ -52,7 +53,8 @@ public class TestRunnerBuilder {
                 testGroupPrefix,
                 runTestLogger,
                 screenShotMaker,
-                logcatSaver);
+                logcatSaver,
+                xmlDelegate);
         testRunListener.setReportDir(environment.getResultsDir());
     }
 

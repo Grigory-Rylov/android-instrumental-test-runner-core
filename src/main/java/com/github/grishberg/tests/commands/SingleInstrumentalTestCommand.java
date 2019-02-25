@@ -2,10 +2,7 @@ package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.ddmlib.testrunner.TestRunResult;
-import com.github.grishberg.tests.ConnectedDeviceWrapper;
-import com.github.grishberg.tests.Environment;
-import com.github.grishberg.tests.InstrumentalExtension;
-import com.github.grishberg.tests.TestRunnerContext;
+import com.github.grishberg.tests.*;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.TestPlanElement;
@@ -23,14 +20,25 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     private final String projectName;
     private String testName;
     private final Map<String, String> instrumentationArgs;
+    private XmlReportGeneratorDelegate xmlReportGeneratorDelegate;
 
     public SingleInstrumentalTestCommand(String projectName,
                                          String testReportSuffix,
                                          Map<String, String> instrumentalArgs,
                                          List<TestPlanElement> testForExecution) {
+        this(projectName, testReportSuffix, instrumentalArgs, testForExecution,
+                XmlReportGeneratorDelegate.STUB.INSTANCE);
+    }
+
+    public SingleInstrumentalTestCommand(String projectName,
+                                         String testReportSuffix,
+                                         Map<String, String> instrumentalArgs,
+                                         List<TestPlanElement> testForExecution,
+                                         XmlReportGeneratorDelegate xmlReportGeneratorDelegate) {
         this.projectName = projectName;
         this.testName = testReportSuffix;
         this.instrumentationArgs = new HashMap<>(instrumentalArgs);
+        this.xmlReportGeneratorDelegate = xmlReportGeneratorDelegate;
 
         initTargetTestArgs(testForExecution);
     }
@@ -72,7 +80,8 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         TestRunnerBuilder testRunnerBuilder = context.createTestRunnerBuilder(projectName,
                 testName,
                 instrumentationArgs,
-                targetDevice);
+                targetDevice,
+                xmlReportGeneratorDelegate);
 
         String singleTestMethodPrefix = String.format("%s#%s", targetDevice.getName(), testName);
         TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();

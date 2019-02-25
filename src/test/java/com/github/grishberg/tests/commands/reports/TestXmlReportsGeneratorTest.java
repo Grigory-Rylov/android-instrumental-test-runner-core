@@ -2,6 +2,7 @@ package com.github.grishberg.tests.commands.reports;
 
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.utils.ILogger;
+import com.github.grishberg.tests.XmlReportGeneratorDelegate;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +32,8 @@ public class TestXmlReportsGeneratorTest {
     LogcatSaver logcatSaver;
     @Mock
     TestIdentifier testIdentifier;
+    @Mock
+    XmlReportGeneratorDelegate xmlReportDelegate;
     private TestXmlReportsGenerator generator;
 
     @Before
@@ -41,7 +44,7 @@ public class TestXmlReportsGeneratorTest {
                 "ProjectName",
                 "FlavorName",
                 "TestPrefix",
-                logger, screenShotMaker, logcatSaver);
+                logger, screenShotMaker, logcatSaver, xmlReportDelegate);
     }
 
     @Test

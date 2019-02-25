@@ -78,7 +78,7 @@ public class SingleInstrumentalTestCommandTest {
         doAnswer((Answer<TestRunnerBuilder>) invocation -> {
             instrumentationArgs = invocation.getArgument(2);
             return testRunnerBuilder;
-        }).when(context).createTestRunnerBuilder(any(), any(), any(), any());
+        }).when(context).createTestRunnerBuilder(any(), any(), any(), any(), any());
 
         when(testRunnerBuilder.getTestRunListener()).thenReturn(reportsGenerator);
         when(testRunnerBuilder.getTestRunner()).thenReturn(testRunner);
