@@ -55,21 +55,10 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
         return device.getDensity();
     }
 
-    private void calculateScreenSize() {
-        try {
-            String screenSize = executeShellCommandAndReturnOutput(SHELL_COMMAND_FOR_SCREEN_SIZE);
-            int[] size = ScreenSizeParser.parseScreenSize(screenSize);
-            deviceWidth = size[0];
-            deviceHeight = size[1];
-        } catch (CommandExecutionException e) {
-            logger.e(TAG, "calculateScreenSize error: ", e);
-        }
-    }
-
     /**
      * @return device screen width.
      */
-    public int getWidth() {
+    public synchronized int getWidth() {
         if (deviceWidth < 0) {
             calculateScreenSize();
         }
@@ -79,7 +68,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     /**
      * @return device screen height.
      */
-    public int getHeight() {
+    public synchronized int getHeight() {
         if (deviceHeight < 0) {
             calculateScreenSize();
         }
@@ -89,7 +78,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     /**
      * @return device screen width in dp
      */
-    public long getWidthInDp() {
+    public synchronized long getWidthInDp() {
         if (deviceWidth < 0) {
             calculateScreenSize();
         }
@@ -99,11 +88,22 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     /**
      * @return device screen width in dp
      */
-    public long getHeightInDp() {
+    public synchronized long getHeightInDp() {
         if (deviceHeight < 0) {
             calculateScreenSize();
         }
         return Math.round((float) deviceHeight / (getDensity() / 160.));
+    }
+
+    private void calculateScreenSize() {
+        try {
+            String screenSize = executeShellCommandAndReturnOutput(SHELL_COMMAND_FOR_SCREEN_SIZE);
+            int[] size = ScreenSizeParser.parseScreenSize(screenSize);
+            deviceWidth = size[0];
+            deviceHeight = size[1];
+        } catch (CommandExecutionException e) {
+            logger.e(TAG, "calculateScreenSize error: ", e);
+        }
     }
 
     public IDevice getDevice() {
