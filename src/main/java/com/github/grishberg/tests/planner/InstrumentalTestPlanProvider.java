@@ -36,12 +36,17 @@ public class InstrumentalTestPlanProvider {
                                                  Map<String, String> instrumentalArgs) throws CommandExecutionException {
         logger.i(TAG, "provideTestPlan for device {}", device.getName());
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
+
+        // Dont use shards when getting list of tests.
+        args.remove("numShards");
+        args.remove("shardIndex");
+
         args.put("log", "true");
 
         args.putAll(getArgsFromCli());
 
         InstrumentTestLogParser receiver = new InstrumentTestLogParser();
-        receiver.setLogger(new TestLogParserLogger(logger));
+        receiver.setLogger(new TestLogParserLogger(device.getName(), logger));
         StringBuilder command = new StringBuilder("am instrument -r -w");
 
         args.put("listener", instrumentationInfo.getInstrumentListener());
@@ -88,15 +93,17 @@ public class InstrumentalTestPlanProvider {
     }
 
     private class TestLogParserLogger implements InstrumentTestLogParser.ParserLogger {
+        private String deviceName;
         private final RunnerLogger logger;
 
-        private TestLogParserLogger(RunnerLogger logger) {
+        private TestLogParserLogger(String deviceName, RunnerLogger logger) {
+            this.deviceName = deviceName;
             this.logger = logger;
         }
 
         @Override
         public void logLine(String line) {
-            logger.i(TAG, line);
+            logger.i(TAG, "device='" + deviceName + "': " + line);
         }
     }
 }
