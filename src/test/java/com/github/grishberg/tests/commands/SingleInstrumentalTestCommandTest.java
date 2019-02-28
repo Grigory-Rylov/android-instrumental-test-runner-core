@@ -164,4 +164,11 @@ public class SingleInstrumentalTestCommandTest {
         testCommand.execute(deviceWrapper, context);
         verify(processCrashedHandler).provideFailMessageOnProcessCrashed(deviceWrapper, currentTest);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwExceptionWhenGivenEmptyTestList() throws Exception {
+        testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME, "test_prefix", args, new ArrayList<>());
+
+        testCommand.execute(deviceWrapper, context);
+    }
 }
