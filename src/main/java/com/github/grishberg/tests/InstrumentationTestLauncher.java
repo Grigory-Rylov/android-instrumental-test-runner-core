@@ -2,8 +2,8 @@ package com.github.grishberg.tests;
 
 import com.android.ddmlib.AndroidDebugBridge;
 import com.github.grishberg.tests.adb.AdbWrapper;
-import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.CommandExecutionException;
+import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.common.BuildFileSystem;
 import com.github.grishberg.tests.common.BuildFileSystemImpl;
 import com.github.grishberg.tests.common.RunnerLogger;
@@ -24,7 +24,6 @@ import java.util.Map;
 public class InstrumentationTestLauncher {
     private static final String TAG = InstrumentationTestLauncher.class.getSimpleName();
     private static final String DEFAULT_FLAVOR = "default_flavor";
-    public static final String NAME = "instrumentalTests";
     @Nullable
     private String androidSdkPath;
     private File coverageDir;
@@ -98,7 +97,7 @@ public class InstrumentationTestLauncher {
         Environment environment = new Environment(getResultsDir(),
                 getReportsDir(), getCoverageDir());
         DeviceCommandsRunner runner = deviceCommandsRunnerFabric
-                .provideDeviceCommandRunner(commandProvider);
+                .provideDeviceCommandRunner(logger, commandProvider);
 
         TestRunnerContext context = new TestRunnerContext(instrumentationInfo,
                 environment, screenshotRelations, logger);
