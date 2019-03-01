@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Generates tree of classes and packages.
+ * This class is thread safe.
  */
 public class PackageTreeGenerator {
     /**

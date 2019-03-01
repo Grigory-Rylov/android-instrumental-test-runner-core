@@ -5,6 +5,7 @@ import com.github.grishberg.tests.InstrumentalExtension;
 import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.RunnerLogger;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,20 +13,21 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Provides set of {@link TestPlanElement} for instrumental tests.
+ * This class will be thread-safe when instance of {@link RunnerLogger} is thread-safe.
  */
 public class InstrumentalTestPlanProvider {
     private static final String TAG = InstrumentalTestPlanProvider.class.getSimpleName();
     private final InstrumentalExtension instrumentationInfo;
     private final Map<String, String> propertiesMap;
     private final PackageTreeGenerator packageTreeGenerator;
-    private RunnerLogger logger;
+    private final RunnerLogger logger;
 
     public InstrumentalTestPlanProvider(Map<String, String> propertiesMap,
                                         InstrumentalExtension instrumentationInfo,
                                         PackageTreeGenerator packageTreeGenerator,
                                         RunnerLogger logger) {
-        this.propertiesMap = propertiesMap;
-        this.instrumentationInfo = instrumentationInfo;
+        this.propertiesMap = Collections.unmodifiableMap(propertiesMap);
+        this.instrumentationInfo = new InstrumentalExtension(instrumentationInfo);
         this.packageTreeGenerator = packageTreeGenerator;
         this.logger = logger;
     }

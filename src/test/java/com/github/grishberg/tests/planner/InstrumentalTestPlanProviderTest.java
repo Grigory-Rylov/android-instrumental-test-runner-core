@@ -22,7 +22,6 @@ import static org.mockito.Mockito.*;
 public class InstrumentalTestPlanProviderTest {
     private static final String RUN_LOG_COMMAND = "am instrument -r -w -e log true -e listener test_listener TestAppPackage/TestRunner";
     private static final String RUN_LOG_COMMAND_WITH_ARG = "am instrument -r -w -e log true -e listener test_listener -e class com.test.SpecialTest TestAppPackage/TestRunner";
-
     private InstrumentalTestPlanProvider provider;
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
@@ -31,8 +30,7 @@ public class InstrumentalTestPlanProviderTest {
     PackageTreeGenerator treeGenerator;
     @Mock
     RunnerLogger logger;
-    @Mock
-    Map<String, String> paramsMap;
+    Map<String, String> paramsMap = new HashMap<>();
 
     @Before
     public void setUp() {
@@ -54,7 +52,8 @@ public class InstrumentalTestPlanProviderTest {
 
     @Test
     public void sendAdditionalArgTestClass() throws Exception {
-        when(paramsMap.get("testClass")).thenReturn("com.test.SpecialTest");
+        paramsMap.put("testClass", "com.test.SpecialTest");
+        provider = new InstrumentalTestPlanProvider(paramsMap, extension, treeGenerator, logger);
         HashMap<String, String> args = new HashMap<>();
 
         provider.provideTestPlan(deviceWrapper, args);

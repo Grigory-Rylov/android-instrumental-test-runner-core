@@ -19,12 +19,16 @@ public class AdbWrapper {
     private AndroidDebugBridge adb;
     private RunnerLogger logger = new RunnerLogger.Stub();
 
-    public void init(String androidSdkPath, RunnerLogger logger) {
+    public synchronized void init(String androidSdkPath, RunnerLogger logger) {
         adb = AndroidDebugBridge.createBridge(androidSdkPath + "/platform-tools/adb", false);
         this.logger = logger;
     }
 
-    public void waitForAdb() throws InterruptedException {
+    public synchronized void waitForAdb() throws InterruptedException {
+        if (adb == null) {
+            throw new IllegalStateException("Need to call init() first");
+        }
+
         for (int counter = 0; counter < ADB_TIMEOUT; counter++) {
             if (adb.isConnected()) {
                 break;
@@ -33,11 +37,17 @@ public class AdbWrapper {
         }
     }
 
-    public List<ConnectedDeviceWrapper> provideDevices() {
+    /**
+     * @return list of available android devices.
+     */
+    public synchronized List<ConnectedDeviceWrapper> provideDevices() {
+        if (adb == null) {
+            throw new IllegalStateException("Need to call init() first");
+        }
         IDevice[] devices = adb.getDevices();
         ArrayList<ConnectedDeviceWrapper> deviceWrappers = new ArrayList<>(devices.length);
-        for (int i = 0; i < devices.length; i++) {
-            deviceWrappers.add(new ConnectedDeviceWrapper(devices[i], logger));
+        for (IDevice device : devices) {
+            deviceWrappers.add(new ConnectedDeviceWrapper(device, logger));
         }
         return deviceWrappers;
     }

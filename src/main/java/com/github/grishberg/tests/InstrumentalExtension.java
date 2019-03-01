@@ -1,9 +1,5 @@
 package com.github.grishberg.tests;
 
-import groovy.lang.Closure;
-
-import java.util.Map;
-
 /**
  * Extension for sending arguments to plugin.
  */
@@ -18,7 +14,24 @@ public class InstrumentalExtension {
     boolean makeScreenshotsWhenFail;
     boolean saveLogcat;
     boolean shardEnabled;
-    Closure<Map<String, String>> instrumentationArgsProvider;
+
+    public InstrumentalExtension() { /* default constructor */ }
+
+    /**
+     * Copy constructor.
+     */
+    public InstrumentalExtension(InstrumentalExtension src) {
+        this.flavorName = src.flavorName;
+        this.androidSdkPath = src.androidSdkPath;
+        this.applicationId = src.applicationId;
+        this.instrumentalPackage = src.instrumentalPackage;
+        this.instrumentalRunner = src.instrumentalRunner;
+        this.instrumentListener = src.instrumentListener;
+        this.coverageEnabled = src.coverageEnabled;
+        this.makeScreenshotsWhenFail = src.makeScreenshotsWhenFail;
+        this.saveLogcat = src.saveLogcat;
+        this.shardEnabled = src.shardEnabled;
+    }
 
     public void setFlavorName(String flavorName) {
         this.flavorName = flavorName;
@@ -66,14 +79,6 @@ public class InstrumentalExtension {
 
     public void setCoverageEnabled(boolean coverageEnabled) {
         this.coverageEnabled = coverageEnabled;
-    }
-
-    public Closure<Map<String, String>> getInstrumentationArgsProvider() {
-        return instrumentationArgsProvider;
-    }
-
-    public void setInstrumentationArgsProvider(Closure<Map<String, String>> instrumentationArgsProvider) {
-        this.instrumentationArgsProvider = instrumentationArgsProvider;
     }
 
     public String getInstrumentListener() {

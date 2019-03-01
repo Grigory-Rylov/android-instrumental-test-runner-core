@@ -53,7 +53,7 @@ public class InstrumentationTestLauncher {
                                        RunnerLogger logger) {
         this.projectName = projectName;
         this.buildDir = buildDir;
-        instrumentationInfo = instrumentalExtension;
+        instrumentationInfo = new InstrumentalExtension(instrumentalExtension);
         this.adbWrapper = adbWrapper;
         this.deviceCommandsRunnerFabric = deviceCommandsRunnerFabric;
         this.logger = logger;

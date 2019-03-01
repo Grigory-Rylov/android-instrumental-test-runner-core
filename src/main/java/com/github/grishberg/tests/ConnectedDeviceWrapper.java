@@ -30,29 +30,69 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     }
 
     @Override
-    public void executeShellCommand(String command,
-                                    IShellOutputReceiver receiver,
-                                    long maxTimeToOutputResponse,
-                                    TimeUnit maxTimeUnits) throws TimeoutException,
+    public synchronized void executeShellCommand(String command,
+                                                 IShellOutputReceiver receiver,
+                                                 long maxTimeToOutputResponse,
+                                                 TimeUnit maxTimeUnits) throws TimeoutException,
             AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         device.executeShellCommand(command, receiver, maxTimeToOutputResponse, maxTimeUnits);
     }
 
     @Override
-    public Future<String> getSystemProperty(String name) {
+    public synchronized Future<String> getSystemProperty(String name) {
         return device.getSystemProperty(name);
     }
 
     @Override
-    public String getName() {
+    public synchronized String getName() {
         return device.getName();
     }
 
     /**
      * @return device density.
      */
-    public int getDensity() {
+    public synchronized int getDensity() {
         return device.getDensity();
+    }
+
+    /**
+     * @return device screen width.
+     */
+    public synchronized int getWidth() {
+        if (deviceWidth < 0) {
+            calculateScreenSize();
+        }
+        return deviceWidth;
+    }
+
+    /**
+     * @return device screen height.
+     */
+    public synchronized int getHeight() {
+        if (deviceHeight < 0) {
+            calculateScreenSize();
+        }
+        return deviceHeight;
+    }
+
+    /**
+     * @return device screen width in dp
+     */
+    public synchronized long getWidthInDp() {
+        if (deviceWidth < 0) {
+            calculateScreenSize();
+        }
+        return Math.round((float) deviceWidth / (getDensity() / 160.));
+    }
+
+    /**
+     * @return device screen width in dp
+     */
+    public synchronized long getHeightInDp() {
+        if (deviceHeight < 0) {
+            calculateScreenSize();
+        }
+        return Math.round((float) deviceHeight / (getDensity() / 160.));
     }
 
     private void calculateScreenSize() {
@@ -66,52 +106,12 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
         }
     }
 
-    /**
-     * @return device screen width.
-     */
-    public int getWidth() {
-        if (deviceWidth < 0) {
-            calculateScreenSize();
-        }
-        return deviceWidth;
-    }
-
-    /**
-     * @return device screen height.
-     */
-    public int getHeight() {
-        if (deviceHeight < 0) {
-            calculateScreenSize();
-        }
-        return deviceHeight;
-    }
-
-    /**
-     * @return device screen width in dp
-     */
-    public long getWidthInDp() {
-        if (deviceWidth < 0) {
-            calculateScreenSize();
-        }
-        return Math.round((float) deviceWidth / (getDensity() / 160.));
-    }
-
-    /**
-     * @return device screen width in dp
-     */
-    public long getHeightInDp() {
-        if (deviceHeight < 0) {
-            calculateScreenSize();
-        }
-        return Math.round((float) deviceHeight / (getDensity() / 160.));
-    }
-
-    public IDevice getDevice() {
+    public synchronized IDevice getDevice() {
         return device;
     }
 
     @Override
-    public String toString() {
+    public synchronized String toString() {
         return "ConnectedDeviceWrapper{" +
                 "sn=" + device.getSerialNumber() +
                 ", isOnline=" + device.isOnline() +
@@ -120,7 +120,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     }
 
     @Override
-    public void pullFile(String temporaryCoverageCopy, String path) throws CommandExecutionException {
+    public synchronized void pullFile(String temporaryCoverageCopy, String path) throws CommandExecutionException {
         try {
             device.pullFile(temporaryCoverageCopy, path);
         } catch (Exception e) {
@@ -128,15 +128,15 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
         }
     }
 
-    public boolean isEmulator() {
+    public synchronized boolean isEmulator() {
         return device.isEmulator();
     }
 
-    public String getSerialNumber() {
+    public synchronized String getSerialNumber() {
         return device.getSerialNumber();
     }
 
-    public void installPackage(String absolutePath, boolean reinstall, String extraArgument)
+    public synchronized void installPackage(String absolutePath, boolean reinstall, String extraArgument)
             throws InstallException {
         device.installPackage(absolutePath, reinstall, extraArgument);
     }
@@ -151,11 +151,11 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
      * @param logger              logger.
      * @throws PullCoverageException
      */
-    public void pullCoverageFile(InstrumentalExtension instrumentationInfo,
-                                 String coverageFilePrefix,
-                                 String coverageFile,
-                                 File outCoverageDir,
-                                 final ILogger logger) throws PullCoverageException {
+    public synchronized void pullCoverageFile(InstrumentalExtension instrumentationInfo,
+                                              String coverageFilePrefix,
+                                              String coverageFile,
+                                              File outCoverageDir,
+                                              final ILogger logger) throws PullCoverageException {
         MultiLineReceiver outputReceiver = new MultilineLoggerReceiver(logger);
 
         logger.verbose("ConnectedDeviceWrapper '%s': fetching coverage data from %s",
@@ -178,9 +178,9 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     }
 
     @Override
-    public void executeShellCommand(String command, IShellOutputReceiver receiver,
-                                    long maxTimeout, long maxTimeToOutputResponse,
-                                    TimeUnit maxTimeUnits) throws TimeoutException,
+    public synchronized void executeShellCommand(String command, IShellOutputReceiver receiver,
+                                                 long maxTimeout, long maxTimeToOutputResponse,
+                                                 TimeUnit maxTimeUnits) throws TimeoutException,
             AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         device.executeShellCommand(command, receiver, maxTimeout, maxTimeToOutputResponse, maxTimeUnits);
     }
@@ -191,7 +191,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
      * @param command adb shell command for execution.
      * @throws CommandExecutionException
      */
-    public void executeShellCommand(String command) throws CommandExecutionException {
+    public synchronized void executeShellCommand(String command) throws CommandExecutionException {
         try {
             executeShellCommand(command, new CollectingOutputReceiver(), 5L, TimeUnit.MINUTES);
         } catch (Exception e) {
@@ -200,7 +200,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     }
 
     @Override
-    public String executeShellCommandAndReturnOutput(String command) throws CommandExecutionException {
+    public synchronized String executeShellCommandAndReturnOutput(String command) throws CommandExecutionException {
         try {
             CollectingOutputReceiver receiver = new CollectingOutputReceiver();
             executeShellCommand(command, receiver, 5L, TimeUnit.MINUTES);
@@ -231,7 +231,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public synchronized boolean equals(Object obj) {
         if (!(obj instanceof ConnectedDeviceWrapper)) {
             return false;
         }

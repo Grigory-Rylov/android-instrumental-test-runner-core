@@ -26,7 +26,7 @@ public class TestRunnerContext {
     }
 
     public InstrumentalExtension getInstrumentalInfo() {
-        return instrumentalInfo;
+        return new InstrumentalExtension(instrumentalInfo);
     }
 
     public Environment getEnvironment() {
