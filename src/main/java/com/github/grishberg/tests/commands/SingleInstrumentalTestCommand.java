@@ -44,6 +44,9 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     }
 
     private void initTargetTestArgs(List<TestPlanElement> testForExecution) {
+        if (testForExecution.isEmpty()) {
+            throw new IllegalArgumentException("Tests plans list must not be empty");
+        }
         StringBuilder sbClass = new StringBuilder();
         StringBuilder sbPackage = new StringBuilder();
         for (int i = 0; i < testForExecution.size(); i++) {
