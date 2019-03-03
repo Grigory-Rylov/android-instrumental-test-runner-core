@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.grishberg.tests.commands.reports.xml;
 
 import com.android.annotations.NonNull;
@@ -34,7 +33,6 @@ import java.util.Set;
  * Custom version of {@link com.android.ddmlib.testrunner.ITestRunListener}.
  */
 public class CustomTestRunListener extends XmlTestRunListener {
-
     @NonNull
     private final String mDeviceName;
     @NonNull
@@ -43,7 +41,6 @@ public class CustomTestRunListener extends XmlTestRunListener {
     private final String mFlavorName;
     private final ILogger mLogger;
     private final Set<TestIdentifier> mFailedTests = Sets.newHashSet();
-
 
     public CustomTestRunListener(@NonNull String deviceName,
                                  @NonNull String projectName, @NonNull String flavorName,
@@ -122,7 +119,6 @@ public class CustomTestRunListener extends XmlTestRunListener {
                 mLogger.verbose("\n%1$s > %2$s[%3$s] \033[32mSUCCESS \033[0m",
                         test.getClassName(), test.getTestName(), mDeviceName);
             }
-
         }
         super.testEnded(test, testMetrics);
     }
