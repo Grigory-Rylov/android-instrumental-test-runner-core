@@ -277,6 +277,8 @@ public class XmlTestRunListener implements ITestRunListener {
         long elapsedTimeMs = testResult.getEndTime() - testResult.getStartTime();
         serializer.attribute(ns, ATTR_TIME, Double.toString((double) elapsedTimeMs / 1000.f));
 
+        generateCustomTestTagAttributes(serializer, ns, testId);
+
         switch (testResult.getStatus()) {
             case FAILURE:
                 printFailedTest(serializer, FAILURE, testResult.getStackTrace());
@@ -291,6 +293,12 @@ public class XmlTestRunListener implements ITestRunListener {
         }
 
         serializer.endTag(ns, TESTCASE);
+    }
+
+    protected void generateCustomTestTagAttributes(KXmlSerializer serializer,
+                                                   String ns,
+                                                   TestIdentifier testId) throws IOException {
+        /* To be implemented in subclass */
     }
 
     private void printFailedTest(KXmlSerializer serializer, String tag, String stack)

@@ -6,6 +6,7 @@ import com.github.grishberg.tests.XmlReportGeneratorDelegate;
 import com.github.grishberg.tests.commands.reports.xml.CustomTestRunListener;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import org.kxml2.io.KXmlSerializer;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,5 +90,15 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
                 Maps.newLinkedHashMap(super.getPropertiesAttributes());
         propertiesAttributes.putAll(xmlReportDelegate.provideProperties());
         return ImmutableMap.copyOf(propertiesAttributes);
+    }
+
+    @Override
+    protected void generateCustomTestTagAttributes(KXmlSerializer serializer,
+                                                   String ns,
+                                                   TestIdentifier testId) throws IOException {
+        Map<String, String> attrs = xmlReportDelegate.provideAdditionalAttributesForTest(testId);
+        for (Map.Entry<String, String> attrEntry : attrs.entrySet()) {
+            serializer.attribute(ns, attrEntry.getKey(), attrEntry.getValue());
+        }
     }
 }
