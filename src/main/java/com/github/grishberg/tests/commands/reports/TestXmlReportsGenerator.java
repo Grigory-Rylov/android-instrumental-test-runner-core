@@ -1,9 +1,9 @@
 package com.github.grishberg.tests.commands.reports;
 
-import com.android.builder.internal.testing.CustomTestRunListener;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.utils.ILogger;
 import com.github.grishberg.tests.XmlReportGeneratorDelegate;
+import com.github.grishberg.tests.commands.reports.xml.CustomTestRunListener;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
