@@ -2,6 +2,8 @@ package com.github.grishberg.tests.planner;
 
 import com.android.ddmlib.MultiLineReceiver;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -20,11 +22,10 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     private static final String TEST = "test";
     private static final String CLASS = "class";
     private static final String ANNOTATIONS = "annotations";
-    private static final String FEATURE = "feature";
-    private static final String FLAGS = "flags";
     private static final String SHORT_MSG = "shortMsg";
     private static final String LONG_MSG = "longMsg";
     private ParserLogger logger;
+    private final Gson gson = new GsonBuilder().create();
     private final ArrayList<TestPlanElement> testPlanList = new ArrayList<>();
     private State state = new StartNewObject();
 
@@ -84,19 +85,8 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
             return;
         }
 
-        if (FEATURE.equals(words[0])) {
-            state.setFeature(words[1]);
-            return;
-        }
-
-        if (FLAGS.equals(words[0])) {
-            List<String> flags = parseFlags(words[1]);
-            state.setFlags(flags);
-        }
-
         if (ANNOTATIONS.equals(words[0])) {
-            List<String> annotations = parseAnnotations(words[1]);
-            state.setAnnotations(annotations);
+            state.setAnnotations(parseAnnotations(words[1]));
         }
     }
 
@@ -115,27 +105,13 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
     }
 
-    private List<String> parseFlags(@Nonnull String flags) {
-        ArrayList<String> result = new ArrayList<>();
-        if (flags.indexOf(',') < 0) {
-            result.add(flags);
-            return result;
-        }
-        return Arrays.asList(flags.split(","));
-    }
-
     @NotNull
     private String[] getSplitArray(String payload) {
         return payload.split("=", 2);
     }
 
-    private List<String> parseAnnotations(@Nonnull String annotations) {
-        ArrayList<String> result = new ArrayList<>();
-        if (annotations.indexOf(',') < 0) {
-            result.add(annotations);
-            return result;
-        }
-        return Arrays.asList(annotations.split(","));
+    private List<AnnotationInfo> parseAnnotations(@Nonnull String annotations) {
+        return Arrays.asList(gson.fromJson(annotations, AnnotationInfo[].class));
     }
 
     @Override
@@ -150,17 +126,13 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     private interface State {
         void storeValuesIfNeeded();
 
-        void setAnnotations(List<String> annotations);
+        void setAnnotations(List<AnnotationInfo> annotations);
 
         void setTestId(String testId);
 
         void setTestMethod(String testMethod);
 
         void setClassName(String className);
-
-        void setFeature(@Nonnull String feature);
-
-        void setFlags(List<String> flags);
 
         void setShortMessage(String shortMsg);
 
@@ -173,9 +145,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         private String testId;
         private String testMethodName;
         private String testClassName;
-        private String feature = "";
-        private List<String> annotations;
-        private List<String> flags;
+        private List<AnnotationInfo> annotations;
 
         @Override
         public void setTestId(String id) {
@@ -195,18 +165,8 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         }
 
         @Override
-        public void setFeature(@Nonnull String feature) {
-            this.feature = feature;
-        }
-
-        @Override
-        public void setAnnotations(List<String> annotations) {
+        public void setAnnotations(List<AnnotationInfo> annotations) {
             this.annotations = annotations;
-        }
-
-        @Override
-        public void setFlags(List<String> flags) {
-            this.flags = flags;
         }
 
         @Override
@@ -224,14 +184,8 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         private void changeStateIfNeeded() {
             if (testId != null && testMethodName != null && testClassName != null) {
                 state = new ReadyToStoreObject(testId, testMethodName, testClassName);
-                if (feature != null) {
-                    state.setFeature(feature);
-                }
                 if (annotations != null) {
                     state.setAnnotations(annotations);
-                }
-                if (flags != null) {
-                    state.setFlags(flags);
                 }
             }
         }
@@ -242,9 +196,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         private final String testMethodName;
         private final String testClassName;
         private TestPlanElement testPlan;
-        private List<String> annotations;
-        private String feature = "";
-        private List<String> flags;
+        private List<AnnotationInfo> annotations;
 
         private ReadyToStoreObject(String testId, String testMethodName, String testClassName) {
             this.testId = testId;
@@ -261,42 +213,20 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
 
         @Override
         public void storeValuesIfNeeded() {
-            testPlan = new TestPlanElement(testId, testMethodName, testClassName);
+            testPlan = new TestPlanElement(testId, testMethodName, testClassName, annotations);
 
             if (!testPlanList.contains(testPlan)) {
                 testPlanList.add(testPlan);
-
-                testPlan.addAnnotations(annotations);
-                testPlan.setFeature(feature);
-                testPlan.setFlags(flags);
             }
         }
 
         @Override
-        public void setAnnotations(List<String> annotations) {
+        public void setAnnotations(List<AnnotationInfo> annotations) {
             if (testPlan != null) {
-                testPlan.addAnnotations(annotations);
+                testPlan = new TestPlanElement(testId, testMethodName, testClassName, annotations);
                 return;
             }
             this.annotations = annotations;
-        }
-
-        @Override
-        public void setFeature(@Nonnull String feature) {
-            if (testPlan != null) {
-                testPlan.setFeature(feature);
-                return;
-            }
-            this.feature = feature;
-        }
-
-        @Override
-        public void setFlags(List<String> flags) {
-            if (testPlan != null) {
-                testPlan.setFlags(flags);
-                return;
-            }
-            this.flags = flags;
         }
 
         @Override
@@ -323,7 +253,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         public void storeValuesIfNeeded() { /* not used */ }
 
         @Override
-        public void setAnnotations(List<String> annotations) { /* not used */ }
+        public void setAnnotations(List<AnnotationInfo> annotations) { /* not used */ }
 
         @Override
         public void setTestId(String testId) { /* not used */ }
@@ -333,12 +263,6 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
 
         @Override
         public void setClassName(String className) { /* not used */ }
-
-        @Override
-        public void setFeature(@Nonnull String feature) { /* not used */ }
-
-        @Override
-        public void setFlags(List<String> flags) { /* not used */ }
 
         @Override
         public void setShortMessage(String shortMsg) {
