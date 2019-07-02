@@ -1,7 +1,10 @@
 package com.github.grishberg.tests.planner;
 
+import com.github.grishberg.tests.utils.TextUtils;
+
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -11,15 +14,22 @@ public class TestPlanElement {
     private final String testId;
     private final String methodName;
     private final String className;
-    private List<String> annotations;
-    private String feature;
-    private List<String> flags = new ArrayList<>();
+    private List<AnnotationInfo> annotations;
     @Nullable
     private TestPlanElement parent;
     private final NodeType type;
     private final ArrayList<TestPlanElement> children = new ArrayList<>();
     private boolean excluded;
     private boolean hasExcluded;
+
+    public TestPlanElement(String testId, String methodName, String fullClassName,
+                           List<AnnotationInfo> annotations) {
+        this.testId = testId;
+        this.methodName = methodName;
+        this.className = fullClassName;
+        this.annotations = annotations;
+        type = TextUtils.isEmpty(methodName) ? NodeType.CLASS : NodeType.METHOD;
+    }
 
     public TestPlanElement(NodeType type, String packageName) {
         this.type = type;
@@ -29,12 +39,7 @@ public class TestPlanElement {
     }
 
     public TestPlanElement(String testId, String methodName, String fullClassName) {
-        this.testId = testId;
-        this.methodName = methodName;
-        this.className = fullClassName;
-        this.annotations = new ArrayList<>();
-        type = (methodName == null || methodName.length() == 0) ?
-                NodeType.CLASS : NodeType.METHOD;
+        this(testId, methodName, fullClassName, Collections.emptyList());
     }
 
     /**
@@ -45,21 +50,12 @@ public class TestPlanElement {
         this.methodName = srcElement.methodName;
         this.className = srcElement.className;
         this.annotations = new ArrayList<>(srcElement.annotations);
-        this.feature = srcElement.feature;
-        this.flags = new ArrayList<>(srcElement.flags);
         if (srcElement.parent != null) {
             this.parent = new TestPlanElement(srcElement.parent);
         }
         this.type = srcElement.type;
         this.excluded = false;
         this.hasExcluded = false;
-    }
-
-    void addAnnotations(List<String> annotations) {
-        if (annotations == null) {
-            return;
-        }
-        this.annotations.addAll(annotations);
     }
 
     public String getMethodName() {
@@ -70,8 +66,8 @@ public class TestPlanElement {
         return className;
     }
 
-    public List<String> getAnnotations() {
-        return new ArrayList<>(annotations);
+    public List<AnnotationInfo> getAnnotations() {
+        return Collections.unmodifiableList(annotations);
     }
 
     @Override
@@ -103,14 +99,6 @@ public class TestPlanElement {
         return result;
     }
 
-    public String getFeature() {
-        return feature;
-    }
-
-    void setFeature(String feature) {
-        this.feature = feature;
-    }
-
     public boolean isPackage() {
         return type == NodeType.PACKAGE;
     }
@@ -127,18 +115,6 @@ public class TestPlanElement {
             prefix = parent.getAmInstrumentCommand() + ".";
         }
         return prefix + className;
-    }
-
-    public List<String> getFlags() {
-        return new ArrayList<>(flags);
-    }
-
-    void setFlags(List<String> flags) {
-        if (flags == null) {
-            this.flags.clear();
-            return;
-        }
-        this.flags = new ArrayList<>(flags);
     }
 
     public void exclude() {
@@ -197,6 +173,19 @@ public class TestPlanElement {
                 "methodName='" + methodName + '\'' +
                 ", className='" + className + '\'' +
                 ", type=" + type +
+                ", annotations=[" + annotationsAsString() + "]" +
                 '}';
+    }
+
+    private String annotationsAsString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < annotations.size(); i++) {
+            AnnotationInfo annotation = annotations.get(i);
+            sb.append(annotation.getName());
+            if (i < annotations.size() - 1) {
+                sb.append(",");
+            }
+        }
+        return sb.toString();
     }
 }

@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.mock;
@@ -26,13 +27,10 @@ public class InstrumentTestLogParserTest {
         String fileName = "for_test/am_instrument_output.txt";
 
         List<String> lines = TestUtils.readFile(fileName);
-        parser.processNewLines(lines.toArray(new String[lines.size()]));
+        parser.processNewLines(lines.toArray(new String[0]));
 
         List<TestPlanElement> testInstances = parser.getTestInstances();
-        Assert.assertEquals(6, testInstances.size());
-        TestPlanElement[] testPlanArray = testInstances.toArray(new TestPlanElement[testInstances.size()]);
-        TestPlanElement testWithFeature = testPlanArray[3];
-        Assert.assertNotNull(testWithFeature.getFeature());
+        Assert.assertEquals(4, testInstances.size());
     }
 
     @Test
@@ -46,20 +44,68 @@ public class InstrumentTestLogParserTest {
     }
 
     @Test
-    public void parseFlags() {
-        String[] lines = getLinesForTest();
+    public void annotationNameNotEmpty() {
+        parser.processNewLines(getLinesForTest());
 
-        parser.processNewLines(lines);
+        TestPlanElement element = parser.getTestInstances().get(0);
+        List<AnnotationInfo> annotations = element.getAnnotations();
 
-        List<TestPlanElement> elements = parser.getTestInstances();
-        TestPlanElement element = elements.get(0);
-        List<String> annotations = element.getAnnotations();
-        List<String> flags = element.getFlags();
+        Assert.assertEquals("com.github.grishberg.annotations.Feature", annotations.get(0).getName());
+    }
 
-        Assert.assertEquals(1, annotations.size());
-        Assert.assertEquals(1, flags.size());
-        Assert.assertEquals("com.github.grishberg.annotaions.Feature", annotations.get(0));
-        Assert.assertEquals("flag1=value1", flags.get(0));
+    @Test
+    public void stringArgumentNotEmpty() {
+        parser.processNewLines(getLinesForTest());
+
+        TestPlanElement element = parser.getTestInstances().get(0);
+        List<AnnotationInfo> annotations = element.getAnnotations();
+
+        AnnotationMember annotationMember = annotations.get(0).getMembersMap().get("stringParam");
+
+        Assert.assertEquals("someParam=someValue", annotationMember.getStrValue());
+    }
+
+    @Test
+    public void intArgumentNotEmpty() {
+        parser.processNewLines(getLinesForTest());
+
+        TestPlanElement element = parser.getTestInstances().get(0);
+        List<AnnotationInfo> annotations = element.getAnnotations();
+
+        AnnotationMember annotationMember = annotations.get(0).getMembersMap().get("intParam");
+
+        Assert.assertEquals(new Integer(777), annotationMember.getIntValue());
+    }
+
+    @Test
+    public void intArrayArgumentNotEmpty() {
+        parser.processNewLines(getLinesForTest());
+
+        TestPlanElement element = parser.getTestInstances().get(0);
+        List<AnnotationInfo> annotations = element.getAnnotations();
+
+        AnnotationMember annotationMember = annotations.get(0).getMembersMap().get("intArray");
+
+        ArrayList<Integer> intArray = new ArrayList<>();
+        intArray.add(0);
+        intArray.add(1);
+        intArray.add(2);
+        Assert.assertEquals(intArray, annotationMember.getIntArray());
+    }
+
+    @Test
+    public void stingArrayArgumentNotEmpty() {
+        parser.processNewLines(getLinesForTest());
+
+        TestPlanElement element = parser.getTestInstances().get(0);
+        List<AnnotationInfo> annotations = element.getAnnotations();
+
+        AnnotationMember annotationMember = annotations.get(0).getMembersMap().get("strArray");
+
+        ArrayList<String> strArray = new ArrayList<>();
+        strArray.add("one");
+        strArray.add("two");
+        Assert.assertEquals(strArray, annotationMember.getStrArray());
     }
 
     @Test(expected = ProcessCrashedException.class)
@@ -86,9 +132,12 @@ public class InstrumentTestLogParserTest {
                 "INSTRUMENTATION_STATUS: numtests=6",
                 "INSTRUMENTATION_STATUS: test=espressoTest1",
                 "INSTRUMENTATION_STATUS_CODE: 1",
-                "INSTRUMENTATION_STATUS: feature=+feature1?param1=enabled&param2=disabled",
-                "INSTRUMENTATION_STATUS: flags=flag1=value1",
-                "INSTRUMENTATION_STATUS: annotations=com.github.grishberg.annotaions.Feature"
+                "INSTRUMENTATION_STATUS: annotations=[" +
+                        "{\"members\":[{\"intArray\":[0,1,2],\"name\":\"intArray\",\"valueType\":\"[I\"}," +
+                        "{\"name\":\"intParam\",\"valueType\":\"int\",\"intValue\"=777}," +
+                        "{\"name\":\"strArray\",\"strArray\":[\"one\",\"two\"],\"valueType\":\"[Ljava.lang.String;\"}," +
+                        "{\"name\":\"stringParam\",\"valueType\":\"java.lang.String\",\"strValue\":\"someParam=someValue\"}]," +
+                        "\"name\":\"com.github.grishberg.annotations.Feature\"}]"
         };
     }
 }

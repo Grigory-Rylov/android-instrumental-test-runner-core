@@ -5,6 +5,7 @@ import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.commands.SetAnimationSpeedCommand;
 import com.github.grishberg.tests.commands.SingleInstrumentalTestCommand;
 import com.github.grishberg.tests.common.RunnerLogger;
+import com.github.grishberg.tests.planner.AnnotationInfo;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import com.github.grishberg.tests.planner.TestPlanElement;
 import org.junit.Assert;
@@ -14,10 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,9 +26,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultCommandProviderTest {
     private static final HashMap<String, String> ARGS = new HashMap<>();
-    private static final String ANNOTATION = "TestAnnotation";
+    private static final AnnotationInfo ANNOTATION = new AnnotationInfo("TestAnnotation");
     private static final String PROJECT_NAME = "test_project";
-
     @Mock
     InstrumentalExtension extension;
     @Mock
@@ -56,9 +53,9 @@ public class DefaultCommandProviderTest {
 
     @Before
     public void setUp() throws Exception {
-        ArrayList<String> emptyAnnotations = new ArrayList<>();
+        ArrayList<AnnotationInfo> emptyAnnotations = new ArrayList<>();
         when(element.getAnnotations()).thenReturn(emptyAnnotations);
-        List<String> annotations = Arrays.asList(ANNOTATION);
+        List<AnnotationInfo> annotations = Arrays.asList(ANNOTATION);
         when(elementWithAnnotation.getAnnotations()).thenReturn(annotations);
 
         when(commandsForAnnotationProvider.provideCommand(annotations))
@@ -89,7 +86,7 @@ public class DefaultCommandProviderTest {
 
     @Test
     public void provideCommandsForDeviceWithAnnotations() throws Exception {
-        List<String> annotations = Arrays.asList(ANNOTATION);
+        List<AnnotationInfo> annotations = Arrays.asList(ANNOTATION);
         when(element.getAnnotations()).thenReturn(annotations);
         List<DeviceRunnerCommand> clearCommand = Arrays.asList(new ClearCommand());
         when(commandsForAnnotationProvider.provideCommand(annotations))

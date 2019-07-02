@@ -24,17 +24,6 @@ public class TestPlanElementTest {
     }
 
     @Test
-    public void addNullAnnotations() {
-        TestPlanElement element = new TestPlanElement("", TEST_METHOD_NAME, "com.test.TestClass");
-
-        element.addAnnotations(null);
-
-        List<String> annotations = element.getAnnotations();
-        Assert.assertNotNull(annotations);
-        Assert.assertEquals(0, annotations.size());
-    }
-
-    @Test
     public void returnMethodNameAfterInit() {
         TestPlanElement element = new TestPlanElement("", TEST_METHOD_NAME, "com.test.TestClass");
         Assert.assertEquals(TEST_METHOD_NAME, element.getMethodName());
