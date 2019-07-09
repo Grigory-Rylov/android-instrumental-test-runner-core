@@ -24,7 +24,8 @@ data class AnnotationMember(
          */
         var strValue: String? = null,
         var strArray: ArrayList<String>? = null,
-        var intArray: ArrayList<Int>? = null
+        var intArray: ArrayList<Int>? = null,
+        var boolValue: Boolean? = null
 )
 
 /**

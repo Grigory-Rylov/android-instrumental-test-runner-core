@@ -108,6 +108,18 @@ public class InstrumentTestLogParserTest {
         Assert.assertEquals(strArray, annotationMember.getStrArray());
     }
 
+    @Test
+    public void boolArgumentNotEmpty() {
+        parser.processNewLines(getLinesForTest());
+
+        TestPlanElement element = parser.getTestInstances().get(0);
+        List<AnnotationInfo> annotations = element.getAnnotations();
+
+        AnnotationMember annotationMember = annotations.get(0).getMembersMap().get("boolParam");
+
+        Assert.assertEquals(Boolean.TRUE, annotationMember.getBoolValue());
+    }
+
     @Test(expected = ProcessCrashedException.class)
     public void parserAppCrash() {
         String[] lines = new String[]{"INSTRUMENTATION_RESULT: shortMsg=Process crashed.",
@@ -135,6 +147,7 @@ public class InstrumentTestLogParserTest {
                 "INSTRUMENTATION_STATUS: annotations=[" +
                         "{\"members\":[{\"intArray\":[0,1,2],\"name\":\"intArray\",\"valueType\":\"[I\"}," +
                         "{\"name\":\"intParam\",\"valueType\":\"int\",\"intValue\"=777}," +
+                        "{\"name\":\"boolParam\",\"valueType\":\"boolean\",\"boolValue\"=true}," +
                         "{\"name\":\"strArray\",\"strArray\":[\"one\",\"two\"],\"valueType\":\"[Ljava.lang.String;\"}," +
                         "{\"name\":\"stringParam\",\"valueType\":\"java.lang.String\",\"strValue\":\"someParam=someValue\"}]," +
                         "\"name\":\"com.github.grishberg.annotations.Feature\"}]"
