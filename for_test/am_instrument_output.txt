@@ -55,8 +55,6 @@ INSTRUMENTATION_STATUS: test=ignoredTestTabletButton2
 INSTRUMENTATION_STATUS: class=com.github.grishberg.instrumentaltestsample.TabletTest
 INSTRUMENTATION_STATUS: current=4
 INSTRUMENTATION_STATUS_CODE: 1
-INSTRUMENTATION_STATUS: annotations=[{"members":[],"name":"com.github.grishberg.instrumentaltestsample.TabletOnly"},{"members":[{"name":"value","valueType":"java.lang.String"}],"name":"org.junit.Ignore"},{"members":[{"name":"expected","valueType":"java.lang.Class"},{"name":"timeout","valueType":"long"}],"name":"org.junit.Test"}]
-INSTRUMENTATION_STATUS_CODE: 1
 INSTRUMENTATION_STATUS: numtests=4
 INSTRUMENTATION_STATUS: stream=.
 INSTRUMENTATION_STATUS: id=AndroidJUnitRunner

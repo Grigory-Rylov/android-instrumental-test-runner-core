@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -196,7 +197,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         private final String testMethodName;
         private final String testClassName;
         private TestPlanElement testPlan;
-        private List<AnnotationInfo> annotations;
+        private List<AnnotationInfo> annotations = Collections.emptyList();
 
         private ReadyToStoreObject(String testId, String testMethodName, String testClassName) {
             this.testId = testId;
