@@ -20,18 +20,10 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class InstrumentTestLogParserTest {
     private static final String TEST_LINE = "test line";
+    private static final String TEST_ELEMENT_WITHOUT_ANNOTATION = "TestPlanElement{methodName=" +
+            "'ignoredTestTabletButton2', className='com.github.grishberg.instrumentaltestsample." +
+            "TabletTest', type=METHOD, annotations=[]}";
     private InstrumentTestLogParser parser = new InstrumentTestLogParser();
-
-    @Test
-    public void parseAmInstrumentOutput() throws Exception {
-        String fileName = "for_test/am_instrument_output.txt";
-
-        List<String> lines = TestUtils.readFile(fileName);
-        parser.processNewLines(lines.toArray(new String[0]));
-
-        List<TestPlanElement> testInstances = parser.getTestInstances();
-        Assert.assertEquals(4, testInstances.size());
-    }
 
     @Test
     public void useLoggerFromSetter() {
@@ -134,6 +126,30 @@ public class InstrumentTestLogParserTest {
                 "INSTRUMENTATION_RESULT: longMsg=java.lang.ClassNotFoundException: Didn't find class \"com.dtmilano.android.uiautomatorhelper.UiAutomatorHelperTestRunner\" on path: DexPathList[[zip file \"/system/framework/android.test.runner.jar\", zip file \"/data/app/com.dtmilano.android.culebratester.test-1/base.apk\", zip file \"/data/app/com.dtmilano.android.culebratester-1/base.apk\"],nativeLibraryDirectories=[/data/app/com.dtmilano.android.culebratester.test-1/lib/arm, /data/app/com.dtmilano.android.culebratester-1/lib/arm, /vendor/lib, /system/lib]",
                 "INSTRUMENTATION_CODE: 0"};
         parser.processNewLines(lines);
+    }
+
+    @Test
+    public void parseAmInstrumentOutput() throws Exception {
+        whenParsedSampleOut();
+
+        List<TestPlanElement> testInstances = parser.getTestInstances();
+        Assert.assertEquals(4, testInstances.size());
+    }
+
+    @Test
+    public void parseAmInstrumentOutputAndCheckTestWithoutAnnotations() throws Exception {
+        whenParsedSampleOut();
+
+        List<TestPlanElement> testInstances = parser.getTestInstances();
+        TestPlanElement testWithoutAnnotation = testInstances.get(3);
+        Assert.assertEquals(TEST_ELEMENT_WITHOUT_ANNOTATION, testWithoutAnnotation.toString());
+    }
+
+    private void whenParsedSampleOut() throws Exception {
+        String fileName = "for_test/am_instrument_output.txt";
+
+        List<String> lines = TestUtils.readFile(fileName);
+        parser.processNewLines(lines.toArray(new String[0]));
     }
 
     private static String[] getLinesForTest() {

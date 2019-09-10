@@ -18,7 +18,7 @@ plugins {
 }
 
 group 'com.github.grishberg'
-version '1.5.2'
+version '1.5.3'
 
 apply plugin: 'kotlin'
 
@@ -50,7 +50,7 @@ dependencies {
     testCompile "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
     compile localGroovy()
     // https://mvnrepository.com/artifact/com.android.tools.ddms/ddmlib
-    compile group: 'com.android.tools.ddms', name: 'ddmlib', version: '26.0.1'
+    compile group: 'com.android.tools.ddms', name: 'ddmlib', version: '26.5.0'
     // https://mvnrepository.com/artifact/commons-io/commons-io
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
 }

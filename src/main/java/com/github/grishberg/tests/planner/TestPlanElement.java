@@ -14,7 +14,7 @@ public class TestPlanElement {
     private final String testId;
     private final String methodName;
     private final String className;
-    private List<AnnotationInfo> annotations;
+    private final List<AnnotationInfo> annotations;
     @Nullable
     private TestPlanElement parent;
     private final NodeType type;
@@ -29,6 +29,9 @@ public class TestPlanElement {
         this.className = fullClassName;
         this.annotations = annotations;
         type = TextUtils.isEmpty(methodName) ? NodeType.CLASS : NodeType.METHOD;
+        if (annotations == null) {
+            throw new IllegalArgumentException("Passed null annotations list");
+        }
     }
 
     public TestPlanElement(NodeType type, String packageName) {
@@ -36,6 +39,7 @@ public class TestPlanElement {
         testId = "";
         methodName = "";
         className = packageName;
+        annotations = Collections.emptyList();
     }
 
     public TestPlanElement(String testId, String methodName, String fullClassName) {
