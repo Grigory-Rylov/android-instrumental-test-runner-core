@@ -158,7 +158,7 @@ public class TestPlanElement {
     /**
      * @return not excluded packages list.
      */
-    List<TestPlanElement> getCompoundElements() {
+    public List<TestPlanElement> getCompoundElements() {
         ArrayList<TestPlanElement> result = new ArrayList<>();
         if (!hasExcluded && !excluded && type != NodeType.PACKAGE) {
             result.add(this);
