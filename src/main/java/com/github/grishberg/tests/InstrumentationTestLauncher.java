@@ -84,7 +84,7 @@ public class InstrumentationTestLauncher {
      * @throws IOException
      * @throws CommandExecutionException
      */
-    public void launchTests() throws InterruptedException, IOException, CommandExecutionException {
+    public boolean launchTests() throws InterruptedException, IOException, CommandExecutionException {
         logger.i(TAG, "InstrumentationTestLauncher.launchTests");
 
         screenshotRelations.clear();
@@ -104,7 +104,7 @@ public class InstrumentationTestLauncher {
         if (processCrashedHandler != null) {
             context.setProcessCrashHandler(processCrashedHandler);
         }
-        runner.runCommands(getDeviceList(), context);
+        return runner.runCommands(getDeviceList(), context);
     }
 
     private void init() {
