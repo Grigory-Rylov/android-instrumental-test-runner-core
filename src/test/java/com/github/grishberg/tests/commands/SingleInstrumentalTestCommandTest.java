@@ -1,6 +1,7 @@
 package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.IDevice;
+import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.ddmlib.testrunner.TestRunResult;
@@ -14,6 +15,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -24,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -38,6 +41,7 @@ public class SingleInstrumentalTestCommandTest {
     private static final String PROJECT_NAME = "test_project";
     private static final String TEST_CLASS = "com.test.TestClass";
     private static final String TEST_NAME = "test1";
+    private static final String TEST_NAME_WITH_DEVICE = "test1[phone-1]";
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
@@ -60,6 +64,7 @@ public class SingleInstrumentalTestCommandTest {
     ILogger iLogger;
     @Mock
     File coverageDir;
+
     @Mock
     ProcessCrashHandler processCrashedHandler;
     private SingleInstrumentalTestCommand testCommand;
@@ -71,9 +76,12 @@ public class SingleInstrumentalTestCommandTest {
 
     @Before
     public void setUp() {
+        when(processCrashedHandler.provideFailMessageOnProcessCrashed(any(), any()))
+                .thenReturn("Process was crashed. See logcat to details.");
         when(context.getInstrumentalInfo()).thenReturn(ext);
         when(context.getEnvironment()).thenReturn(environment);
         when(context.getProcessCrashedHandler()).thenReturn(processCrashedHandler);
+        when(context.getLogger()).thenReturn(mock(RunnerLogger.class));
         when(environment.getCoverageDir()).thenReturn(coverageDir);
         doAnswer((Answer<TestRunnerBuilder>) invocation -> {
             instrumentationArgs = invocation.getArgument(2);
@@ -131,35 +139,50 @@ public class SingleInstrumentalTestCommandTest {
     @Test(expected = CommandExecutionException.class)
     public void throwExecuteCommandExceptionWhenSomeDeviceException() throws Exception {
         Mockito.doThrow(new IOException(new Throwable())).when(testRunner)
-                .run(reportsGenerator);
+                .run((ITestRunListener[]) any());
 
         testCommand.execute(deviceWrapper, context);
     }
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void failTestWhenProcessCrashed() throws Exception {
-        Mockito.doThrow(new ProcessCrashedException("Process crashed")).when(testRunner)
-                .run(reportsGenerator);
+        doAnswer(invocation -> {
+            for (Object listener : invocation.getArguments()) {
+                ((ITestRunListener) listener).testStarted(
+                        new TestIdentifier(TEST_CLASS, TEST_NAME_WITH_DEVICE));
+            }
+            throw new ProcessCrashedException("Process crashed");
+        }).when(testRunner).run((ITestRunListener[]) any());
 
         testCommand.execute(deviceWrapper, context);
 
         verify(reportsGenerator).failLastTest("Process was crashed. See logcat to details.");
     }
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void callTestRunEndedFromReporterWhenProcessCrashed() throws Exception {
-        Mockito.doThrow(new ProcessCrashedException("Process crashed")).when(testRunner)
-                .run(reportsGenerator);
+        doAnswer(invocation -> {
+            for (Object listener : invocation.getArguments()) {
+                ((ITestRunListener) listener).testStarted(
+                        new TestIdentifier(TEST_CLASS, TEST_NAME_WITH_DEVICE));
+            }
+            throw new ProcessCrashedException("Process crashed");
+        }).when(testRunner).run((ITestRunListener[]) any());
 
         testCommand.execute(deviceWrapper, context);
 
-        verify(reportsGenerator).testRunEnded(anyInt(), any());
+        verify(reportsGenerator).testRunEnded(anyLong(), any());
     }
 
-    @Test(expected = CommandExecutionException.class)
+    @Test
     public void handleProcessCrashedWhenProcessCrashed() throws Exception {
-        Mockito.doThrow(new ProcessCrashedException("Process crashed")).when(testRunner)
-                .run(reportsGenerator);
+        doAnswer(invocation -> {
+            for (Object listener : invocation.getArguments()) {
+                ((ITestRunListener) listener).testStarted(
+                        new TestIdentifier(TEST_CLASS, TEST_NAME_WITH_DEVICE));
+            }
+            throw new ProcessCrashedException("Process crashed");
+        }).when(testRunner).run((ITestRunListener[]) any());
 
         testCommand.execute(deviceWrapper, context);
         verify(processCrashedHandler).provideFailMessageOnProcessCrashed(deviceWrapper, currentTest);

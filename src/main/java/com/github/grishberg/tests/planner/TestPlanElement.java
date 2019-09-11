@@ -140,7 +140,7 @@ public class TestPlanElement {
         child.parent = this;
     }
 
-    List<TestPlanElement> getAllTestMethods() {
+    public List<TestPlanElement> getAllTestMethods() {
         if (type == NodeType.CLASS) {
             return children;
         }
