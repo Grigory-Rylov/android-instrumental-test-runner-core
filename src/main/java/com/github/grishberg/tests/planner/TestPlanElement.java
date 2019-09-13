@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Test plan for running single test.
@@ -85,13 +86,13 @@ public class TestPlanElement {
 
         TestPlanElement that = (TestPlanElement) o;
 
-        if (testId != null ? !testId.equals(that.testId) : that.testId != null) {
+        if (!Objects.equals(testId, that.testId)) {
             return false;
         }
-        if (methodName != null ? !methodName.equals(that.methodName) : that.methodName != null) {
+        if (!Objects.equals(methodName, that.methodName)) {
             return false;
         }
-        return className != null ? className.equals(that.className) : that.className == null;
+        return Objects.equals(className, that.className);
     }
 
     @Override

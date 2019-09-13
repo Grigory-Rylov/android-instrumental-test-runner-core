@@ -225,9 +225,18 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         public void setAnnotations(List<AnnotationInfo> annotations) {
             if (testPlan != null) {
                 testPlan = new TestPlanElement(testId, testMethodName, testClassName, annotations);
+                replaceTestPlanInListIfExists(testPlan);
                 return;
             }
             this.annotations = annotations;
+        }
+
+        private void replaceTestPlanInListIfExists(TestPlanElement testPlan) {
+            int pos = testPlanList.indexOf(testPlan); // see TestPlanElement.equals
+            if (pos >= 0) {
+                testPlanList.remove(pos);
+                testPlanList.add(testPlan);
+            }
         }
 
         @Override
