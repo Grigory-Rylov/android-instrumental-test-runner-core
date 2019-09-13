@@ -23,6 +23,16 @@ public class InstrumentTestLogParserTest {
     private static final String TEST_ELEMENT_WITHOUT_ANNOTATION = "TestPlanElement{methodName=" +
             "'ignoredTestTabletButton2', className='com.github.grishberg.instrumentaltestsample." +
             "TabletTest', type=METHOD, annotations=[]}";
+    private static final String TEST_ELEMENT_WITH_ANNOTATION_1 = "TestPlanElement{methodName=" +
+            "'testPhoneButton2', className='com.github.grishberg.instrumentaltestsample." +
+            "MainActivityTest', type=METHOD, annotations=[org.junit.Test]}";
+    private static final String TEST_ELEMENT_WITH_ANNOTATION_2 = "TestPlanElement{methodName=" +
+            "'testPhoneButton', className='com.github.grishberg.instrumentaltestsample." +
+            "MainActivityTest', type=METHOD, annotations=[org.junit.Test]}";
+    private static final String TEST_ELEMENT_WITH_ANNOTATION_3 = "TestPlanElement{methodName=" +
+            "'testTabletButton', className='com.github.grishberg.instrumentaltestsample." +
+            "TabletTest', type=METHOD, annotations=[com.github.grishberg.instrumentaltestsample" +
+            ".TabletOnly,org.junit.Test]}";
     private InstrumentTestLogParser parser = new InstrumentTestLogParser();
 
     @Test
@@ -145,11 +155,25 @@ public class InstrumentTestLogParserTest {
         Assert.assertEquals(TEST_ELEMENT_WITHOUT_ANNOTATION, testWithoutAnnotation.toString());
     }
 
+    @Test
+    public void annotationsReadCorrectlyTest() throws Exception {
+        whenParsedSampleOut();
+
+        List<TestPlanElement> testInstances = parser.getTestInstances();
+
+        Assert.assertEquals(TEST_ELEMENT_WITH_ANNOTATION_1, testInstances.get(0).toString());
+        Assert.assertEquals(TEST_ELEMENT_WITH_ANNOTATION_2, testInstances.get(1).toString());
+        Assert.assertEquals(TEST_ELEMENT_WITH_ANNOTATION_3, testInstances.get(2).toString());
+    }
+
     private void whenParsedSampleOut() throws Exception {
         String fileName = "for_test/am_instrument_output.txt";
 
         List<String> lines = TestUtils.readFile(fileName);
-        parser.processNewLines(lines.toArray(new String[0]));
+        for (String line : lines) {
+            String[] singleLineArray = new String[]{line};
+            parser.processNewLines(singleLineArray);
+        }
     }
 
     private static String[] getLinesForTest() {
