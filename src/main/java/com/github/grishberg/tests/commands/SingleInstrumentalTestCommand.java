@@ -2,19 +2,32 @@ package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.ddmlib.testrunner.TestRunResult;
-import com.github.grishberg.tests.*;
+import com.github.grishberg.tests.ConnectedDeviceWrapper;
+import com.github.grishberg.tests.Environment;
+import com.github.grishberg.tests.InstrumentalExtension;
+import com.github.grishberg.tests.TestRunnerContext;
+import com.github.grishberg.tests.XmlReportGeneratorDelegate;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.EmptyTestRunListener;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.NodeType;
 import com.github.grishberg.tests.planner.TestPlanElement;
+
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.CheckForNull;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.annotation.CheckForNull;
 
 /**
  * Executes instrumentation test for single test method.
@@ -201,7 +214,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
             if (test == null) {
                 return;
             }
-            String methodName = test.getTestName().substring(0, test.getTestName().indexOf('['));
+            String methodName = getTestMethodName(test);
             boolean removed = allPlannedTests.removeIf(plan ->
                     Objects.equals(plan.getClassName(), test.getClassName()) &&
                     Objects.equals(plan.getMethodName(), methodName));
@@ -209,6 +222,15 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                 logger.w(TAG, "Test '{}' '{}' was not planned to be run but did.",
                         test.getClassName(), methodName);
             }
+        }
+
+        @NotNull
+        private String getTestMethodName(@NotNull TestIdentifier test) {
+            String methodName = test.getTestName();
+            if (methodName.indexOf('[') > 0 ) {
+                methodName = methodName.substring(0, test.getTestName().indexOf('['));
+            }
+            return methodName;
         }
 
         void endLastTest() {

@@ -6,16 +6,20 @@ import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.ddmlib.testrunner.TestRunResult;
 import com.android.utils.ILogger;
-import com.github.grishberg.tests.*;
+import com.github.grishberg.tests.ConnectedDeviceWrapper;
+import com.github.grishberg.tests.Environment;
+import com.github.grishberg.tests.InstrumentalExtension;
+import com.github.grishberg.tests.ProcessCrashHandler;
+import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.TestPlanElement;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -26,12 +30,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by grishberg on 22.03.18.
@@ -188,6 +194,19 @@ public class SingleInstrumentalTestCommandTest {
         verify(processCrashedHandler).provideFailMessageOnProcessCrashed(deviceWrapper, currentTest);
     }
 
+    @Test
+    public void handleProcessCrashedWhenProcessCrashedWithoutDeviceSuffix() throws Exception {
+        doAnswer(invocation -> {
+            for (Object listener : invocation.getArguments()) {
+                ((ITestRunListener) listener).testStarted(
+                        new TestIdentifier(TEST_CLASS, TEST_NAME));
+            }
+            throw new ProcessCrashedException("Process crashed");
+        }).when(testRunner).run((ITestRunListener[]) any());
+
+        testCommand.execute(deviceWrapper, context);
+        verify(processCrashedHandler).provideFailMessageOnProcessCrashed(deviceWrapper, currentTest);
+    }
     @Test(expected = IllegalArgumentException.class)
     public void throwExceptionWhenGivenEmptyTestList() throws Exception {
         testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME, "test_prefix", args, new ArrayList<>());
