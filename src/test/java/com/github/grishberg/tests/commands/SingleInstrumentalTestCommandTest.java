@@ -16,7 +16,6 @@ import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.TestPlanElement;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.anyLong;
@@ -111,7 +112,7 @@ public class SingleInstrumentalTestCommandTest {
     public void initWithClass() throws Exception {
         testCommand.execute(deviceWrapper, context);
 
-        Assert.assertEquals("com.test.TestClass#test1", instrumentationArgs.get("class"));
+        assertEquals("com.test.TestClass#test1", instrumentationArgs.get("class"));
     }
 
     @Test
@@ -160,8 +161,9 @@ public class SingleInstrumentalTestCommandTest {
             throw new ProcessCrashedException("Process crashed");
         }).when(testRunner).run((ITestRunListener[]) any());
 
-        testCommand.execute(deviceWrapper, context);
+        DeviceCommandResult result = testCommand.execute(deviceWrapper, context);
 
+        assertTrue(result.isFailed());
         verify(reportsGenerator).failLastTest("Process was crashed. See logcat to details.");
     }
 
@@ -207,6 +209,7 @@ public class SingleInstrumentalTestCommandTest {
         testCommand.execute(deviceWrapper, context);
         verify(processCrashedHandler).provideFailMessageOnProcessCrashed(deviceWrapper, currentTest);
     }
+
     @Test(expected = IllegalArgumentException.class)
     public void throwExceptionWhenGivenEmptyTestList() throws Exception {
         testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME, "test_prefix", args, new ArrayList<>());
