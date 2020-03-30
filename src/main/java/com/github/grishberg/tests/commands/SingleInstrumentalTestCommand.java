@@ -199,7 +199,9 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                             "Last size is " + lastSize + ", but left tests are " + testsLeft.size();
 
                     commands.add(new SingleInstrumentalTestCommand(projectName, newTestName,
-                            providedInstrumentationArgs, testsLeft));
+                            providedInstrumentationArgs, testsLeft, xmlReportGeneratorDelegate,
+                            // They aren't supposed to be called. Let's protect them.
+                            RetryHandler.FAIL_ON_CALL));
                 }
             }
         }
@@ -357,6 +359,9 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         RetryHandler NOOP = (List<TestPlanElement> failedTests,
                              Map<String, String> providedInstrumentationArgs)
                 -> Collections.emptyList();
+        RetryHandler FAIL_ON_CALL = (failedTests, providedInstrumentationArgs) -> {
+            throw new IllegalStateException("Retry was forbidden to run");
+        };
 
         /**
          * @return commands to run failed tests. Cleanup commands can be included. Commands will
