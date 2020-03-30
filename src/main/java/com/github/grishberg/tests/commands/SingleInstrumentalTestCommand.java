@@ -191,6 +191,9 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
             }
             if (testsResult.processCrashedException != null) {
                 logger.e(TAG, "Process crashed", testsResult.processCrashedException);
+
+                context.getProcessCrashedHandler().onAfterProcessCrashed(targetDevice, context);
+
                 String newTestName = String.format("%s@%03d", testName, counter++);
                 if (!testsLeft.isEmpty()) {
                     logger.i(TAG, "{} tests left after crash, enqueuing 'left-over' command.",

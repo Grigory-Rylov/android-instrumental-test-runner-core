@@ -210,6 +210,29 @@ public class SingleInstrumentalTestCommandTest {
         verify(processCrashedHandler).provideFailMessageOnProcessCrashed(deviceWrapper, currentTest);
     }
 
+    @Test
+    public void clearDataWhenProcessCrashedDuringTest() throws Exception {
+        InstrumentalExtension instrumentalExtension = new InstrumentalExtension();
+        instrumentalExtension.setApplicationId("application_id");
+        when(context.getInstrumentalInfo()).thenReturn(instrumentalExtension);
+
+        doAnswer(invocation -> new ClearCommand().execute(invocation.getArgument(0),
+                invocation.getArgument(1)))
+                .when(processCrashedHandler).onAfterProcessCrashed(any(), any());
+
+        doAnswer(invocation -> {
+            for (Object listener : invocation.getArguments()) {
+                ((ITestRunListener) listener).testStarted(
+                        new TestIdentifier(TEST_CLASS, TEST_NAME_WITH_DEVICE));
+            }
+            throw new ProcessCrashedException("Process crashed");
+        }).when(testRunner).run((ITestRunListener[]) any());
+
+        testCommand.execute(deviceWrapper, context);
+
+        verify(deviceWrapper).executeShellCommand("pm clear application_id");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void throwExceptionWhenGivenEmptyTestList() throws Exception {
         testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME, "test_prefix", args, new ArrayList<>());
