@@ -23,14 +23,14 @@ public class InstallApkCommand implements DeviceRunnerCommand {
             throws CommandExecutionException {
         RunnerLogger logger = runnerContext.getLogger();
         DeviceCommandResult result = new DeviceCommandResult();
-        Exception lastException = null;
+        Throwable lastException = null;
         for (int i = 0; i < 3; i++) {
             try {
                 String extraArgument = "";
                 logger.i(TAG, "InstallApkCommand: install file {}", apkFile.getName());
                 device.installPackage(apkFile.getAbsolutePath(), true, extraArgument);
                 break;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.e(TAG, "InstallApkCommand: ", e);
                 lastException = e;
             }

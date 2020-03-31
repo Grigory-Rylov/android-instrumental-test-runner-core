@@ -123,7 +123,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     public synchronized void pullFile(String temporaryCoverageCopy, String path) throws CommandExecutionException {
         try {
             device.pullFile(temporaryCoverageCopy, path);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new CommandExecutionException("pullFile exception:", e);
         }
     }
@@ -172,7 +172,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
                             .getPath());
             executeShellCommand("rm " + temporaryCoverageCopy, outputReceiver, 30L,
                     TimeUnit.SECONDS);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new PullCoverageException(e);
         }
     }
@@ -194,7 +194,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     public synchronized void executeShellCommand(String command) throws CommandExecutionException {
         try {
             executeShellCommand(command, new CollectingOutputReceiver(), 5L, TimeUnit.MINUTES);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new CommandExecutionException("executeShellCommand exception:", e);
         }
     }
@@ -205,7 +205,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
             CollectingOutputReceiver receiver = new CollectingOutputReceiver();
             executeShellCommand(command, receiver, 5L, TimeUnit.MINUTES);
             return receiver.getOutput();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new CommandExecutionException("executeShellCommand exception:", e);
         }
     }

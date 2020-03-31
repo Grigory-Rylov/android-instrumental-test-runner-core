@@ -47,7 +47,7 @@ class DeviceCommandsRunner {
                             hasFailedTests = true;
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.e(TAG, "Execute command exception:", e);
                     commandException = e;
                 } finally {

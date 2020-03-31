@@ -40,7 +40,7 @@ public class ScreenShotMakerImpl implements ScreenShotMaker {
             deviceWrapper.executeShellCommand("screencap -p /sdcard/fail_screen.png");
             deviceWrapper.pullFile("/sdcard/fail_screen.png", outFile.getAbsolutePath());
             deviceWrapper.executeShellCommand("rm /sdcard/fail_screen.png");
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.e(TAG, "makeScreenshot fail:", e);
         }
     }
