@@ -1,8 +1,7 @@
 [![Build Status](https://travis-ci.org/Grigory-Rylov/android-instrumental-test-runner.svg?branch=master)](https://travis-ci.org/Grigory-Rylov/android-instrumental-test-runner)
 [![Quality Gate](https://sonarcloud.io/api/badges/gate?key=com.github.grishberg:android-instrumental-test-runner)](https://sonarcloud.io/dashboard/index/com.github.grishberg:android-instrumental-test-runner) [![Technical debt ratio](https://sonarcloud.io/api/badges/measure?key=com.github.grishberg:android-instrumental-test-runner&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard/index/com.github.grishberg:android-instrumental-test-runner)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.github.grishberg%3Aandroid-instrumental-test-runner&metric=coverage)](https://sonarcloud.io/api/project_badges/measure?project=com.github.grishberg%3Aandroid-instrumental-test-runner&metric=coverage)
-[![Download](https://api.bintray.com/packages/grigory-rylov/gradle/android-instrumental-test-runner/images/download.svg) ](https://bintray.com/grigory-rylov/gradle/android-instrumental-test-runner/_latestVersion)
-
+[![Download](https://api.bintray.com/packages/grigory-rylov/android/android-instrumental-test-runner-core/images/download.svg) ](https://bintray.com/grigory-rylov/android/android-instrumental-test-runner-core/_latestVersion)
 # android-instrumentation-test-runner-core
 Runner for espresso tests
 
