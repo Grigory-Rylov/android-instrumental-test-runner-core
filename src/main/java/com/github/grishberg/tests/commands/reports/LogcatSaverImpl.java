@@ -53,7 +53,7 @@ public class LogcatSaverImpl implements LogcatSaver {
         File outFile = new File(logcatDir, String.format("%s-%s.log", device.getName(), testName));
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outFile))) {
             writer.write(logcat);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new CommandExecutionException(e);
         }
     }

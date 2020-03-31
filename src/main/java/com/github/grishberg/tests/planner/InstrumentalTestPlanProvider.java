@@ -59,7 +59,7 @@ public class InstrumentalTestPlanProvider {
 
         try {
             device.executeShellCommand(command.toString(), receiver, 0, TimeUnit.SECONDS);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new CommandExecutionException(e);
         }
 

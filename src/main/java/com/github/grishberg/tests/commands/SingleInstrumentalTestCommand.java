@@ -161,7 +161,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
             testRunListener.failLastTest(failMessage);
             testTracker.failLastTest(failMessage);
             testRunListener.testRunEnded(0, new HashMap<>());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new CommandExecutionException("SingleInstrumentalTestCommand.execute failed:", e);
         }
 
