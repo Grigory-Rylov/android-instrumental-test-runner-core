@@ -1,9 +1,16 @@
 package com.github.grishberg.tests.common
 
 import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 
-class FileLogger : RunnerLogger {
-    private val logger = LogManager.getLogger(FileLogger::class.java.name)
+class FileLogger(
+        logOutputDir: String
+) : RunnerLogger {
+    private val logger: Logger
+    init {
+        System.setProperty("grishberg.instrumentation.test.runner.logDir", logOutputDir)
+        logger = LogManager.getLogger(FileLogger::class.java.name)
+    }
 
     override fun w(tag: String, message: String) {
         logger.warn("$tag : $message")
