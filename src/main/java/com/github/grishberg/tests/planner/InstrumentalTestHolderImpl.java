@@ -47,6 +47,11 @@ public class InstrumentalTestHolderImpl implements InstrumentalTestHolder {
         return compoundPlans;
     }
 
+    @Override
+    public int size() {
+        return planList.size();
+    }
+
     /**
      * Returns tree-items in flat list.
      */

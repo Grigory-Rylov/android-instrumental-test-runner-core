@@ -10,4 +10,9 @@ public interface InstrumentalTestHolder {
     Iterator<TestPlanElement> provideTestNodeElementsIterator();
 
     List<TestPlanElement> provideCompoundTestPlan();
+
+    /**
+     * Returns total count of tests (TestPlanElement items) that this class holds.
+     */
+    int size();
 }
