@@ -14,6 +14,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Wraps {@link IDevice} interface.
+ *
+ * Adds useful extra utility methods like pullCoverageFile(), getWidth(), getHeight(), etc.
+ * Adds synchronization (no parallel commands when multiple devices are connected).
+ * Adds verbose logging.
  */
 public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellExecuter {
     private static final String TAG = ConnectedDeviceWrapper.class.getSimpleName();
@@ -35,6 +39,8 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
                                                  long maxTimeToOutputResponse,
                                                  TimeUnit maxTimeUnits) throws TimeoutException,
             AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        logger.d(TAG, "Execute shell command on {}: \"{}\"",
+                device.getName(), command);
         device.executeShellCommand(command, receiver, maxTimeToOutputResponse, maxTimeUnits);
     }
 
@@ -121,6 +127,8 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
 
     @Override
     public synchronized void pullFile(String temporaryCoverageCopy, String path) throws CommandExecutionException {
+        logger.d(TAG, "Pull file from {}: \"{}\"",
+                device.getName(), path);
         try {
             device.pullFile(temporaryCoverageCopy, path);
         } catch (Throwable e) {
@@ -138,6 +146,8 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
 
     public synchronized void installPackage(String absolutePath, boolean reinstall, String extraArgument)
             throws InstallException {
+        logger.d(TAG, "Install package on {}: \"{}\"",
+                device.getName(), absolutePath);
         device.installPackage(absolutePath, reinstall, extraArgument);
     }
 
@@ -158,6 +168,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
                                               final ILogger logger) throws PullCoverageException {
         MultiLineReceiver outputReceiver = new MultilineLoggerReceiver(logger);
 
+        // TODO: Why another logger is used here?
         logger.verbose("ConnectedDeviceWrapper '%s': fetching coverage data from %s",
                 getName(), coverageFile);
         try {
@@ -182,6 +193,8 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
                                                  long maxTimeout, long maxTimeToOutputResponse,
                                                  TimeUnit maxTimeUnits) throws TimeoutException,
             AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        logger.d(TAG, "Execute shell command on {}: \"{}\"",
+                device.getName(), command);
         device.executeShellCommand(command, receiver, maxTimeout, maxTimeToOutputResponse, maxTimeUnits);
     }
 
