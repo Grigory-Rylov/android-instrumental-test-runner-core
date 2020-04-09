@@ -29,8 +29,6 @@ public class DefaultCommandProviderTest {
     private static final AnnotationInfo ANNOTATION = new AnnotationInfo("TestAnnotation");
     private static final String PROJECT_NAME = "test_project";
     @Mock
-    InstrumentalExtension extension;
-    @Mock
     InstrumentationArgsProvider argsProvider;
     @Mock
     RunnerLogger logger;
@@ -38,8 +36,6 @@ public class DefaultCommandProviderTest {
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
     InstrumentalTestPlanProvider planProvider;
-    @Mock
-    Environment environment;
     @Mock
     CommandsForAnnotationProvider commandsForAnnotationProvider;
     @Mock
@@ -53,6 +49,7 @@ public class DefaultCommandProviderTest {
 
     @Before
     public void setUp() throws Exception {
+        when(context.getLogger()).thenReturn(logger);
         ArrayList<AnnotationInfo> emptyAnnotations = new ArrayList<>();
         when(element.getAnnotations()).thenReturn(emptyAnnotations);
         List<AnnotationInfo> annotations = Arrays.asList(ANNOTATION);
@@ -67,13 +64,13 @@ public class DefaultCommandProviderTest {
         when(planProvider.provideTestPlan(deviceWrapper, ARGS)).thenReturn(testPlanElements);
         when(argsProvider.provideInstrumentationArgs(deviceWrapper)).thenReturn(ARGS);
         provider = new DefaultCommandProvider(PROJECT_NAME, argsProvider,
-                commandsForAnnotationProvider, logger);
+                commandsForAnnotationProvider);
     }
 
     @Test
     public void provideCommandsForDevice() throws Exception {
         List<DeviceRunnerCommand> commandList = provider.provideCommandsForDevice(deviceWrapper,
-                planProvider, environment);
+                planProvider, context);
         Assert.assertEquals(3, commandList.size());
         Assert.assertTrue(commandList.get(0) instanceof SetAnimationSpeedCommand);
 
@@ -92,7 +89,7 @@ public class DefaultCommandProviderTest {
         when(commandsForAnnotationProvider.provideCommand(annotations))
                 .thenReturn(clearCommand);
         List<DeviceRunnerCommand> commandList = provider.provideCommandsForDevice(deviceWrapper,
-                planProvider, environment);
+                planProvider, context);
         Assert.assertEquals(4, commandList.size());
         Assert.assertTrue(commandList.get(0) instanceof SetAnimationSpeedCommand);
 
@@ -111,7 +108,7 @@ public class DefaultCommandProviderTest {
                 Arrays.asList(element, elementWithAnnotation));
 
         List<DeviceRunnerCommand> commandList = provider.provideCommandsForDevice(deviceWrapper,
-                planProvider, environment);
+                planProvider, context);
         Assert.assertEquals(5, commandList.size());
         Assert.assertTrue(commandList.get(0) instanceof SetAnimationSpeedCommand);
 

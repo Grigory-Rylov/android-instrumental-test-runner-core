@@ -17,22 +17,21 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
     private final String projectName;
     private final InstrumentationArgsProvider argsProvider;
     private final CommandsForAnnotationProvider commandsForAnnotationProvider;
-    private final RunnerLogger logger;
 
     DefaultCommandProvider(String projectName,
                            InstrumentationArgsProvider argsProvider,
-                           CommandsForAnnotationProvider commandsForAnnotationProvider,
-                           RunnerLogger logger) {
+                           CommandsForAnnotationProvider commandsForAnnotationProvider) {
         this.projectName = projectName;
         this.argsProvider = argsProvider;
         this.commandsForAnnotationProvider = commandsForAnnotationProvider;
-        this.logger = logger;
     }
 
     @Override
     public List<DeviceRunnerCommand> provideCommandsForDevice(ConnectedDeviceWrapper device,
                                                               InstrumentalTestPlanProvider testPlanProvider,
-                                                              Environment environment) throws CommandExecutionException {
+                                                              TestRunnerContext context)
+            throws CommandExecutionException {
+        RunnerLogger logger = context.getLogger();
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         commands.add(new SetAnimationSpeedCommand(0, 0, 0));
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);

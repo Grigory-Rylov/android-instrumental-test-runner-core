@@ -54,7 +54,7 @@ public class DeviceCommandsRunnerTest {
         commands.add(command);
         when(context.getLogger()).thenReturn(logger);
         when(context.getEnvironment()).thenReturn(environment);
-        when(commandProvider.provideCommandsForDevice(deviceWrapper, planProvider, environment))
+        when(commandProvider.provideCommandsForDevice(eq(deviceWrapper), eq(planProvider), any()))
                 .thenReturn(commands);
         when(command.execute(eq(deviceWrapper), any())).thenReturn(result);
         devices = Arrays.asList(deviceWrapper);

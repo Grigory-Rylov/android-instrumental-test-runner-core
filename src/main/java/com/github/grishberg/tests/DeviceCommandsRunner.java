@@ -39,7 +39,7 @@ class DeviceCommandsRunner {
 
                 try {
                     List<DeviceRunnerCommand> commands = commandProvider.provideCommandsForDevice(device,
-                            testPlanProvider, environment);
+                            testPlanProvider, context);
                     for (DeviceRunnerCommand command : commands) {
                         logger.i(TAG, "Before executing device = {} command = {}",
                                 device, command.toString());
