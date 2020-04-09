@@ -34,7 +34,8 @@ public class InstrumentalTestPlanProvider {
 
     public List<TestPlanElement> provideTestPlan(ConnectedDeviceWrapper device,
                                                  Map<String, String> instrumentalArgs) throws CommandExecutionException {
-        logger.i(TAG, "provideTestPlan for device {}", device.getName());
+        logger.i(TAG, "Get list of tests in \"{}\" app on {}",
+                instrumentationInfo.getInstrumentalPackage(), device.getName());
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");
 
@@ -62,6 +63,9 @@ public class InstrumentalTestPlanProvider {
         } catch (Throwable e) {
             throw new CommandExecutionException(e);
         }
+        logger.i(TAG, "Found {} tests in {} using device {}",
+                receiver.getTestInstances().size(), instrumentationInfo.getInstrumentalPackage(),
+                device.getName());
 
         return receiver.getTestInstances();
     }

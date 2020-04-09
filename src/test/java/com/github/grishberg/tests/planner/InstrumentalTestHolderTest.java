@@ -42,4 +42,9 @@ public class InstrumentalTestHolderTest {
         List<TestPlanElement> elements = holder.provideCompoundTestPlan();
         Assert.assertEquals(3, elements.size());
     }
+
+    @Test
+    public void size() {
+        Assert.assertEquals(7, holder.size());
+    }
 }
