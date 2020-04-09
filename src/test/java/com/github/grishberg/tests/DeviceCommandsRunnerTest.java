@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -54,7 +56,7 @@ public class DeviceCommandsRunnerTest {
         when(context.getEnvironment()).thenReturn(environment);
         when(commandProvider.provideCommandsForDevice(deviceWrapper, planProvider, environment))
                 .thenReturn(commands);
-        when(command.execute(deviceWrapper, context)).thenReturn(result);
+        when(command.execute(eq(deviceWrapper), any())).thenReturn(result);
         devices = Arrays.asList(deviceWrapper);
         runner = new DeviceCommandsRunner(planProvider, commandProvider);
     }
@@ -62,20 +64,20 @@ public class DeviceCommandsRunnerTest {
     @Test
     public void runCommands() throws Exception {
         Assert.assertTrue(runner.runCommands(devices, context));
-        verify(command).execute(deviceWrapper, context);
+        verify(command).execute(eq(deviceWrapper), any());
     }
 
     @Test
     public void runCommandsReturnFalseWhenHasFailedTests() throws Exception {
         when(result.isFailed()).thenReturn(true);
         Assert.assertFalse(runner.runCommands(devices, context));
-        verify(command).execute(deviceWrapper, context);
+        verify(command).execute(eq(deviceWrapper), any());
     }
 
     @Test(expected = CommandExecutionException.class)
     public void logErrorWhenException() throws Exception {
         CommandExecutionException exception = new CommandExecutionException("Exception", new Throwable());
-        when(command.execute(deviceWrapper, context))
+        when(command.execute(eq(deviceWrapper), any()))
                 .thenThrow(exception);
         runner.runCommands(devices, context);
         verify(logger).e("DCR", "Execute command exception:", exception);
@@ -84,7 +86,7 @@ public class DeviceCommandsRunnerTest {
     @Test(expected = CommandExecutionException.class)
     public void throwExecuteCommandExceptionWhenOtherException() throws Exception {
         NullPointerException exception = new NullPointerException();
-        when(command.execute(deviceWrapper, context))
+        when(command.execute(eq(deviceWrapper), any()))
                 .thenThrow(exception);
         runner.runCommands(devices, context);
         verify(logger).e("DCR", "Execute command exception:", exception);
@@ -93,7 +95,7 @@ public class DeviceCommandsRunnerTest {
     @Test(expected = ProcessCrashedException.class)
     public void throwProcessCrashedExceptionWhenProcessCrashed() throws Exception {
         ProcessCrashedException exception = new ProcessCrashedException("test process crashed");
-        when(command.execute(deviceWrapper, context))
+        when(command.execute(eq(deviceWrapper), any()))
                 .thenThrow(exception);
         runner.runCommands(devices, context);
         verify(logger).e("DCR", "Execute command exception:", exception);

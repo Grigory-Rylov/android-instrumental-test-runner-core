@@ -121,7 +121,8 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     }
 
     private TestsCommandResult executeImpl(ConnectedDeviceWrapper targetDevice,
-                                           TestRunnerContext context) throws CommandExecutionException {
+                                           TestRunnerContext context,
+                                           RunnerLogger logger) throws CommandExecutionException {
         InstrumentalExtension instrumentationInfo = context.getInstrumentalInfo();
         Environment environment = context.getEnvironment();
 
@@ -134,7 +135,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         String singleTestMethodPrefix = String.format("%s#%s", targetDevice.getName(), testName);
         TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();
 
-        TestTracker testTracker = new TestTracker(context.getLogger());
+        TestTracker testTracker = new TestTracker(logger);
         ProcessCrashedException processCrashedException = null;
         try {
             testRunnerBuilder.getTestRunner().run(testRunListener, testTracker);
@@ -151,7 +152,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                         singleTestMethodPrefix,
                         testRunnerBuilder.getCoverageFile(),
                         environment.getCoverageDir(),
-                        testRunnerBuilder.getRunTestLogger());
+                        logger);
             }
         } catch (ProcessCrashedException e) {
             processCrashedException = e;
@@ -184,7 +185,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
             SingleInstrumentalTestCommand command = commands.poll();
             testsLeft = command.allPlannedTests;
             int lastSize = testsLeft.size();
-            TestsCommandResult testsResult = command.executeImpl(targetDevice, context);
+            TestsCommandResult testsResult = command.executeImpl(targetDevice, context, logger);
             failedTests.addAll(testsResult.failedTests);
             if (!testsResult.failedTests.isEmpty()) {
                 result.setFailed(true);
@@ -322,7 +323,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         @NotNull
         private String getTestMethodName(@NotNull TestIdentifier test) {
             String methodName = test.getTestName();
-            if (methodName.indexOf('[') > 0 ) {
+            if (methodName.indexOf('[') > 0) {
                 methodName = methodName.substring(0, test.getTestName().indexOf('['));
             }
             return methodName;
@@ -372,9 +373,6 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
          * is ready.
          * <br/>If retry isn't needed, return empty list or use {@link #NOOP}
          * <br/><b>NOTE:</b> new tests commands must have different test name than previous one.
-         *
-         * @param failedTests from previous tests command.
-         * @param providedInstrumentationArgs for previous test command.
          */
         @NotNull
         List<DeviceRunnerCommand> getRetryCommands(

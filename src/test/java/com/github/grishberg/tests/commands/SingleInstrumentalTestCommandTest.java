@@ -1,11 +1,9 @@
 package com.github.grishberg.tests.commands;
 
-import com.android.ddmlib.IDevice;
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.ddmlib.testrunner.TestRunResult;
-import com.android.utils.ILogger;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalExtension;
@@ -36,7 +34,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,8 +49,6 @@ public class SingleInstrumentalTestCommandTest {
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
-    IDevice device;
-    @Mock
     Environment environment;
     @Mock
     RunnerLogger logger;
@@ -67,8 +62,6 @@ public class SingleInstrumentalTestCommandTest {
     RemoteAndroidTestRunner testRunner;
     @Mock
     TestRunResult testRunResult;
-    @Mock
-    ILogger iLogger;
     @Mock
     File coverageDir;
 
@@ -88,7 +81,7 @@ public class SingleInstrumentalTestCommandTest {
         when(context.getInstrumentalInfo()).thenReturn(ext);
         when(context.getEnvironment()).thenReturn(environment);
         when(context.getProcessCrashedHandler()).thenReturn(processCrashedHandler);
-        when(context.getLogger()).thenReturn(mock(RunnerLogger.class));
+        when(context.getLogger()).thenReturn(logger);
         when(environment.getCoverageDir()).thenReturn(coverageDir);
         doAnswer((Answer<TestRunnerBuilder>) invocation -> {
             instrumentationArgs = invocation.getArgument(2);
@@ -97,7 +90,6 @@ public class SingleInstrumentalTestCommandTest {
 
         when(testRunnerBuilder.getTestRunListener()).thenReturn(reportsGenerator);
         when(testRunnerBuilder.getTestRunner()).thenReturn(testRunner);
-        when(testRunnerBuilder.getRunTestLogger()).thenReturn(iLogger);
         when(testRunnerBuilder.getCoverageFile()).thenReturn("coverage_file");
 
         when(reportsGenerator.getRunResult()).thenReturn(testRunResult);
@@ -125,7 +117,7 @@ public class SingleInstrumentalTestCommandTest {
                 "test_device#test_prefix",
                 "coverage_file",
                 coverageDir,
-                iLogger);
+                logger);
     }
 
     @Test
@@ -140,7 +132,7 @@ public class SingleInstrumentalTestCommandTest {
                 anyString(),
                 anyString(),
                 any(File.class),
-                any(ILogger.class));
+                any(RunnerLogger.class));
     }
 
     @Test(expected = CommandExecutionException.class)

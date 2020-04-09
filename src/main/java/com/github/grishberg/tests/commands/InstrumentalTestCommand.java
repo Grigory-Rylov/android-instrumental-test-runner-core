@@ -55,7 +55,7 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
                         coverageOutFilePrefix,
                         testRunnerBuilder.getCoverageFile(),
                         environment.getCoverageDir(),
-                        testRunnerBuilder.getRunTestLogger());
+                        context.getLogger());
             }
         } catch (Throwable e) {
             throw new CommandExecutionException("InstrumentalTestCommand.execute failed:", e);
