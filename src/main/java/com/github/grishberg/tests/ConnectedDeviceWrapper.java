@@ -2,6 +2,7 @@ package com.github.grishberg.tests;
 
 import com.android.ddmlib.*;
 import com.github.grishberg.tests.commands.CommandExecutionException;
+import com.github.grishberg.tests.common.DeviceRunnerLogger;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.common.ScreenSizeParser;
 import com.github.grishberg.tests.exceptions.PullCoverageException;
@@ -29,7 +30,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
 
     public ConnectedDeviceWrapper(IDevice device, RunnerLogger logger) {
         this.device = device;
-        this.logger = logger;
+        this.logger = new DeviceRunnerLogger(this, logger);
     }
 
     @Override

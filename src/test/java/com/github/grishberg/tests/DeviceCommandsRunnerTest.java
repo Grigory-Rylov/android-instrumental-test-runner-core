@@ -43,7 +43,7 @@ public class DeviceCommandsRunnerTest {
     @Mock
     DeviceCommandResult result;
     @Mock
-    TestRunnerContext context;
+    InternalContext context;
     private List<DeviceRunnerCommand> commands;
     private List<ConnectedDeviceWrapper> devices;
     private DeviceCommandsRunner runner;

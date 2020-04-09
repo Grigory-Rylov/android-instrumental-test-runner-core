@@ -6,9 +6,9 @@ import com.github.grishberg.tests.common.DeviceRunnerLogger
 /**
  * Wrapper for [TestRunnerContext] that holds reference to current [ConnectedDeviceWrapper]
  */
-class DeviceSpecificTestRunnerContext(
+internal class DeviceSpecificTestRunnerContext(
         device: ConnectedDeviceWrapper,
-        private val context: TestRunnerContext
+        private val context: InternalContext
 ) : TestRunnerContext {
     private val logger = DeviceRunnerLogger(device, context.getLogger())
 
@@ -30,7 +30,12 @@ class DeviceSpecificTestRunnerContext(
             instrumentationArgs: Map<String, String>,
             targetDevice: ConnectedDeviceWrapper,
             xmlDelegate: XmlReportGeneratorDelegate): TestRunnerBuilder {
-        return context.createTestRunnerBuilder(projectName, testName, instrumentationArgs, targetDevice, xmlDelegate)
+        return return TestRunnerBuilder(projectName,
+                testName,
+                instrumentationArgs,
+                targetDevice,
+                this,
+                xmlDelegate)
     }
 
     override fun setProcessCrashHandler(handler: ProcessCrashHandler) {

@@ -27,7 +27,7 @@ class DeviceCommandsRunner {
         this.commandProvider = commandProvider;
     }
 
-    boolean runCommands(List<ConnectedDeviceWrapper> devices, final TestRunnerContext ctx) throws InterruptedException,
+    boolean runCommands(List<ConnectedDeviceWrapper> devices, final InternalContext ctx) throws InterruptedException,
             CommandExecutionException {
         final CountDownLatch deviceCounter = new CountDownLatch(devices.size());
         final Environment environment = ctx.getEnvironment();

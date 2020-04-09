@@ -53,7 +53,7 @@ public class InstrumentationTestLauncherTest {
         List<ConnectedDeviceWrapper> devicesList = Arrays.asList(deviceWrapper);
         when((adbWrapper.provideDevices())).thenReturn(devicesList);
         when(deviceCommandsRunnerFabric.provideDeviceCommandRunner(any(DeviceRunnerCommandProvider.class))).thenReturn(runner);
-        when(runner.runCommands(eq(devicesList), any(TestRunnerContext.class))).thenReturn(true);
+        when(runner.runCommands(eq(devicesList), any())).thenReturn(true);
         launcher = provideTask();
         launcher.initAfterApply(adbWrapper, deviceCommandsRunnerFabric, logger);
     }

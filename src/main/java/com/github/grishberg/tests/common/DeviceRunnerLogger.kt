@@ -10,34 +10,36 @@ class DeviceRunnerLogger(
         private val logger: RunnerLogger
 ) : RunnerLogger {
     override fun w(tag: String, message: String) {
-        logger.w("$tag/${device.name}", message)
+        logger.w(buildTagWithDevice(tag), message)
     }
 
     override fun i(tag: String, message: String) {
-        logger.i("$tag/${device.name}", message)
+        logger.i(buildTagWithDevice(tag), message)
     }
 
     override fun i(tag: String, msgFormat: String, vararg args: Any?) {
-        logger.i("$tag/${device.name}", msgFormat, args)
+        logger.i(buildTagWithDevice(tag), msgFormat, args)
     }
 
     override fun d(tag: String, message: String?) {
-        logger.d("$tag/${device.name}", message);
+        logger.d(buildTagWithDevice(tag), message)
     }
 
     override fun d(tag: String, msgFormat: String, vararg args: Any?) {
-        logger.d("$tag/${device.name}", msgFormat, args)
+        logger.d(buildTagWithDevice(tag), msgFormat, args)
     }
 
     override fun e(tag: String, message: String?) {
-        logger.e("$tag/${device.name}", message);
+        logger.e(buildTagWithDevice(tag), message)
     }
 
     override fun e(tag: String, message: String?, throwable: Throwable?) {
-        logger.e("$tag/${device.name}", message, throwable);
+        logger.e(buildTagWithDevice(tag), message, throwable)
     }
 
     override fun w(tag: String, msgFormat: String, vararg args: Any?) {
-        logger.w("$tag/${device.name}", msgFormat, args)
+        logger.w(buildTagWithDevice(tag), msgFormat, args)
     }
+
+    private fun buildTagWithDevice(tag: String) = "${device.name} / $tag"
 }

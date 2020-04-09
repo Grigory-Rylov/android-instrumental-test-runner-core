@@ -98,7 +98,7 @@ public class InstrumentationTestLauncher {
                 getReportsDir(), getCoverageDir());
         DeviceCommandsRunner runner = deviceCommandsRunnerFabric.provideDeviceCommandRunner(commandProvider);
 
-        TestRunnerContext context = new TestRunnerContextImpl(instrumentationInfo,
+        InternalContext context = new InternalContext(instrumentationInfo,
                 environment, screenshotRelations, logger);
         if (processCrashedHandler != null) {
             context.setProcessCrashHandler(processCrashedHandler);
