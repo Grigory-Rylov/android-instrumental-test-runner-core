@@ -61,7 +61,7 @@ public class DefaultCommandProviderTest {
                 .thenReturn(new ArrayList<>());
 
         List<TestPlanElement> testPlanElements = Arrays.asList(element);
-        when(planProvider.provideTestPlan(deviceWrapper, ARGS)).thenReturn(testPlanElements);
+        when(planProvider.provideTestPlan(deviceWrapper, context,  ARGS)).thenReturn(testPlanElements);
         when(argsProvider.provideInstrumentationArgs(deviceWrapper)).thenReturn(ARGS);
         provider = new DefaultCommandProvider(PROJECT_NAME, argsProvider,
                 commandsForAnnotationProvider);
@@ -104,7 +104,7 @@ public class DefaultCommandProviderTest {
 
     @Test
     public void provideCommandsWhenHasAnnotations() throws Exception {
-        when(planProvider.provideTestPlan(deviceWrapper, ARGS)).thenReturn(
+        when(planProvider.provideTestPlan(deviceWrapper, context, ARGS)).thenReturn(
                 Arrays.asList(element, elementWithAnnotation));
 
         List<DeviceRunnerCommand> commandList = provider.provideCommandsForDevice(deviceWrapper,

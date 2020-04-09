@@ -96,8 +96,7 @@ public class InstrumentationTestLauncher {
 
         Environment environment = new Environment(getResultsDir(),
                 getReportsDir(), getCoverageDir());
-        DeviceCommandsRunner runner = deviceCommandsRunnerFabric
-                .provideDeviceCommandRunner(logger, commandProvider);
+        DeviceCommandsRunner runner = deviceCommandsRunnerFabric.provideDeviceCommandRunner(commandProvider);
 
         TestRunnerContext context = new TestRunnerContextImpl(instrumentationInfo,
                 environment, screenshotRelations, logger);

@@ -2,6 +2,7 @@ package com.github.grishberg.tests.planner;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalExtension;
+import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,21 +31,24 @@ public class InstrumentalTestPlanProviderTest {
     PackageTreeGenerator treeGenerator;
     @Mock
     RunnerLogger logger;
+    @Mock
+    TestRunnerContext context;
     Map<String, String> paramsMap = new HashMap<>();
 
     @Before
     public void setUp() {
+        when(context.getLogger()).thenReturn(logger);
         extension.setInstrumentListener("test_listener");
         extension.setInstrumentalRunner("TestRunner");
         extension.setInstrumentalPackage("TestAppPackage");
-        provider = new InstrumentalTestPlanProvider(paramsMap, extension, treeGenerator, logger);
+        provider = new InstrumentalTestPlanProvider(paramsMap, extension, treeGenerator);
     }
 
     @Test
     public void provideTestPlan() throws Exception {
         HashMap<String, String> args = new HashMap<>();
 
-        provider.provideTestPlan(deviceWrapper, args);
+        provider.provideTestPlan(deviceWrapper, context, args);
 
         verify(deviceWrapper).executeShellCommand(eq(RUN_LOG_COMMAND), any(InstrumentTestLogParser.class),
                 eq(0L), eq(TimeUnit.SECONDS));
@@ -53,10 +57,10 @@ public class InstrumentalTestPlanProviderTest {
     @Test
     public void sendAdditionalArgTestClass() throws Exception {
         paramsMap.put("testClass", "com.test.SpecialTest");
-        provider = new InstrumentalTestPlanProvider(paramsMap, extension, treeGenerator, logger);
+        provider = new InstrumentalTestPlanProvider(paramsMap, extension, treeGenerator);
         HashMap<String, String> args = new HashMap<>();
 
-        provider.provideTestPlan(deviceWrapper, args);
+        provider.provideTestPlan(deviceWrapper, context, args);
 
         verify(deviceWrapper).executeShellCommand(eq(RUN_LOG_COMMAND_WITH_ARG), any(InstrumentTestLogParser.class),
                 eq(0L), eq(TimeUnit.SECONDS));

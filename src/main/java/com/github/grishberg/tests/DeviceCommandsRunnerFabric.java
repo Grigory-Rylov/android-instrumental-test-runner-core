@@ -23,13 +23,12 @@ public class DeviceCommandsRunnerFabric {
         this.packageTreeGenerator = packageTreeGenerator;
     }
 
-    private InstrumentalTestPlanProvider createInstrumentalTestPlanProvider(RunnerLogger logger) {
+    private InstrumentalTestPlanProvider createInstrumentalTestPlanProvider() {
         return new InstrumentalTestPlanProvider(propertiesMap, instrumentationInfo,
-                packageTreeGenerator, logger);
+                packageTreeGenerator);
     }
 
-    DeviceCommandsRunner provideDeviceCommandRunner(RunnerLogger logger,
-                                                    DeviceRunnerCommandProvider commandProvider) {
-        return new DeviceCommandsRunner(createInstrumentalTestPlanProvider(logger), commandProvider);
+    DeviceCommandsRunner provideDeviceCommandRunner(DeviceRunnerCommandProvider commandProvider) {
+        return new DeviceCommandsRunner(createInstrumentalTestPlanProvider(), commandProvider);
     }
 }

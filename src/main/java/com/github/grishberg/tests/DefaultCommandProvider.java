@@ -37,7 +37,7 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
         logger.i(TAG, "provideCommandsForDevice: device = {}, args = {}",
                 device, instrumentalArgs);
-        List<TestPlanElement> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
+        List<TestPlanElement> planSet = testPlanProvider.provideTestPlan(device, context, instrumentalArgs);
 
         List<TestPlanElement> planList = new ArrayList<>();
         int testIndex = 0;
