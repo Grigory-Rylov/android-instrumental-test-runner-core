@@ -2,6 +2,7 @@ package com.github.grishberg.tests.planner;
 
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.InstrumentalExtension;
+import com.github.grishberg.tests.TestRunnerContext;
 import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.RunnerLogger;
 
@@ -20,20 +21,19 @@ public class InstrumentalTestPlanProvider {
     private final InstrumentalExtension instrumentationInfo;
     private final Map<String, String> propertiesMap;
     private final PackageTreeGenerator packageTreeGenerator;
-    private final RunnerLogger logger;
 
     public InstrumentalTestPlanProvider(Map<String, String> propertiesMap,
                                         InstrumentalExtension instrumentationInfo,
-                                        PackageTreeGenerator packageTreeGenerator,
-                                        RunnerLogger logger) {
+                                        PackageTreeGenerator packageTreeGenerator) {
         this.propertiesMap = Collections.unmodifiableMap(propertiesMap);
         this.instrumentationInfo = new InstrumentalExtension(instrumentationInfo);
         this.packageTreeGenerator = packageTreeGenerator;
-        this.logger = logger;
     }
 
     public List<TestPlanElement> provideTestPlan(ConnectedDeviceWrapper device,
+                                                 TestRunnerContext context,
                                                  Map<String, String> instrumentalArgs) throws CommandExecutionException {
+        RunnerLogger logger = context.getLogger();
         logger.i(TAG, "provideTestPlan for device {}", device.getName());
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");
@@ -82,9 +82,10 @@ public class InstrumentalTestPlanProvider {
      * @return test holder contains all test methods in project.
      */
     public InstrumentalTestHolder provideInstrumentalTests(ConnectedDeviceWrapper device,
+                                                           TestRunnerContext context,
                                                            Map<String, String> instrumentalArgs) throws CommandExecutionException {
-        // TODO: create fabric
-        return new InstrumentalTestHolderImpl(provideTestPlan(device, instrumentalArgs), packageTreeGenerator);
+        // TODO: create factory
+        return new InstrumentalTestHolderImpl(provideTestPlan(device, context, instrumentalArgs), packageTreeGenerator);
     }
 
     private class TestLogParserLogger implements InstrumentTestLogParser.ParserLogger {
