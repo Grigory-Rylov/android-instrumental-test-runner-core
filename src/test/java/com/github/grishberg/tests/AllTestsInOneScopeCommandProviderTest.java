@@ -36,18 +36,19 @@ public class AllTestsInOneScopeCommandProviderTest {
     @Mock
     InstrumentalTestPlanProvider planProvider;
     @Mock
-    Environment environment;
+    TestRunnerContext context;
 
     @Before
     public void setUp() throws Exception {
+        when(context.getLogger()).thenReturn(logger);
         when(argsProvider.provideInstrumentationArgs(deviceWrapper)).thenReturn(ARGS);
-        provider = new AllTestsInOneScopeCommandProvider(PROJECT_NAME, argsProvider, logger);
+        provider = new AllTestsInOneScopeCommandProvider(PROJECT_NAME, argsProvider);
     }
 
     @Test
     public void provideCommandsForDevice() throws Exception {
         List<DeviceRunnerCommand> commandList = provider.provideCommandsForDevice(deviceWrapper,
-                planProvider, environment);
+                planProvider, context);
         Assert.assertEquals(1, commandList.size());
         DeviceRunnerCommand command = commandList.get(0);
         Assert.assertNotNull(command);

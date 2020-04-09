@@ -133,7 +133,7 @@ public class InstrumentationTestLauncher {
         if (commandProvider == null) {
             logger.i(TAG, "command provider is empty, use DefaultCommandProvider");
             commandProvider = new DefaultCommandProvider(projectName,
-                    instrumentationArgsProvider, commandsForAnnotationProvider, logger);
+                    instrumentationArgsProvider, commandsForAnnotationProvider);
         }
     }
 

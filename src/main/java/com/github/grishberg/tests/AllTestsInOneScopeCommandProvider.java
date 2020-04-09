@@ -17,20 +17,18 @@ public class AllTestsInOneScopeCommandProvider implements DeviceRunnerCommandPro
     private static final String TAG = AllTestsInOneScopeCommandProvider.class.getSimpleName();
     private final String projectName;
     private final InstrumentationArgsProvider argsProvider;
-    private final RunnerLogger logger;
 
     public AllTestsInOneScopeCommandProvider(String projectName,
-                                             InstrumentationArgsProvider argsProvider,
-                                             RunnerLogger logger) {
+                                             InstrumentationArgsProvider argsProvider) {
         this.projectName = projectName;
         this.argsProvider = argsProvider;
-        this.logger = logger;
     }
 
     @Override
     public List<DeviceRunnerCommand> provideCommandsForDevice(ConnectedDeviceWrapper device,
                                                               InstrumentalTestPlanProvider testPlanProvider,
-                                                              Environment environment) {
+                                                              TestRunnerContext context) {
+        RunnerLogger logger = context.getLogger();
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
         logger.i(TAG, "device = {}, args = {}",
