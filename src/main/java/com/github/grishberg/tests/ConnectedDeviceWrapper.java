@@ -1,7 +1,6 @@
 package com.github.grishberg.tests;
 
 import com.android.ddmlib.*;
-import com.android.utils.ILogger;
 import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.common.ScreenSizeParser;
@@ -14,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Wraps {@link IDevice} interface.
- *
+ * <p>
  * Adds useful extra utility methods like pullCoverageFile(), getWidth(), getHeight(), etc.
  * Adds synchronization (no parallel commands when multiple devices are connected).
  * Adds verbose logging.
@@ -165,12 +164,11 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
                                               String coverageFilePrefix,
                                               String coverageFile,
                                               File outCoverageDir,
-                                              final ILogger logger) throws PullCoverageException {
+                                              RunnerLogger logger) throws PullCoverageException {
         MultiLineReceiver outputReceiver = new MultilineLoggerReceiver(logger);
 
         // TODO: Why another logger is used here?
-        logger.verbose("ConnectedDeviceWrapper '%s': fetching coverage data from %s",
-                getName(), coverageFile);
+        logger.i(TAG, "fetching coverage data from %s", coverageFile);
         try {
             String temporaryCoverageCopy = "/data/local/tmp/" + instrumentationInfo.getApplicationId()
                     + "." + COVERAGE_FILE_NAME;
@@ -224,16 +222,16 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     }
 
     private class MultilineLoggerReceiver extends MultiLineReceiver {
-        private final ILogger logger;
+        private final RunnerLogger logger;
 
-        MultilineLoggerReceiver(ILogger logger) {
+        MultilineLoggerReceiver(RunnerLogger logger) {
             this.logger = logger;
         }
 
         @Override
         public void processNewLines(String[] lines) {
             for (String line : lines) {
-                logger.verbose(line);
+                logger.i(TAG, line);
             }
         }
 

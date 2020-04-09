@@ -20,9 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -109,8 +107,8 @@ public class ConnectedDeviceWrapperTest {
     @Test
     public void pullCoverageFile() throws Exception {
         deviceWrapper.pullCoverageFile(extension, "coverageFilePrefix", "coverageFile",
-                coverageFile, logger);
-        verify(logger).verbose(anyString(), anyString(), anyString());
+                coverageFile, runnerLogger);
+        verify(runnerLogger).i(anyString(), anyString(), anyString());
     }
 
     @Test

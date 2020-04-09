@@ -99,7 +99,7 @@ public class InstrumentationTestLauncher {
         DeviceCommandsRunner runner = deviceCommandsRunnerFabric
                 .provideDeviceCommandRunner(logger, commandProvider);
 
-        TestRunnerContext context = new TestRunnerContext(instrumentationInfo,
+        TestRunnerContext context = new TestRunnerContextImpl(instrumentationInfo,
                 environment, screenshotRelations, logger);
         if (processCrashedHandler != null) {
             context.setProcessCrashHandler(processCrashedHandler);
