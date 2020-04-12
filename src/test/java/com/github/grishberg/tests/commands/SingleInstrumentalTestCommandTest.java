@@ -52,8 +52,6 @@ public class SingleInstrumentalTestCommandTest {
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
-    IDevice device;
-    @Mock
     Environment environment;
     @Mock
     RunnerLogger logger;
@@ -67,8 +65,6 @@ public class SingleInstrumentalTestCommandTest {
     RemoteAndroidTestRunner testRunner;
     @Mock
     TestRunResult testRunResult;
-    @Mock
-    ILogger iLogger;
     @Mock
     File coverageDir;
 
@@ -88,7 +84,7 @@ public class SingleInstrumentalTestCommandTest {
         when(context.getInstrumentalInfo()).thenReturn(ext);
         when(context.getEnvironment()).thenReturn(environment);
         when(context.getProcessCrashedHandler()).thenReturn(processCrashedHandler);
-        when(context.getLogger()).thenReturn(mock(RunnerLogger.class));
+        when(deviceWrapper.getLogger()).thenReturn(mock(RunnerLogger.class));
         when(environment.getCoverageDir()).thenReturn(coverageDir);
         doAnswer((Answer<TestRunnerBuilder>) invocation -> {
             instrumentationArgs = invocation.getArgument(2);
@@ -97,7 +93,6 @@ public class SingleInstrumentalTestCommandTest {
 
         when(testRunnerBuilder.getTestRunListener()).thenReturn(reportsGenerator);
         when(testRunnerBuilder.getTestRunner()).thenReturn(testRunner);
-        when(testRunnerBuilder.getRunTestLogger()).thenReturn(iLogger);
         when(testRunnerBuilder.getCoverageFile()).thenReturn("coverage_file");
 
         when(reportsGenerator.getRunResult()).thenReturn(testRunResult);
@@ -124,8 +119,7 @@ public class SingleInstrumentalTestCommandTest {
         verify(deviceWrapper).pullCoverageFile(ext,
                 "test_device#test_prefix",
                 "coverage_file",
-                coverageDir,
-                iLogger);
+                coverageDir);
     }
 
     @Test
@@ -139,8 +133,7 @@ public class SingleInstrumentalTestCommandTest {
                 any(InstrumentalExtension.class),
                 anyString(),
                 anyString(),
-                any(File.class),
-                any(ILogger.class));
+                any(File.class));
     }
 
     @Test(expected = CommandExecutionException.class)

@@ -40,8 +40,9 @@ public class AllTestsInOneScopeCommandProviderTest {
 
     @Before
     public void setUp() throws Exception {
+        when(deviceWrapper.getLogger()).thenReturn(logger);
         when(argsProvider.provideInstrumentationArgs(deviceWrapper)).thenReturn(ARGS);
-        provider = new AllTestsInOneScopeCommandProvider(PROJECT_NAME, argsProvider, logger);
+        provider = new AllTestsInOneScopeCommandProvider(PROJECT_NAME, argsProvider);
     }
 
     @Test
@@ -53,6 +54,6 @@ public class AllTestsInOneScopeCommandProviderTest {
         Assert.assertNotNull(command);
         verify(argsProvider).provideInstrumentationArgs(deviceWrapper);
         verify(logger).i(AllTestsInOneScopeCommandProvider.class.getSimpleName(),
-                "device = {}, args = {}", deviceWrapper, ARGS);
+                "args = \"{}\"", ARGS);
     }
 }

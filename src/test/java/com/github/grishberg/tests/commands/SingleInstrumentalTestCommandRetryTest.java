@@ -94,7 +94,7 @@ public class SingleInstrumentalTestCommandRetryTest {
         when(context.getInstrumentalInfo()).thenReturn(ext);
         when(context.getEnvironment()).thenReturn(environment);
         when(context.getProcessCrashedHandler()).thenReturn(processCrashedHandler);
-        when(context.getLogger()).thenReturn(mock(RunnerLogger.class));
+        when(deviceWrapper.getLogger()).thenReturn(mock(RunnerLogger.class));
         doAnswer((Answer<TestRunnerBuilder>) invocation -> {
             instrumentationArgs = invocation.getArgument(2);
             return testRunnerBuilder;

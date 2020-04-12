@@ -14,7 +14,7 @@ public class ClearCommand implements DeviceRunnerCommand {
     public DeviceCommandResult execute(ConnectedDeviceWrapper device, TestRunnerContext context)
             throws CommandExecutionException {
         InstrumentalExtension instrumentalInfo = context.getInstrumentalInfo();
-        context.getLogger().i(TAG, "ClearCommand for package {}",
+        device.getLogger().i(TAG, "ClearCommand for package {}",
                 instrumentalInfo.getApplicationId());
         StringBuilder command = new StringBuilder("pm clear ");
         command.append(instrumentalInfo.getApplicationId());

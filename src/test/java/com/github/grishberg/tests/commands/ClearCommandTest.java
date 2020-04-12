@@ -32,7 +32,7 @@ public class ClearCommandTest {
     @Before
     public void setUp() throws Exception {
         when(context.getInstrumentalInfo()).thenReturn(ext);
-        when(context.getLogger()).thenReturn(logger);
+        when(deviceWrapper.getLogger()).thenReturn(logger);
         when(ext.getApplicationId()).thenReturn("appId");
         clearCommand = new ClearCommand();
     }

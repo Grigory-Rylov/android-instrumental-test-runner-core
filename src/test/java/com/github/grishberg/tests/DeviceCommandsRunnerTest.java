@@ -50,7 +50,7 @@ public class DeviceCommandsRunnerTest {
     public void setUp() throws Exception {
         commands = new ArrayList<>();
         commands.add(command);
-        when(context.getLogger()).thenReturn(logger);
+        when(deviceWrapper.getLogger()).thenReturn(logger);
         when(context.getEnvironment()).thenReturn(environment);
         when(commandProvider.provideCommandsForDevice(deviceWrapper, planProvider, environment))
                 .thenReturn(commands);

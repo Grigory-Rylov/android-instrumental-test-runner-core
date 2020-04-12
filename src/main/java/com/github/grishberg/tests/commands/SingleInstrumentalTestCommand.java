@@ -134,7 +134,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         String singleTestMethodPrefix = String.format("%s#%s", targetDevice.getName(), testName);
         TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();
 
-        TestTracker testTracker = new TestTracker(context.getLogger());
+        TestTracker testTracker = new TestTracker(targetDevice.getLogger());
         ProcessCrashedException processCrashedException = null;
         try {
             testRunnerBuilder.getTestRunner().run(testRunListener, testTracker);
@@ -150,8 +150,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                 targetDevice.pullCoverageFile(instrumentationInfo,
                         singleTestMethodPrefix,
                         testRunnerBuilder.getCoverageFile(),
-                        environment.getCoverageDir(),
-                        testRunnerBuilder.getRunTestLogger());
+                        environment.getCoverageDir());
             }
         } catch (ProcessCrashedException e) {
             processCrashedException = e;
@@ -171,7 +170,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice, TestRunnerContext context)
             throws CommandExecutionException {
-        RunnerLogger logger = context.getLogger();
+        RunnerLogger logger = targetDevice.getLogger();
 
         Queue<SingleInstrumentalTestCommand> commands = new ArrayDeque<>();
         commands.add(this);
@@ -233,7 +232,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
             List<TestPlanElement> failedTests,
             DeviceCommandResult result)
             throws CommandExecutionException {
-        RunnerLogger logger = context.getLogger();
+        RunnerLogger logger = targetDevice.getLogger();
         List<DeviceRunnerCommand> commands = retryHandler.getRetryCommands(
                 failedTests, providedInstrumentationArgs);
         if (commands.isEmpty()) {

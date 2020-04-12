@@ -17,16 +17,13 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
     private final String projectName;
     private final InstrumentationArgsProvider argsProvider;
     private final CommandsForAnnotationProvider commandsForAnnotationProvider;
-    private final RunnerLogger logger;
 
     DefaultCommandProvider(String projectName,
                            InstrumentationArgsProvider argsProvider,
-                           CommandsForAnnotationProvider commandsForAnnotationProvider,
-                           RunnerLogger logger) {
+                           CommandsForAnnotationProvider commandsForAnnotationProvider) {
         this.projectName = projectName;
         this.argsProvider = argsProvider;
         this.commandsForAnnotationProvider = commandsForAnnotationProvider;
-        this.logger = logger;
     }
 
     @Override
@@ -35,9 +32,9 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
                                                               Environment environment) throws CommandExecutionException {
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         commands.add(new SetAnimationSpeedCommand(0, 0, 0));
+        RunnerLogger logger = device.getLogger();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
-        logger.i(TAG, "provideCommandsForDevice: device = {}, args = {}",
-                device, instrumentalArgs);
+        logger.i(TAG, "provideCommandsForDevice: args = {}", instrumentalArgs);
         List<TestPlanElement> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
 
         List<TestPlanElement> planList = new ArrayList<>();
