@@ -53,6 +53,7 @@ public class DefaultCommandProviderTest {
 
     @Before
     public void setUp() throws Exception {
+        when(deviceWrapper.getLogger()).thenReturn(logger);
         ArrayList<AnnotationInfo> emptyAnnotations = new ArrayList<>();
         when(element.getAnnotations()).thenReturn(emptyAnnotations);
         List<AnnotationInfo> annotations = Arrays.asList(ANNOTATION);
@@ -67,7 +68,7 @@ public class DefaultCommandProviderTest {
         when(planProvider.provideTestPlan(deviceWrapper, ARGS)).thenReturn(testPlanElements);
         when(argsProvider.provideInstrumentationArgs(deviceWrapper)).thenReturn(ARGS);
         provider = new DefaultCommandProvider(PROJECT_NAME, argsProvider,
-                commandsForAnnotationProvider, logger);
+                commandsForAnnotationProvider);
     }
 
     @Test

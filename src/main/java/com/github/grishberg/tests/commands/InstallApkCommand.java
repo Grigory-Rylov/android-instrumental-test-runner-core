@@ -21,7 +21,7 @@ public class InstallApkCommand implements DeviceRunnerCommand {
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper device, TestRunnerContext runnerContext)
             throws CommandExecutionException {
-        RunnerLogger logger = runnerContext.getLogger();
+        RunnerLogger logger = device.getLogger();
         DeviceCommandResult result = new DeviceCommandResult();
         Throwable lastException = null;
         for (int i = 0; i < 3; i++) {

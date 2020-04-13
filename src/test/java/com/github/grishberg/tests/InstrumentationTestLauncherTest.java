@@ -52,7 +52,7 @@ public class InstrumentationTestLauncherTest {
     public void setUp() throws Exception {
         List<ConnectedDeviceWrapper> devicesList = Arrays.asList(deviceWrapper);
         when((adbWrapper.provideDevices())).thenReturn(devicesList);
-        when(deviceCommandsRunnerFabric.provideDeviceCommandRunner(eq(logger), any(DeviceRunnerCommandProvider.class))).thenReturn(runner);
+        when(deviceCommandsRunnerFabric.provideDeviceCommandRunner(any(DeviceRunnerCommandProvider.class))).thenReturn(runner);
         when(runner.runCommands(eq(devicesList), any(TestRunnerContext.class))).thenReturn(true);
         launcher = provideTask();
         launcher.initAfterApply(adbWrapper, deviceCommandsRunnerFabric, logger);
@@ -144,7 +144,6 @@ public class InstrumentationTestLauncherTest {
 
         verify(adbWrapper).init(ADB_PATH, logger);
         verify(adbWrapper).waitForAdb();
-        verify(deviceCommandsRunnerFabric).provideDeviceCommandRunner(any(RunnerLogger.class),
-                any(DeviceRunnerCommandProvider.class));
+        verify(deviceCommandsRunnerFabric).provideDeviceCommandRunner(any(DeviceRunnerCommandProvider.class));
     }
 }

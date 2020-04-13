@@ -134,7 +134,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         String singleTestMethodPrefix = String.format("%s#%s", targetDevice.getName(), testName);
         TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();
 
-        TestTracker testTracker = new TestTracker(context.getLogger());
+        TestTracker testTracker = new TestTracker(targetDevice.getLogger());
         ProcessCrashedException processCrashedException = null;
         try {
             testRunnerBuilder.getTestRunner().run(testRunListener, testTracker);
@@ -150,8 +150,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                 targetDevice.pullCoverageFile(instrumentationInfo,
                         singleTestMethodPrefix,
                         testRunnerBuilder.getCoverageFile(),
-                        environment.getCoverageDir(),
-                        testRunnerBuilder.getRunTestLogger());
+                        environment.getCoverageDir());
             }
         } catch (ProcessCrashedException e) {
             processCrashedException = e;
@@ -171,7 +170,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     @Override
     public DeviceCommandResult execute(ConnectedDeviceWrapper targetDevice, TestRunnerContext context)
             throws CommandExecutionException {
-        RunnerLogger logger = context.getLogger();
+        RunnerLogger logger = targetDevice.getLogger();
 
         Queue<SingleInstrumentalTestCommand> commands = new ArrayDeque<>();
         commands.add(this);
@@ -220,8 +219,8 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         }
 
         if (result.isFailed()) {
-            logger.i(TAG, "{} tests failed on device = {} during command = {}. " +
-                            "Will attempt to rerun them", failedTests.size());
+            logger.i(TAG, "{} tests failed during command = {}. " +
+                            "Will attempt to rerun them", failedTests.size(), this);
             retryFailedTests(targetDevice, context, failedTests, result);
         }
 
@@ -233,34 +232,30 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
             List<TestPlanElement> failedTests,
             DeviceCommandResult result)
             throws CommandExecutionException {
-        RunnerLogger logger = context.getLogger();
+        RunnerLogger logger = targetDevice.getLogger();
         List<DeviceRunnerCommand> commands = retryHandler.getRetryCommands(
                 failedTests, providedInstrumentationArgs);
         if (commands.isEmpty()) {
-            logger.i(TAG, "[{}] Tests rerun attempt was stopped, " +
-                    "because no retry commands were provided", targetDevice);
+            logger.i(TAG, "Tests rerun attempt was stopped, " +
+                    "because no retry commands were provided");
             return;
         }
 
         DeviceCommandResult retryResult = new DeviceCommandResult();
         for (DeviceRunnerCommand command : commands) {
             String commandString = command.toString();
-            logger.i(TAG, "[{}] Before executing retry-command = {}",
-                    targetDevice, commandString);
+            logger.i(TAG, "Before executing retry-command = {}", commandString);
             if (command.execute(targetDevice, context).isFailed()) {
                 retryResult.setFailed(true);
             }
-            logger.i(TAG, "[{}] After executing retry-command = {}",
-                    targetDevice, commandString);
+            logger.i(TAG, "After executing retry-command = {}", commandString);
         }
 
         if (retryResult.isFailed()) {
-            logger.i(TAG, "[{}] Retry failed, there still were failed tests",
-                    targetDevice);
+            logger.i(TAG, "Retry failed, there still were failed tests");
         } else {
             result.setFailed(false);
-            logger.i(TAG, "[{}] Retry was successful, all tests finished correctly",
-                    targetDevice);
+            logger.i(TAG, "Retry was successful, all tests finished correctly");
         }
     }
 

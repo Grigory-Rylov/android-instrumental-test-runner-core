@@ -25,7 +25,7 @@ public class TestRunnerBuilder {
                              XmlReportGeneratorDelegate xmlDelegate) {
         InstrumentalExtension instrumentationInfo = context.getInstrumentalInfo();
         Environment environment = context.getEnvironment();
-        RunnerLogger logger = context.getLogger();
+        RunnerLogger logger = targetDevice.getLogger();
 
         runner = new RemoteAndroidTestRunner(
                 instrumentationInfo.getInstrumentalPackage(),
@@ -90,9 +90,5 @@ public class TestRunnerBuilder {
 
     TestXmlReportsGenerator getTestRunListener() {
         return testRunListener;
-    }
-
-    public ILogger getRunTestLogger() {
-        return runTestLogger;
     }
 }

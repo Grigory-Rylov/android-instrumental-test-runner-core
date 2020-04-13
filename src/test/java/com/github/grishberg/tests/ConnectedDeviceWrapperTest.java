@@ -4,7 +4,6 @@ import com.android.ddmlib.CollectingOutputReceiver;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.TimeoutException;
-import com.android.utils.ILogger;
 import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.RunnerLogger;
 import org.junit.Before;
@@ -20,9 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -37,8 +34,6 @@ public class ConnectedDeviceWrapperTest {
     IShellOutputReceiver shellOutputReceiver;
     @Mock
     InstrumentalExtension extension;
-    @Mock
-    ILogger logger;
     @Mock
     RunnerLogger runnerLogger;
     private IShellOutputReceiver receiver;
@@ -109,8 +104,8 @@ public class ConnectedDeviceWrapperTest {
     @Test
     public void pullCoverageFile() throws Exception {
         deviceWrapper.pullCoverageFile(extension, "coverageFilePrefix", "coverageFile",
-                coverageFile, logger);
-        verify(logger).verbose(anyString(), anyString(), anyString());
+                coverageFile);
+        verify(runnerLogger).i(eq("test_device / ConnectedDeviceWrapper"), anyString(), any());
     }
 
     @Test

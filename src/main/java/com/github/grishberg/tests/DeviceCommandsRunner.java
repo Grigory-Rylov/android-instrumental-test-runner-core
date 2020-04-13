@@ -31,32 +31,28 @@ class DeviceCommandsRunner {
             CommandExecutionException {
         final CountDownLatch deviceCounter = new CountDownLatch(devices.size());
         final Environment environment = context.getEnvironment();
-        final RunnerLogger logger = context.getLogger();
         for (ConnectedDeviceWrapper device : devices) {
             new Thread(() -> {
-                long tid = Thread.currentThread().getId();
-                final String threadTag = String.format("%s/%s", TAG, tid);
-                logger.i(threadTag, "New thread {} started to run commands on {}", tid, device);
+                final RunnerLogger logger = device.getLogger();
+                logger.i(TAG, "New command execution task started to run commands");
                 try {
                     List<DeviceRunnerCommand> commands = commandProvider.provideCommandsForDevice(device,
                             testPlanProvider, environment);
                     for (DeviceRunnerCommand command : commands) {
-                        logger.i(threadTag, "Before executing device = {} command = {}",
-                                device, command.toString());
+                        logger.i(TAG, "Before executing command = {}", command.toString());
                         DeviceCommandResult result = command.execute(device, context);
-                        logger.i(threadTag, "After executing device = {} command = {}",
-                                device, command.toString());
+                        logger.i(TAG, "After executing command = {}", command.toString());
                         if (result.isFailed()) {
                             hasFailedTests = true;
                         }
                     }
                 } catch (Throwable e) {
-                    logger.e(threadTag, "Execute command exception:", e);
+                    logger.e(TAG, "Execute command exception:", e);
                     commandException = e;
                 } finally {
                     deviceCounter.countDown();
                 }
-                logger.i(threadTag, "Thread {} ({}) is finished", tid, device);
+                logger.i(TAG, "Command execution task is finished");
             }).start();
         }
         deviceCounter.await();

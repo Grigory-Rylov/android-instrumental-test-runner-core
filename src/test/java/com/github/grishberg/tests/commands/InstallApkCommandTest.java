@@ -30,7 +30,7 @@ public class InstallApkCommandTest {
 
     @Before
     public void setUp() throws Exception {
-        when(context.getLogger()).thenReturn(logger);
+        when(deviceWrapper.getLogger()).thenReturn(logger);
         command = new InstallApkCommand(apkFile);
     }
 

@@ -20,22 +20,19 @@ public class InstrumentalTestPlanProvider {
     private final InstrumentalExtension instrumentationInfo;
     private final Map<String, String> propertiesMap;
     private final PackageTreeGenerator packageTreeGenerator;
-    private final RunnerLogger logger;
 
     public InstrumentalTestPlanProvider(Map<String, String> propertiesMap,
                                         InstrumentalExtension instrumentationInfo,
-                                        PackageTreeGenerator packageTreeGenerator,
-                                        RunnerLogger logger) {
+                                        PackageTreeGenerator packageTreeGenerator) {
         this.propertiesMap = Collections.unmodifiableMap(propertiesMap);
         this.instrumentationInfo = new InstrumentalExtension(instrumentationInfo);
         this.packageTreeGenerator = packageTreeGenerator;
-        this.logger = logger;
     }
 
     public List<TestPlanElement> provideTestPlan(ConnectedDeviceWrapper device,
                                                  Map<String, String> instrumentalArgs) throws CommandExecutionException {
-        logger.i(TAG, "Get list of tests in \"{}\" app on {}",
-                instrumentationInfo.getInstrumentalPackage(), device.getName());
+        RunnerLogger logger = device.getLogger();
+        logger.i(TAG, "Get list of tests in \"{}\" app", instrumentationInfo.getInstrumentalPackage());
         HashMap<String, String> args = new HashMap<>(instrumentalArgs);
         args.put("log", "true");
 
@@ -63,9 +60,8 @@ public class InstrumentalTestPlanProvider {
         } catch (Throwable e) {
             throw new CommandExecutionException(e);
         }
-        logger.i(TAG, "Found {} tests in {} using device {}",
-                receiver.getTestInstances().size(), instrumentationInfo.getInstrumentalPackage(),
-                device.getName());
+        logger.i(TAG, "Found {} tests in {}",
+                receiver.getTestInstances().size(), instrumentationInfo.getInstrumentalPackage());
 
         return receiver.getTestInstances();
     }

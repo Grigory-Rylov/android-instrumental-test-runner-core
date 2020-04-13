@@ -34,10 +34,11 @@ public class InstrumentalTestPlanProviderTest {
 
     @Before
     public void setUp() {
+        when(deviceWrapper.getLogger()).thenReturn(logger);
         extension.setInstrumentListener("test_listener");
         extension.setInstrumentalRunner("TestRunner");
         extension.setInstrumentalPackage("TestAppPackage");
-        provider = new InstrumentalTestPlanProvider(paramsMap, extension, treeGenerator, logger);
+        provider = new InstrumentalTestPlanProvider(paramsMap, extension, treeGenerator);
     }
 
     @Test
@@ -53,7 +54,7 @@ public class InstrumentalTestPlanProviderTest {
     @Test
     public void sendAdditionalArgTestClass() throws Exception {
         paramsMap.put("testClass", "com.test.SpecialTest");
-        provider = new InstrumentalTestPlanProvider(paramsMap, extension, treeGenerator, logger);
+        provider = new InstrumentalTestPlanProvider(paramsMap, extension, treeGenerator);
         HashMap<String, String> args = new HashMap<>();
 
         provider.provideTestPlan(deviceWrapper, args);

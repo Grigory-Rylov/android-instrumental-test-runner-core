@@ -1,8 +1,8 @@
 package com.github.grishberg.tests;
 
 import com.android.ddmlib.*;
-import com.android.utils.ILogger;
 import com.github.grishberg.tests.commands.CommandExecutionException;
+import com.github.grishberg.tests.common.DeviceSpecificLogger;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.common.ScreenSizeParser;
 import com.github.grishberg.tests.exceptions.PullCoverageException;
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Wraps {@link IDevice} interface.
- *
+ * <p>
  * Adds useful extra utility methods like pullCoverageFile(), getWidth(), getHeight(), etc.
  * Adds synchronization (no parallel commands when multiple devices are connected).
  * Adds verbose logging.
@@ -30,7 +30,11 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
 
     public ConnectedDeviceWrapper(IDevice device, RunnerLogger logger) {
         this.device = device;
-        this.logger = logger;
+        this.logger = new DeviceSpecificLogger(device, logger);
+    }
+
+    public RunnerLogger getLogger() {
+        return logger;
     }
 
     @Override
@@ -39,8 +43,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
                                                  long maxTimeToOutputResponse,
                                                  TimeUnit maxTimeUnits) throws TimeoutException,
             AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        logger.d(TAG, "Execute shell command on {}: \"{}\"",
-                device.getName(), command);
+        logger.d(TAG, "Execute shell command \"{}\"", command);
         device.executeShellCommand(command, receiver, maxTimeToOutputResponse, maxTimeUnits);
     }
 
@@ -127,8 +130,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
 
     @Override
     public synchronized void pullFile(String temporaryCoverageCopy, String path) throws CommandExecutionException {
-        logger.d(TAG, "Pull file from {}: \"{}\"",
-                device.getName(), path);
+        logger.d(TAG, "Pull file \"{}\"", path);
         try {
             device.pullFile(temporaryCoverageCopy, path);
         } catch (Throwable e) {
@@ -146,8 +148,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
 
     public synchronized void installPackage(String absolutePath, boolean reinstall, String extraArgument)
             throws InstallException {
-        logger.d(TAG, "Install package on {}: \"{}\"",
-                device.getName(), absolutePath);
+        logger.d(TAG, "Install package \"{}\"", absolutePath);
         device.installPackage(absolutePath, reinstall, extraArgument);
     }
 
@@ -158,19 +159,15 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
      * @param coverageFilePrefix  prefix for generating coverage on local dir.
      * @param coverageFile        full path to coverage file on target device.
      * @param outCoverageDir      local dir, where coverage file will be copied.
-     * @param logger              logger.
      * @throws PullCoverageException
      */
     public synchronized void pullCoverageFile(InstrumentalExtension instrumentationInfo,
                                               String coverageFilePrefix,
                                               String coverageFile,
-                                              File outCoverageDir,
-                                              final ILogger logger) throws PullCoverageException {
+                                              File outCoverageDir) throws PullCoverageException {
         MultiLineReceiver outputReceiver = new MultilineLoggerReceiver(logger);
 
-        // TODO: Why another logger is used here?
-        logger.verbose("ConnectedDeviceWrapper '%s': fetching coverage data from %s",
-                getName(), coverageFile);
+        logger.i(TAG, "Fetching coverage data from %s", coverageFile);
         try {
             String temporaryCoverageCopy = "/data/local/tmp/" + instrumentationInfo.getApplicationId()
                     + "." + COVERAGE_FILE_NAME;
@@ -193,8 +190,7 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
                                                  long maxTimeout, long maxTimeToOutputResponse,
                                                  TimeUnit maxTimeUnits) throws TimeoutException,
             AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        logger.d(TAG, "Execute shell command on {}: \"{}\"",
-                device.getName(), command);
+        logger.d(TAG, "Execute shell command \"{}\"", command);
         device.executeShellCommand(command, receiver, maxTimeout, maxTimeToOutputResponse, maxTimeUnits);
     }
 
@@ -224,16 +220,16 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
     }
 
     private class MultilineLoggerReceiver extends MultiLineReceiver {
-        private final ILogger logger;
+        private final RunnerLogger logger;
 
-        MultilineLoggerReceiver(ILogger logger) {
+        MultilineLoggerReceiver(RunnerLogger logger) {
             this.logger = logger;
         }
 
         @Override
         public void processNewLines(String[] lines) {
             for (String line : lines) {
-                logger.verbose(line);
+                logger.d(TAG, line);
             }
         }
 

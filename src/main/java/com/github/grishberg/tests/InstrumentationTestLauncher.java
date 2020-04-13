@@ -97,7 +97,7 @@ public class InstrumentationTestLauncher {
         Environment environment = new Environment(getResultsDir(),
                 getReportsDir(), getCoverageDir());
         DeviceCommandsRunner runner = deviceCommandsRunnerFabric
-                .provideDeviceCommandRunner(logger, commandProvider);
+                .provideDeviceCommandRunner(commandProvider);
 
         TestRunnerContext context = new TestRunnerContext(instrumentationInfo,
                 environment, screenshotRelations, logger);
@@ -133,7 +133,7 @@ public class InstrumentationTestLauncher {
         if (commandProvider == null) {
             logger.i(TAG, "command provider is empty, use DefaultCommandProvider");
             commandProvider = new DefaultCommandProvider(projectName,
-                    instrumentationArgsProvider, commandsForAnnotationProvider, logger);
+                    instrumentationArgsProvider, commandsForAnnotationProvider);
         }
     }
 
