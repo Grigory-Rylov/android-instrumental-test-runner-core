@@ -17,7 +17,7 @@ class DeviceSpecificLogger(
     }
 
     override fun i(tag: String, msgFormat: String, vararg args: Any?) {
-        logger.i(createTag(tag), msgFormat, args)
+        logger.i(createTag(tag), msgFormat, *args)
     }
 
     override fun d(tag: String, message: String?) {
@@ -25,7 +25,7 @@ class DeviceSpecificLogger(
     }
 
     override fun d(tag: String, msgFormat: String, vararg args: Any?) {
-        logger.d(createTag(tag), msgFormat, args)
+        logger.d(createTag(tag), msgFormat, *args)
     }
 
     override fun e(tag: String, message: String?) {
@@ -37,7 +37,7 @@ class DeviceSpecificLogger(
     }
 
     override fun w(tag: String, msgFormat: String, vararg args: Any?) {
-        logger.w(createTag(tag), msgFormat, args)
+        logger.w(createTag(tag), msgFormat, *args)
     }
 
     private fun createTag(tag: String): String = "${device.name} / $tag"
