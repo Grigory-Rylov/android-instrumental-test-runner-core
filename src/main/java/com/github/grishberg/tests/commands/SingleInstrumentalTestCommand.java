@@ -219,8 +219,8 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         }
 
         if (result.isFailed()) {
-            logger.i(TAG, "{} tests failed on device = {} during command = {}. " +
-                            "Will attempt to rerun them", failedTests.size());
+            logger.i(TAG, "{} tests failed during command = {}. " +
+                            "Will attempt to rerun them", failedTests.size(), this);
             retryFailedTests(targetDevice, context, failedTests, result);
         }
 
@@ -236,30 +236,26 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         List<DeviceRunnerCommand> commands = retryHandler.getRetryCommands(
                 failedTests, providedInstrumentationArgs);
         if (commands.isEmpty()) {
-            logger.i(TAG, "[{}] Tests rerun attempt was stopped, " +
-                    "because no retry commands were provided", targetDevice);
+            logger.i(TAG, "Tests rerun attempt was stopped, " +
+                    "because no retry commands were provided");
             return;
         }
 
         DeviceCommandResult retryResult = new DeviceCommandResult();
         for (DeviceRunnerCommand command : commands) {
             String commandString = command.toString();
-            logger.i(TAG, "[{}] Before executing retry-command = {}",
-                    targetDevice, commandString);
+            logger.i(TAG, "Before executing retry-command = {}", commandString);
             if (command.execute(targetDevice, context).isFailed()) {
                 retryResult.setFailed(true);
             }
-            logger.i(TAG, "[{}] After executing retry-command = {}",
-                    targetDevice, commandString);
+            logger.i(TAG, "After executing retry-command = {}", commandString);
         }
 
         if (retryResult.isFailed()) {
-            logger.i(TAG, "[{}] Retry failed, there still were failed tests",
-                    targetDevice);
+            logger.i(TAG, "Retry failed, there still were failed tests");
         } else {
             result.setFailed(false);
-            logger.i(TAG, "[{}] Retry was successful, all tests finished correctly",
-                    targetDevice);
+            logger.i(TAG, "Retry was successful, all tests finished correctly");
         }
     }
 
