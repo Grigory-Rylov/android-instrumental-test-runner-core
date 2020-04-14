@@ -71,6 +71,21 @@ public class TestPlanElement {
         return className;
     }
 
+    /**
+     * Returns full test name in dot-separated format: <package name>.<class name>.<test name>.
+     * Useful for logging (some projects prefer dot-separated representation).
+     */
+    public String getFullTestNameDotSeparated() {
+        return className + "." + methodName;
+    }
+
+    /**
+     * Returns full test name: <package name>.<class name>#<test name>.
+     */
+    public String getFullTestName() {
+        return className + "#" + methodName;
+    }
+
     public List<AnnotationInfo> getAnnotations() {
         return Collections.unmodifiableList(annotations);
     }
@@ -113,7 +128,7 @@ public class TestPlanElement {
      */
     public String getAmInstrumentCommand() {
         if (type == NodeType.METHOD) {
-            return className + "#" + methodName;
+            return getFullTestName();
         }
         String prefix = "";
         if (parent != null) {
