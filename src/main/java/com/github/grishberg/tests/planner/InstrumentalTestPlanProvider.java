@@ -38,8 +38,7 @@ public class InstrumentalTestPlanProvider {
 
         args.putAll(getArgsFromCli());
 
-        InstrumentTestLogParser receiver = new InstrumentTestLogParser();
-        receiver.setLogger(new TestLogParserLogger(logger));
+        InstrumentTestLogParser receiver = new InstrumentTestLogParser(logger);
         StringBuilder command = new StringBuilder("am instrument -r -w");
 
         args.put("listener", instrumentationInfo.getInstrumentListener());
@@ -85,18 +84,5 @@ public class InstrumentalTestPlanProvider {
                                                            Map<String, String> instrumentalArgs) throws CommandExecutionException {
         // TODO: create fabric
         return new InstrumentalTestHolderImpl(provideTestPlan(device, instrumentalArgs), packageTreeGenerator);
-    }
-
-    private class TestLogParserLogger implements InstrumentTestLogParser.ParserLogger {
-        private final RunnerLogger logger;
-
-        private TestLogParserLogger(RunnerLogger logger) {
-            this.logger = logger;
-        }
-
-        @Override
-        public void logLine(String line) {
-            logger.i(TAG, line);
-        }
     }
 }
