@@ -84,7 +84,7 @@ public class CustomTestRunListener extends XmlTestRunListener {
     @Override
     public void testRunStarted(String runName, int testCount) {
         if (mLogger != null) {
-            mLogger.info("Starting %1$d tests on %2$s", testCount, mDeviceName);
+            mLogger.info("Starting %1$d tests", testCount);
         }
         super.testRunStarted(runName, testCount);
     }
@@ -92,8 +92,8 @@ public class CustomTestRunListener extends XmlTestRunListener {
     @Override
     public void testFailed(TestIdentifier test, String trace) {
         if (mLogger != null) {
-            mLogger.warning("\n%1$s > %2$s[%3$s] \033[31mFAILED \033[0m",
-                    test.getClassName(), test.getTestName(), mDeviceName);
+            mLogger.warning("\n%1$s#%2$s \033[31mFAILED \033[0m",
+                    test.getClassName(), test.getTestName());
             mLogger.warning(getModifiedTrace(trace));
         }
 
@@ -105,8 +105,8 @@ public class CustomTestRunListener extends XmlTestRunListener {
     @Override
     public void testAssumptionFailure(TestIdentifier test, String trace) {
         if (mLogger != null) {
-            mLogger.warning("\n%1$s > %2$s[%3$s] \033[33mSKIPPED \033[0m\n%4$s",
-                    test.getClassName(), test.getTestName(), mDeviceName, getModifiedTrace(trace));
+            mLogger.warning("\n%1$s#%2$s \033[33mSKIPPED \033[0m\n%3$s",
+                    test.getClassName(), test.getTestName(), getModifiedTrace(trace));
         }
         super.testAssumptionFailure(test, trace);
     }
@@ -116,8 +116,8 @@ public class CustomTestRunListener extends XmlTestRunListener {
         if (!mFailedTests.remove(test)) {
             // if wasn't present in the list, then the test succeeded.
             if (mLogger != null) {
-                mLogger.verbose("\n%1$s > %2$s[%3$s] \033[32mSUCCESS \033[0m",
-                        test.getClassName(), test.getTestName(), mDeviceName);
+                mLogger.verbose("\n%1$s#%2$s \033[32mSUCCESS \033[0m",
+                        test.getClassName(), test.getTestName());
             }
         }
         super.testEnded(test, testMetrics);
@@ -126,7 +126,7 @@ public class CustomTestRunListener extends XmlTestRunListener {
     @Override
     public void testRunFailed(String errorMessage) {
         if (mLogger != null) {
-            mLogger.warning("Tests on %1$s failed: %2$s", mDeviceName, errorMessage);
+            mLogger.warning("Tests failed: %1$s", errorMessage);
         }
         super.testRunFailed(errorMessage);
     }
@@ -134,8 +134,8 @@ public class CustomTestRunListener extends XmlTestRunListener {
     @Override
     public void testIgnored(TestIdentifier test) {
         if (mLogger != null) {
-            mLogger.warning("\n%1$s > %2$s[%3$s] \033[33mSKIPPED \033[0m",
-                    test.getClassName(), test.getTestName(), mDeviceName);
+            mLogger.warning("\n%1$s#%2$s \033[33mSKIPPED \033[0m",
+                    test.getClassName(), test.getTestName());
         }
         super.testIgnored(test);
     }
