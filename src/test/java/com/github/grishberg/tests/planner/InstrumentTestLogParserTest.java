@@ -1,25 +1,23 @@
 package com.github.grishberg.tests.planner;
 
 import com.github.grishberg.tests.TestUtils;
+import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
-import com.github.grishberg.tests.planner.InstrumentTestLogParser.ParserLogger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 /**
  * Created by grishberg on 29.10.17.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class InstrumentTestLogParserTest {
-    private static final String TEST_LINE = "test line";
     private static final String TEST_ELEMENT_WITHOUT_ANNOTATION = "TestPlanElement{methodName=" +
             "'ignoredTestTabletButton2', className='com.github.grishberg.instrumentaltestsample." +
             "TabletTest', type=METHOD, annotations=[]}";
@@ -33,16 +31,14 @@ public class InstrumentTestLogParserTest {
             "'testTabletButton', className='com.github.grishberg.instrumentaltestsample." +
             "TabletTest', type=METHOD, annotations=[com.github.grishberg.instrumentaltestsample" +
             ".TabletOnly,org.junit.Test]}";
-    private InstrumentTestLogParser parser = new InstrumentTestLogParser();
+    @Mock
+    RunnerLogger runnerLogger;
 
-    @Test
-    public void useLoggerFromSetter() {
-        ParserLogger mockLogger = mock(ParserLogger.class);
-        parser.setLogger(mockLogger);
+    private InstrumentTestLogParser parser;
 
-        parser.processNewLines(new String[]{TEST_LINE});
-
-        verify(mockLogger).logLine(TEST_LINE);
+    @Before
+    public void setUp() {
+        parser = new InstrumentTestLogParser(runnerLogger);
     }
 
     @Test
@@ -166,6 +162,13 @@ public class InstrumentTestLogParserTest {
         Assert.assertEquals(TEST_ELEMENT_WITH_ANNOTATION_3, testInstances.get(2).toString());
     }
 
+    @Test(expected = InstrumentTestLogParserException.class)
+    public void parseErrorState(){
+        parser.processNewLines(linesWithWrongRunner());
+
+        List<TestPlanElement> testInstances = parser.getTestInstances();
+    }
+
     private void whenParsedSampleOut() throws Exception {
         String fileName = "for_test/am_instrument_output.txt";
 
@@ -193,4 +196,22 @@ public class InstrumentTestLogParserTest {
                         "\"name\":\"com.github.grishberg.annotations.Feature\"}]"
         };
     }
+
+
+    private static String[] linesWithWrongRunner() {
+        return new String[]{"onError: commandError=true message=INSTRUMENTATION_FAILED: ru.yandex.searchplugin.tests/androidx.test.runner.ThereIsWrongLauncher",
+                "android.util.AndroidException: INSTRUMENTATION_FAILED: ru.yandex.searchplugin.tests/androidx.test.runner.ThereIsWrongLauncher",
+                "at com.android.commands.am.Instrument.run(Instrument.java:486)",
+                "at com.android.commands.am.Am.runInstrument(Am.java:194)",
+                "at com.android.commands.am.Am.onRun(Am.java:80)",
+                "at com.android.internal.os.BaseCommand.run(BaseCommand.java:54)",
+                "at com.android.commands.am.Am.main(Am.java:50)",
+                "at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)",
+                "at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:340)",
+                "INSTRUMENTATION_STATUS: Error=Unable to find instrumentation info for: ComponentInfo{ru.yandex.searchplugin.tests/androidx.test.runner.ThereIsWrongLauncher}",
+                "INSTRUMENTATION_STATUS: id=ActivityManagerService",
+                "INSTRUMENTATION_STATUS_CODE: -1"
+        };
+    }
+
 }

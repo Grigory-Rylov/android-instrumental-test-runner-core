@@ -1,6 +1,7 @@
 package com.github.grishberg.tests.planner;
 
 import com.android.ddmlib.MultiLineReceiver;
+import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,35 +17,41 @@ import java.util.List;
  * Parses am instrument -e log true output and generates.
  */
 public class InstrumentTestLogParser extends MultiLineReceiver {
+    private static final String TAG = InstrumentTestLogParser.class.getSimpleName();
     private static final String INSTRUMENTATION_STATUS = "INSTRUMENTATION_STATUS: ";
     private static final String INSTRUMENTATION_RESULT = "INSTRUMENTATION_RESULT: ";
     private static final String INSTRUMENTATION_CODE = "INSTRUMENTATION_CODE: ";
     private static final String ID = "id";
     private static final String TEST = "test";
     private static final String CLASS = "class";
+    private static final String ERROR = "error";
     private static final String ANNOTATIONS = "annotations";
     private static final String SHORT_MSG = "shortMsg";
     private static final String LONG_MSG = "longMsg";
-    private ParserLogger logger;
+    private final RunnerLogger logger;
     private final Gson gson = new GsonBuilder().create();
     private final ArrayList<TestPlanElement> testPlanList = new ArrayList<>();
     private State state = new StartNewObject();
 
-    public void setLogger(ParserLogger logger) {
+    public InstrumentTestLogParser(RunnerLogger logger) {
         this.logger = logger;
     }
 
+    /**
+     * @param lines input lines from am instrument.
+     * @throws InstrumentTestLogParserException
+     */
     @Override
-    public void processNewLines(String[] lines) {
+    public void processNewLines(String[] lines) throws InstrumentTestLogParserException {
         for (String word : lines) {
             processLine(word);
         }
         state.storeValuesIfNeeded();
     }
 
-    private void processLine(String word) {
+    private void processLine(String word) throws InstrumentTestLogParserException {
         if (logger != null) {
-            logger.logLine(word);
+            logger.d(TAG, word);
         }
         int startPos = word.indexOf(INSTRUMENTATION_RESULT);
         if (startPos >= 0) {
@@ -70,24 +77,29 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
             return;
         }
 
-        if (ID.equals(words[0])) {
-            state.storeValuesIfNeeded();
-            state.setTestId(words[1]);
-            return;
-        }
+        switch (words[0].toLowerCase()) {
+            case ID:
+                state.storeValuesIfNeeded();
+                state.setTestId(words[1]);
+                break;
 
-        if (TEST.equals(words[0])) {
-            state.setTestMethod(words[1]);
-            return;
-        }
+            case TEST:
+                state.setTestMethod(words[1]);
+                break;
 
-        if (CLASS.equals(words[0])) {
-            state.setClassName(words[1]);
-            return;
-        }
+            case CLASS:
+                state.setClassName(words[1]);
+                break;
 
-        if (ANNOTATIONS.equals(words[0])) {
-            state.setAnnotations(parseAnnotations(words[1]));
+            case ANNOTATIONS:
+                state.setAnnotations(parseAnnotations(words[1]));
+                break;
+
+            case ERROR:
+                throw new InstrumentTestLogParserException(words[1]);
+
+            default:
+                logger.w(TAG, "Unknown parameter: {}={}", words[0], words[1]);
         }
     }
 
@@ -292,9 +304,5 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
                 );
             }
         }
-    }
-
-    public interface ParserLogger {
-        void logLine(String line);
     }
 }
