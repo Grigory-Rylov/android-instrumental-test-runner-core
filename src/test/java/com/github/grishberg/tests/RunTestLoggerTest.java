@@ -67,6 +67,12 @@ public class RunTestLoggerTest {
     }
 
     @Test
+    public void warning_dontCrashWhenGivenMessageWithSpecialSymbol() throws Exception {
+        logger.warning("test message %s");
+        verify(runnerLogger).w(anyString(), anyString());
+    }
+
+    @Test
     public void info_dontLogWhenFormatIsNull() throws Exception {
         logger.info(null, 1, "test");
         verify(runnerLogger, never()).i(anyString(), anyString());

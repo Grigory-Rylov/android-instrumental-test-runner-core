@@ -20,7 +20,8 @@ public class RunTestLogger implements ILogger {
         if (msgFormat == null) {
             return;
         }
-        logger.e(TAG, String.format(msgFormat, args), t);
+        String message = formatMessageIfNeeded(msgFormat, args);
+        logger.e(TAG, message, t);
     }
 
     @Override
@@ -28,7 +29,7 @@ public class RunTestLogger implements ILogger {
         if (msgFormat == null) {
             return;
         }
-        String message = String.format(msgFormat, args);
+        String message = formatMessageIfNeeded(msgFormat, args);
         logger.w(TAG, message);
         throwExceptionIfProcessCrashed(message);
     }
@@ -44,7 +45,18 @@ public class RunTestLogger implements ILogger {
         if (msgFormat == null) {
             return;
         }
-        logger.i(TAG, String.format(msgFormat, args));
+        String msg = formatMessageIfNeeded(msgFormat, args);
+        logger.i(TAG, msg);
+    }
+
+    private String formatMessageIfNeeded(String msgFormat, Object[] args) {
+        String message;
+        if (args.length == 0) {
+            message = msgFormat;
+        } else {
+            message = String.format(msgFormat, args);
+        }
+        return message;
     }
 
     @Override
