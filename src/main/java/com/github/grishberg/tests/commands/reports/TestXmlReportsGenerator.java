@@ -6,6 +6,7 @@ import com.github.grishberg.tests.XmlReportGeneratorDelegate;
 import com.github.grishberg.tests.commands.reports.xml.CustomTestRunListener;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.Nullable;
 import org.kxml2.io.KXmlSerializer;
 
 import java.io.File;
@@ -80,6 +81,7 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
     /**
      * @return current executed test.
      */
+    @Nullable
     public TestIdentifier getCurrentTest() {
         return currentTest;
     }
