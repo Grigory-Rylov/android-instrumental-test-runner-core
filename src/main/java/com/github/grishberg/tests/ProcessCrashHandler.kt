@@ -10,7 +10,7 @@ interface ProcessCrashHandler {
      * Is called when process crashed.
      * returns fail message for xml report.
      */
-    fun provideFailMessageOnProcessCrashed(targetDevice: ConnectedDeviceWrapper, failedTest: TestIdentifier): String
+    fun provideFailMessageOnProcessCrashed(targetDevice: ConnectedDeviceWrapper, failedTest: TestIdentifier?): String
 
     /**
      * Can be used to make a cleanup after process crashed during tests execution.
@@ -19,7 +19,7 @@ interface ProcessCrashHandler {
 
     object STUB : ProcessCrashHandler {
         override fun provideFailMessageOnProcessCrashed(device: ConnectedDeviceWrapper,
-                                                        failedTest: TestIdentifier) =
+                                                        failedTest: TestIdentifier?) =
                 "Process was crashed. See logcat for details."
 
         override fun onAfterProcessCrashed(device: ConnectedDeviceWrapper,
