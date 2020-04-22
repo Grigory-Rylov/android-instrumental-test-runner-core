@@ -1,10 +1,16 @@
 package com.github.grishberg.tests.commands;
 
+import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestRunResult;
-import com.github.grishberg.tests.*;
+import com.github.grishberg.tests.ConnectedDeviceWrapper;
+import com.github.grishberg.tests.Environment;
+import com.github.grishberg.tests.InstrumentalExtension;
+import com.github.grishberg.tests.TestRunnerContext;
+import com.github.grishberg.tests.XmlReportGeneratorDelegate;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Executes instrumental tests on connected device.
@@ -44,7 +50,10 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
         try {
             TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();
 
-            testRunnerBuilder.getTestRunner().run(testRunListener);
+            RemoteAndroidTestRunner testRunner = testRunnerBuilder.getTestRunner();
+            testRunner.setMaxTimeToOutputResponse(instrumentationInfo.getMaxTimeToOutputResponseInSeconds(),
+                    TimeUnit.SECONDS);
+            testRunner.run(testRunListener);
 
             TestRunResult runResult = testRunListener.getRunResult();
             result.setFailed(runResult.hasFailedTests());

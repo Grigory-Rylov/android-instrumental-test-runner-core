@@ -1,11 +1,9 @@
 package com.github.grishberg.tests.commands;
 
-import com.android.ddmlib.IDevice;
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.ddmlib.testrunner.TestRunResult;
-import com.android.utils.ILogger;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalExtension;
@@ -29,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -49,6 +48,7 @@ public class SingleInstrumentalTestCommandTest {
     private static final String TEST_CLASS = "com.test.TestClass";
     private static final String TEST_NAME = "test1";
     private static final String TEST_NAME_WITH_DEVICE = "test1[phone-1]";
+    private static final long MAX_TIME_TO_OUTPUT = 300;
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
@@ -99,6 +99,7 @@ public class SingleInstrumentalTestCommandTest {
         when(reportsGenerator.getCurrentTest()).thenReturn(currentTest);
 
         when(deviceWrapper.getName()).thenReturn("test_device");
+        ext.setMaxTimeToOutputResponseInSeconds(MAX_TIME_TO_OUTPUT);
         testElements.add(new TestPlanElement("", TEST_NAME, TEST_CLASS));
         testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME, "test_prefix", args, testElements);
     }
@@ -108,6 +109,13 @@ public class SingleInstrumentalTestCommandTest {
         testCommand.execute(deviceWrapper, context);
 
         assertEquals("com.test.TestClass#test1", instrumentationArgs.get("class"));
+    }
+
+    @Test
+    public void setMaxTimeToOutputFromInstrumentalExtension() throws Exception {
+        testCommand.execute(deviceWrapper, context);
+
+        verify(testRunner).setMaxTimeToOutputResponse(MAX_TIME_TO_OUTPUT, TimeUnit.SECONDS);
     }
 
     @Test

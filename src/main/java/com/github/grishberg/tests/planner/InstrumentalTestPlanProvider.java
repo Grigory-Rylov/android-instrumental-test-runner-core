@@ -55,7 +55,8 @@ public class InstrumentalTestPlanProvider {
         command.append(instrumentationInfo.getInstrumentalRunner());
 
         try {
-            device.executeShellCommand(command.toString(), receiver, 0, TimeUnit.SECONDS);
+            device.executeShellCommand(command.toString(),
+                    receiver, instrumentationInfo.getMaxTimeToOutputResponseInSeconds(), TimeUnit.SECONDS);
         } catch (Throwable e) {
             throw new CommandExecutionException(e);
         }

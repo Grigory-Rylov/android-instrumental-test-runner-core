@@ -1,5 +1,6 @@
 package com.github.grishberg.tests.commands;
 
+import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
@@ -12,10 +13,10 @@ import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.NodeType;
 import com.github.grishberg.tests.planner.TestPlanElement;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.CheckForNull;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,17 +26,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.annotation.CheckForNull;
 
 /**
  * Executes instrumentation test for single test method.
  */
 public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     private static final String TAG = "SITestCommand";
-
     private static final String CLASS = "class";
     private static final String PACKAGE = "package";
     private final String projectName;
@@ -137,7 +136,9 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         TestTracker testTracker = new TestTracker(targetDevice.getLogger());
         ProcessCrashedException processCrashedException = null;
         try {
-            testRunnerBuilder.getTestRunner().run(testRunListener, testTracker);
+            RemoteAndroidTestRunner testRunner = testRunnerBuilder.getTestRunner();
+            testRunner.setMaxTimeToOutputResponse(instrumentationInfo.getMaxTimeToOutputResponseInSeconds(), TimeUnit.SECONDS);
+            testRunner.run(testRunListener, testTracker);
 
             assert testRunListener.getRunResult().getNumAllFailedTests()
                     == testTracker.failedTests.size() :
@@ -317,7 +318,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         @NotNull
         private String getTestMethodName(@NotNull TestIdentifier test) {
             String methodName = test.getTestName();
-            if (methodName.indexOf('[') > 0 ) {
+            if (methodName.indexOf('[') > 0) {
                 methodName = methodName.substring(0, test.getTestName().indexOf('['));
             }
             return methodName;
@@ -362,14 +363,13 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         };
 
         /**
+         * @param failedTests                 from previous tests command.
+         * @param providedInstrumentationArgs for previous test command.
          * @return commands to run failed tests. Cleanup commands can be included. Commands will
          * be run run after failed tests found, so prepared device environment by previous commands
          * is ready.
          * <br/>If retry isn't needed, return empty list or use {@link #NOOP}
          * <br/><b>NOTE:</b> new tests commands must have different test name than previous one.
-         *
-         * @param failedTests from previous tests command.
-         * @param providedInstrumentationArgs for previous test command.
          */
         @NotNull
         List<DeviceRunnerCommand> getRetryCommands(
