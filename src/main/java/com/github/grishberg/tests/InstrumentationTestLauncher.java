@@ -33,7 +33,7 @@ public class InstrumentationTestLauncher {
     private InstrumentationArgsProvider instrumentationArgsProvider;
     private InstrumentalExtension instrumentationInfo;
     private CommandsForAnnotationProvider commandsForAnnotationProvider;
-    private DeviceCommandsRunnerFabric deviceCommandsRunnerFabric;
+    private DeviceCommandsRunnerFactory deviceCommandsRunnerFabric;
     private AdbWrapper adbWrapper;
     private RunnerLogger logger;
     private String projectName;
@@ -47,7 +47,7 @@ public class InstrumentationTestLauncher {
                                        String buildDir,
                                        InstrumentalExtension instrumentalExtension,
                                        AdbWrapper adbWrapper,
-                                       DeviceCommandsRunnerFabric deviceCommandsRunnerFabric,
+                                       DeviceCommandsRunnerFactory deviceCommandsRunnerFabric,
                                        BuildFileSystem buildFileSystem,
                                        RunnerLogger logger) {
         this.projectName = projectName;
@@ -63,14 +63,14 @@ public class InstrumentationTestLauncher {
                                        String buildDir,
                                        InstrumentalExtension instrumentalExtension,
                                        AdbWrapper adbWrapper,
-                                       DeviceCommandsRunnerFabric deviceCommandsRunnerFabric,
+                                       DeviceCommandsRunnerFactory deviceCommandsRunnerFabric,
                                        RunnerLogger logger) {
         this(projectName, buildDir, instrumentalExtension, adbWrapper,
                 deviceCommandsRunnerFabric, new BuildFileSystemImpl(), logger);
     }
 
     void initAfterApply(AdbWrapper adbWrapper,
-                        DeviceCommandsRunnerFabric deviceCommandsRunnerFabric,
+                        DeviceCommandsRunnerFactory deviceCommandsRunnerFabric,
                         RunnerLogger logger) {
         this.adbWrapper = adbWrapper;
         this.deviceCommandsRunnerFabric = deviceCommandsRunnerFabric;

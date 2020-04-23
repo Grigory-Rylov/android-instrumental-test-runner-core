@@ -59,7 +59,7 @@ public class DeviceCommandsRunnerTest {
         mockDeviceBehavior(deviceWrapper,"emulator-5554", logger, result);
         when(context.getEnvironment()).thenReturn(environment);
         devices = Arrays.asList(deviceWrapper);
-        runner = new DeviceCommandsRunner(planProvider, commandProvider);
+        runner = new SimpleCommandsRunner(planProvider, commandProvider);
     }
 
     private void mockDeviceBehavior(ConnectedDeviceWrapper deviceWrapper,
