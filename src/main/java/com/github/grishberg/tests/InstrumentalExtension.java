@@ -14,6 +14,7 @@ public class InstrumentalExtension {
     boolean makeScreenshotsWhenFail;
     boolean saveLogcat;
     boolean shardEnabled;
+    long maxTimeToOutputResponseInSeconds;
 
     public InstrumentalExtension() { /* default constructor */ }
 
@@ -31,6 +32,7 @@ public class InstrumentalExtension {
         this.makeScreenshotsWhenFail = src.makeScreenshotsWhenFail;
         this.saveLogcat = src.saveLogcat;
         this.shardEnabled = src.shardEnabled;
+        this.maxTimeToOutputResponseInSeconds = src.maxTimeToOutputResponseInSeconds;
     }
 
     public void setFlavorName(String flavorName) {
@@ -114,5 +116,24 @@ public class InstrumentalExtension {
 
     public void setShardEnabled(boolean shardEnabled) {
         this.shardEnabled = shardEnabled;
+    }
+
+    /**
+     * @return maxTimeToOutputResponseInSeconds that is used as a maximum waiting time when expecting the
+     * command output from the device.
+     */
+    public long getMaxTimeToOutputResponseInSeconds() {
+        return maxTimeToOutputResponseInSeconds;
+    }
+
+    /**
+     * <p><var>maxTimeToOutputResponse</var> is used as a maximum waiting time when expecting the
+     * command output from the device.<br>
+     * At any time, if the shell command does not output anything for a period longer than
+     * <var>maxTimeToOutputResponse</var>, then the method will throw
+     * {@link com.github.grishberg.tests.commands.CommandExecutionException}.
+     */
+    public void setMaxTimeToOutputResponseInSeconds(long maxTimeToOutputResponseInSeconds) {
+        this.maxTimeToOutputResponseInSeconds = maxTimeToOutputResponseInSeconds;
     }
 }

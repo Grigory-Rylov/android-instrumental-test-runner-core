@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 public class InstrumentalTestPlanProviderTest {
     private static final String RUN_LOG_COMMAND = "am instrument -r -w -e log true -e listener test_listener TestAppPackage/TestRunner";
     private static final String RUN_LOG_COMMAND_WITH_ARG = "am instrument -r -w -e log true -e listener test_listener -e class com.test.SpecialTest TestAppPackage/TestRunner";
+    private static final long MAX_TIME_TO_OUTPUT = 300;
     private InstrumentalTestPlanProvider provider;
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
@@ -38,6 +39,7 @@ public class InstrumentalTestPlanProviderTest {
         extension.setInstrumentListener("test_listener");
         extension.setInstrumentalRunner("TestRunner");
         extension.setInstrumentalPackage("TestAppPackage");
+        extension.setMaxTimeToOutputResponseInSeconds(MAX_TIME_TO_OUTPUT);
         provider = new InstrumentalTestPlanProvider(paramsMap, extension, treeGenerator);
     }
 
@@ -48,7 +50,7 @@ public class InstrumentalTestPlanProviderTest {
         provider.provideTestPlan(deviceWrapper, args);
 
         verify(deviceWrapper).executeShellCommand(eq(RUN_LOG_COMMAND), any(InstrumentTestLogParser.class),
-                eq(0L), eq(TimeUnit.SECONDS));
+                eq(MAX_TIME_TO_OUTPUT), eq(TimeUnit.SECONDS));
     }
 
     @Test
@@ -60,6 +62,6 @@ public class InstrumentalTestPlanProviderTest {
         provider.provideTestPlan(deviceWrapper, args);
 
         verify(deviceWrapper).executeShellCommand(eq(RUN_LOG_COMMAND_WITH_ARG), any(InstrumentTestLogParser.class),
-                eq(0L), eq(TimeUnit.SECONDS));
+                eq(MAX_TIME_TO_OUTPUT), eq(TimeUnit.SECONDS));
     }
 }
