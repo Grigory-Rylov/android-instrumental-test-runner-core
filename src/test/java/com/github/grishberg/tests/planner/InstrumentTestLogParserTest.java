@@ -165,8 +165,11 @@ public class InstrumentTestLogParserTest {
     @Test(expected = InstrumentTestLogParserException.class)
     public void parseErrorState(){
         parser.processNewLines(linesWithWrongRunner());
+    }
 
-        List<TestPlanElement> testInstances = parser.getTestInstances();
+    @Test(expected = InstrumentTestLogParserException.class)
+    public void parseWrongRunnerState(){
+        parser.processNewLines(linesWithWrongRunnerWithoutError());
     }
 
     private void whenParsedSampleOut() throws Exception {
@@ -211,6 +214,20 @@ public class InstrumentTestLogParserTest {
                 "INSTRUMENTATION_STATUS: Error=Unable to find instrumentation info for: ComponentInfo{ru.yandex.searchplugin.tests/androidx.test.runner.ThereIsWrongLauncher}",
                 "INSTRUMENTATION_STATUS: id=ActivityManagerService",
                 "INSTRUMENTATION_STATUS_CODE: -1"
+        };
+    }
+
+    private static String[] linesWithWrongRunnerWithoutError() {
+        return new String[]{
+                "android.util.AndroidException: INSTRUMENTATION_FAILED: ru.yandex.searchplugin.tests/androidx.test.runner.ThereIsWrongLauncher",
+                "at com.android.commands.am.Instrument.run(Instrument.java:486)",
+                "at com.android.commands.am.Am.runInstrument(Am.java:194)",
+                "at com.android.commands.am.Am.onRun(Am.java:80)",
+                "at com.android.internal.os.BaseCommand.run(BaseCommand.java:54)",
+                "at com.android.commands.am.Am.main(Am.java:50)",
+                "at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)",
+                "at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:340)",
+                ""
         };
     }
 

@@ -21,6 +21,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
     private static final String INSTRUMENTATION_STATUS = "INSTRUMENTATION_STATUS: ";
     private static final String INSTRUMENTATION_RESULT = "INSTRUMENTATION_RESULT: ";
     private static final String INSTRUMENTATION_CODE = "INSTRUMENTATION_CODE: ";
+    private static final String INSTRUMENTATION_FAILED = "INSTRUMENTATION_FAILED: ";
     private static final String ID = "id";
     private static final String TEST = "test";
     private static final String CLASS = "class";
@@ -53,6 +54,7 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         if (logger != null) {
             logger.d(TAG, word);
         }
+        state.onNewLine(word);
         int startPos = word.indexOf(INSTRUMENTATION_RESULT);
         if (startPos >= 0) {
             parseInstrumentationResult(word.substring(startPos + INSTRUMENTATION_STATUS.length()));
@@ -62,6 +64,11 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         startPos = word.indexOf(INSTRUMENTATION_CODE);
         if (startPos >= 0) {
             state.setCode(word.substring(startPos + INSTRUMENTATION_CODE.length()));
+            return;
+        }
+
+        if (word.contains(INSTRUMENTATION_FAILED)) {
+            state = new InstrumentationFailedState(word);
             return;
         }
 
@@ -152,6 +159,8 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
         void setLongMessage(String longMsg);
 
         void setCode(String code);
+
+        default void onNewLine(String word) { /* stub */ }
     }
 
     private class StartNewObject implements State {
@@ -304,5 +313,46 @@ public class InstrumentTestLogParser extends MultiLineReceiver {
                 );
             }
         }
+    }
+
+    private class InstrumentationFailedState implements State {
+        private final StringBuilder sb = new StringBuilder();
+
+        public InstrumentationFailedState(String failedLine) {
+            sb.append(failedLine);
+            sb.append("\n");
+        }
+
+        @Override
+        public void storeValuesIfNeeded() {
+            throw new InstrumentTestLogParserException(sb.toString());
+        }
+
+        @Override
+        public void onNewLine(String word) {
+            sb.append(word);
+            sb.append("\n");
+        }
+
+        @Override
+        public void setAnnotations(List<AnnotationInfo> annotations) { /* not used */ }
+
+        @Override
+        public void setTestId(String testId) { /* not used */ }
+
+        @Override
+        public void setTestMethod(String testMethod) { /* not used */ }
+
+        @Override
+        public void setClassName(String className) { /* not used */ }
+
+        @Override
+        public void setShortMessage(String shortMsg) { /* not used */ }
+
+        @Override
+        public void setLongMessage(String longMsg) { /* not used */ }
+
+        @Override
+        public void setCode(String code) { /* not used */ }
     }
 }
