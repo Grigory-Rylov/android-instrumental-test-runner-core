@@ -33,7 +33,7 @@ public class InstrumentationTestLauncher {
     private InstrumentationArgsProvider instrumentationArgsProvider;
     private InstrumentalExtension instrumentationInfo;
     private CommandsForAnnotationProvider commandsForAnnotationProvider;
-    private DeviceCommandsRunnerFabric deviceCommandsRunnerFabric;
+    private CommandsRunnerFactory deviceCommandsRunnerFactory;
     private AdbWrapper adbWrapper;
     private RunnerLogger logger;
     private String projectName;
@@ -47,14 +47,14 @@ public class InstrumentationTestLauncher {
                                        String buildDir,
                                        InstrumentalExtension instrumentalExtension,
                                        AdbWrapper adbWrapper,
-                                       DeviceCommandsRunnerFabric deviceCommandsRunnerFabric,
+                                       CommandsRunnerFactory deviceCommandsRunnerFactory,
                                        BuildFileSystem buildFileSystem,
                                        RunnerLogger logger) {
         this.projectName = projectName;
         this.buildDir = buildDir;
         instrumentationInfo = new InstrumentalExtension(instrumentalExtension);
         this.adbWrapper = adbWrapper;
-        this.deviceCommandsRunnerFabric = deviceCommandsRunnerFabric;
+        this.deviceCommandsRunnerFactory = deviceCommandsRunnerFactory;
         this.logger = logger;
         this.buildFileSystem = buildFileSystem;
     }
@@ -63,17 +63,17 @@ public class InstrumentationTestLauncher {
                                        String buildDir,
                                        InstrumentalExtension instrumentalExtension,
                                        AdbWrapper adbWrapper,
-                                       DeviceCommandsRunnerFabric deviceCommandsRunnerFabric,
+                                       CommandsRunnerFactory deviceCommandsRunnerFactory,
                                        RunnerLogger logger) {
         this(projectName, buildDir, instrumentalExtension, adbWrapper,
-                deviceCommandsRunnerFabric, new BuildFileSystemImpl(), logger);
+                deviceCommandsRunnerFactory, new BuildFileSystemImpl(), logger);
     }
 
     void initAfterApply(AdbWrapper adbWrapper,
-                        DeviceCommandsRunnerFabric deviceCommandsRunnerFabric,
+                        CommandsRunnerFactory deviceCommandsRunnerFabric,
                         RunnerLogger logger) {
         this.adbWrapper = adbWrapper;
-        this.deviceCommandsRunnerFabric = deviceCommandsRunnerFabric;
+        this.deviceCommandsRunnerFactory = deviceCommandsRunnerFabric;
         this.logger = logger;
     }
 
@@ -96,7 +96,7 @@ public class InstrumentationTestLauncher {
 
         Environment environment = new Environment(getResultsDir(),
                 getReportsDir(), getCoverageDir());
-        DeviceCommandsRunner runner = deviceCommandsRunnerFabric
+        DeviceCommandsRunner runner = deviceCommandsRunnerFactory
                 .provideDeviceCommandRunner(commandProvider);
 
         TestRunnerContext context = new TestRunnerContext(instrumentationInfo,
@@ -127,7 +127,7 @@ public class InstrumentationTestLauncher {
                 deviceTypeAdapter = new DefaultDeviceTypeAdapter();
             }
             instrumentationArgsProvider = new DefaultInstrumentationArgsProvider(
-                    instrumentationInfo, new ShardArgumentsImpl(adbWrapper, logger, deviceTypeAdapter));
+                    instrumentationInfo, new ShardArgumentsImpl(adbWrapper, deviceTypeAdapter));
             logger.i(TAG, "init: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
         }
         if (commandProvider == null) {

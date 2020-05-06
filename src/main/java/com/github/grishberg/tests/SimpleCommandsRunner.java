@@ -1,11 +1,12 @@
 package com.github.grishberg.tests;
 
+import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.commands.DeviceCommandResult;
 import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
-import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -13,7 +14,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Executes commands for online devices.
  */
-class DeviceCommandsRunner {
+class SimpleCommandsRunner implements DeviceCommandsRunner {
     private static final String TAG = "DCR";
     private final InstrumentalTestPlanProvider testPlanProvider;
     private final DeviceRunnerCommandProvider commandProvider;
@@ -22,14 +23,16 @@ class DeviceCommandsRunner {
     private volatile Throwable commandException;
     private volatile String failedDeviceName;
 
-    DeviceCommandsRunner(InstrumentalTestPlanProvider testPlanProvider,
+    SimpleCommandsRunner(InstrumentalTestPlanProvider testPlanProvider,
                          DeviceRunnerCommandProvider commandProvider) {
         this.testPlanProvider = testPlanProvider;
         this.commandProvider = commandProvider;
     }
 
-    boolean runCommands(List<ConnectedDeviceWrapper> devices, final TestRunnerContext context) throws InterruptedException,
-            CommandExecutionException {
+    @Override
+    public boolean runCommands(
+            @NotNull List<? extends ConnectedDeviceWrapper> devices,
+            @NotNull TestRunnerContext context) throws InterruptedException, CommandExecutionException {
         final CountDownLatch deviceCounter = new CountDownLatch(devices.size());
         final Environment environment = context.getEnvironment();
         for (ConnectedDeviceWrapper device : devices) {
@@ -49,7 +52,7 @@ class DeviceCommandsRunner {
                     }
                 } catch (Throwable e) {
                     logger.e(TAG, "Execute command exception:", e);
-                    synchronized (DeviceCommandsRunner.this) {
+                    synchronized (SimpleCommandsRunner.this) {
                         // Save exception from the first failed child thread only
                         if (commandException == null) {
                             commandException = e;

@@ -33,7 +33,7 @@ public class InstrumentationTestLauncherTest {
     @Mock
     AdbWrapper adbWrapper;
     @Mock
-    DeviceCommandsRunnerFabric deviceCommandsRunnerFabric;
+    CommandsRunnerFactory deviceCommandsRunnerFabric;
     @Mock
     RunnerLogger logger;
     @Mock
