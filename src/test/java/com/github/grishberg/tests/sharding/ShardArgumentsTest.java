@@ -44,7 +44,7 @@ public class ShardArgumentsTest {
         when(tablet1.getWidthInDp()).thenReturn(600L);
         when(tablet2.getWidthInDp()).thenReturn(600L);
         when(adbWrapper.provideDevices()).thenReturn(deviceList);
-        sharding = new ShardArgumentsImpl(adbWrapper, logger,
+        sharding = new ShardArgumentsImpl(adbWrapper,
                 new TabletsAndPhoneDeviceTypeAdapter(600));
     }
 

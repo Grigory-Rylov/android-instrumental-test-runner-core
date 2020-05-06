@@ -127,7 +127,7 @@ public class InstrumentationTestLauncher {
                 deviceTypeAdapter = new DefaultDeviceTypeAdapter();
             }
             instrumentationArgsProvider = new DefaultInstrumentationArgsProvider(
-                    instrumentationInfo, new ShardArgumentsImpl(adbWrapper, logger, deviceTypeAdapter));
+                    instrumentationInfo, new ShardArgumentsImpl(adbWrapper, deviceTypeAdapter));
             logger.i(TAG, "init: instrumentationArgsProvider is empty, use DefaultInstrumentationArgsProvider");
         }
         if (commandProvider == null) {
