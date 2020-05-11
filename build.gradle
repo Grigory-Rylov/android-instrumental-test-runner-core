@@ -18,7 +18,7 @@ plugins {
 }
 
 group 'com.github.grishberg'
-version '1.6.13'
+version '1.6.14'
 
 apply plugin: 'kotlin'
 
