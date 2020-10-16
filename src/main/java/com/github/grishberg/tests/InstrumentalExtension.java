@@ -14,6 +14,7 @@ public class InstrumentalExtension {
     boolean makeScreenshotsWhenFail;
     boolean saveLogcat;
     boolean shardEnabled;
+    boolean htmlReportsEnabled;
     long maxTimeToOutputResponseInSeconds;
 
     public InstrumentalExtension() { /* default constructor */ }
@@ -32,6 +33,7 @@ public class InstrumentalExtension {
         this.makeScreenshotsWhenFail = src.makeScreenshotsWhenFail;
         this.saveLogcat = src.saveLogcat;
         this.shardEnabled = src.shardEnabled;
+        this.htmlReportsEnabled = src.htmlReportsEnabled;
         this.maxTimeToOutputResponseInSeconds = src.maxTimeToOutputResponseInSeconds;
     }
 
@@ -116,6 +118,14 @@ public class InstrumentalExtension {
 
     public void setShardEnabled(boolean shardEnabled) {
         this.shardEnabled = shardEnabled;
+    }
+
+    public boolean isHtmlReportsEnabled() {
+        return htmlReportsEnabled;
+    }
+
+    public void setHtmlReportsEnabled(boolean htmlReportsEnabled) {
+        this.htmlReportsEnabled = htmlReportsEnabled;
     }
 
     /**
