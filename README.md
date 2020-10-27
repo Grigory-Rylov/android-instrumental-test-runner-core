@@ -1,7 +1,9 @@
 [![Build Status](https://travis-ci.org/Grigory-Rylov/android-instrumental-test-runner.svg?branch=master)](https://travis-ci.org/Grigory-Rylov/android-instrumental-test-runner)
-[![Quality Gate](https://sonarcloud.io/api/badges/gate?key=com.github.grishberg:android-instrumental-test-runner)](https://sonarcloud.io/dashboard/index/com.github.grishberg:android-instrumental-test-runner) [![Technical debt ratio](https://sonarcloud.io/api/badges/measure?key=com.github.grishberg:android-instrumental-test-runner&metric=sqale_debt_ratio)](https://sonarcloud.io/dashboard/index/com.github.grishberg:android-instrumental-test-runner)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.github.grishberg%3Aandroid-instrumental-test-runner&metric=coverage)](https://sonarcloud.io/api/project_badges/measure?project=com.github.grishberg%3Aandroid-instrumental-test-runner&metric=coverage)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.github.grishberg%3Aandroid-instrumental-test-runner&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.github.grishberg%3Aandroid-instrumental-test-runner) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=com.github.grishberg%3Aandroid-instrumental-test-runner&metric=sqale_index)](https://sonarcloud.io/dashboard?id=com.github.grishberg%3Aandroid-instrumental-test-runner)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.github.grishberg%3Aandroid-instrumental-test-runner&metric=coverage)](https://sonarcloud.io/dashboard?id=com.github.grishberg%3Aandroid-instrumental-test-runner)
 [![Download](https://api.bintray.com/packages/grigory-rylov/android/android-instrumental-test-runner-core/images/download.svg) ](https://bintray.com/grigory-rylov/android/android-instrumental-test-runner-core/_latestVersion)
+![Download count](https://img.shields.io/bintray/dt/grigory-rylov/android/android-instrumental-test-runner-core.svg)
+
 # android-instrumentation-test-runner-core
 Runner for espresso tests
 
