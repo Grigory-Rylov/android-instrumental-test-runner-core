@@ -49,6 +49,8 @@ public class TestPlanElement {
 
     /**
      * Clone instance of srcElement.
+     *
+     * @param srcElement source element.
      */
     public TestPlanElement(TestPlanElement srcElement) {
         this.testId = srcElement.testId;

@@ -13,6 +13,16 @@ Sample project https://github.com/Grigory-Rylov/Android-Intsrumentation-Test-Exa
 
 
 To use with single test use command line parameter -PtestClass=com.test.SomeClassWithTests
+
+# Dependecies
+## Gradle
+```
+dependencies {
+    implementation "io.github.grigory-rylov:android-instrumental-test-runner-core:$version"
+}
+
+```
+
 Copyright 2017 Grigory Rylov
 
 Licensed under the Apache License, Version 2.0 (the "License");

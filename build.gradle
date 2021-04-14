@@ -1,5 +1,5 @@
 buildscript {
-    def kotlin_version = '1.2.61'
+    def kotlin_version = '1.4.30'
 
     repositories {
         mavenCentral()
@@ -10,14 +10,15 @@ buildscript {
 }
 
 plugins {
-    id "org.sonarqube" version "2.6"
+    id "org.sonarqube" version "3.1.1"
     id 'java'
     id 'groovy'
     id 'jacoco'
-    id "com.jfrog.bintray" version "1.7.3"
+    id 'maven-publish'
+    id 'signing'
 }
 
-group 'com.github.grishberg'
+group 'io.github.grigory-rylov'
 version '1.6.15'
 
 apply plugin: 'kotlin'
@@ -26,13 +27,17 @@ ext {
     PUBLISH_GROUP_ID = group
     PUBLISH_ARTIFACT_ID = 'android-instrumental-test-runner-core'
     PUBLISH_VERSION = version
+    GROUP = group
+    VERSION_NAME = version
+    POM_ARTIFACT_ID='android-instrumental-test-runner-core'
 }
+
+apply plugin: 'signing'
 
 sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    jcenter()
     maven {
         url 'https://maven.google.com'
     }
@@ -79,7 +84,7 @@ configurations {
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
-    testClassesDir = sourceSets.integration.output.classesDir
+    testClassesDirs = sourceSets.integration.output.classesDirs
     classpath = sourceSets.integration.runtimeClasspath
 }
 
@@ -94,23 +99,16 @@ tasks.sonarqube.dependsOn jacocoTestReport
 
 test {
     jacoco {
-        append = true
         includeNoLocationClasses = true
     }
 }
 
-apply from: 'sonar.gradle'
-
-// need to call  ./gradlew clean build generateRelease
-apply from: 'publish.gradle'
-
-apply plugin: 'maven-publish'
-// ./gradlew publishToMavenLocal
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
+apply from: 'sonar.gradle'
+
+// ./gradlew -Prelease publish
+apply from: 'publish.gradle'

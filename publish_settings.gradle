@@ -1,0 +1,16 @@
+project.ext {
+    POM_PROJECT_NAME='Android instrumental test runner core'
+    POM_DESCRIPTION='Library allows to run espresso test with device screen filtering.\n' +
+            'Also allows to execute actions before test execution for instance clear data,' +
+            ' create some files e.t.c'
+    POM_URL='https://github.com/Grigory-Rylov/android-instrumental-test-runner-core'
+    POM_SCM_URL='https://github.com/Grigory-Rylov/android-instrumental-test-runner-core'
+    POM_SCM_CONNECTION='scm:git:https://github.com/Grigory-Rylov/android-instrumental-test-runner-core'
+    POM_SCM_DEV_CONNECTION='scm:git:https://github.com/Grigory-Rylov/android-instrumental-test-runner-core'
+    POM_LICENCE_NAME='The Apache License, Version 2.0'
+    POM_LICENCE_URL='https://www.apache.org/licenses/LICENSE-2.0.txt'
+    POM_DEVELOPER_ID='grishberg'
+    POM_DEVELOPER_NAME='Grigory Rylov'
+    POM_DEVELOPER_MAIL='grishberg@gmail.com'
+    POM_PACKAGING='jar'
+}
