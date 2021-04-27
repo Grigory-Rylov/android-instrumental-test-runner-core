@@ -76,6 +76,8 @@ public class XmlTestRunListener implements ITestRunListener {
 
     /**
      * Sets the report file to use.
+     *
+     * @param file output report dir
      */
     public void setReportDir(File file) {
         mReportDir = file;

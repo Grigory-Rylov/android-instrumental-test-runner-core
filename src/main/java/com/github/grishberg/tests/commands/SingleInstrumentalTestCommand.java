@@ -221,7 +221,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
 
         if (result.isFailed()) {
             logger.i(TAG, "{} tests failed during command = {}. " +
-                            "Will attempt to rerun them", failedTests.size(), this);
+                    "Will attempt to rerun them", failedTests.size(), this);
             retryFailedTests(targetDevice, context, failedTests, result);
         }
 
@@ -368,8 +368,8 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
          * @return commands to run failed tests. Cleanup commands can be included. Commands will
          * be run run after failed tests found, so prepared device environment by previous commands
          * is ready.
-         * <br/>If retry isn't needed, return empty list or use {@link #NOOP}
-         * <br/><b>NOTE:</b> new tests commands must have different test name than previous one.
+         * <br>If retry isn't needed, return empty list or use {@link #NOOP}
+         * <br><b>NOTE:</b> new tests commands must have different test name than previous one.
          */
         @NotNull
         List<DeviceRunnerCommand> getRetryCommands(

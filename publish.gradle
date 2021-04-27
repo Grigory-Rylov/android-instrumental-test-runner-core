@@ -1,45 +1,67 @@
 // ./gradlew clean build generateRelease
-apply plugin: 'maven'
+apply from: 'publish_settings.gradle'
 
-def groupId = project.PUBLISH_GROUP_ID
 def artifactId = project.PUBLISH_ARTIFACT_ID
-def version = project.PUBLISH_VERSION
 
-def localReleaseDest = "${buildDir}/release/${version}"
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = project.PUBLISH_ARTIFACT_ID
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = project.POM_PROJECT_NAME
+                description = project.POM_DESCRIPTION
+                url = project.POM_URL
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
+                licenses {
+                    license {
+                        name = project.POM_LICENCE_NAME
+                        url = project.POM_LICENCE_URL
+                    }
+                }
+                developers {
+                    developer {
+                        id = project.POM_DEVELOPER_ID
+                        name = project.POM_DEVELOPER_NAME
+                        email = project.POM_DEVELOPER_MAIL
+                    }
+                }
+                scm {
+                    connection = project.POM_SCM_CONNECTION
+                    developerConnection = project.POM_SCM_DEV_CONNECTION
+                    url = project.POM_SCM_URL
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username project.hasProperty('ossrhUsername') ? project.property('ossrhUsername') : ''
+                password project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : ''
+            }
 
-uploadArchives {
-    repositories.mavenDeployer {
-        pom.groupId = groupId
-        pom.artifactId = artifactId
-        pom.version = version
-        // Add other pom properties here if you want (developer details / licenses)
-        repository(url: "file://${localReleaseDest}")
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl
+        }
     }
 }
 
-task zipRelease(type: Zip) {
-    from localReleaseDest
-    destinationDir buildDir
-    archiveName "release-${version}.zip"
+signing {
+    sign publishing.publications.mavenJava
 }
 
-task generateRelease() {
-
-    doLast() {
-        println "Release ${version} can be found at ${localReleaseDest}/"
-        println "Release ${version} zipped can be found ${buildDir}/release-${version}.zip"
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
     }
-}
-
-generateRelease.dependsOn(uploadArchives)
-generateRelease.dependsOn(zipRelease)
-
-
-artifacts {
-    archives sourcesJar
 }
