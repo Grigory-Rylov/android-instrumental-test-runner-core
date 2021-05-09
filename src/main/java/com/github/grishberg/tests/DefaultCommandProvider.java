@@ -1,8 +1,11 @@
 package com.github.grishberg.tests;
 
-import com.github.grishberg.tests.commands.*;
+import com.github.grishberg.tests.commands.CommandExecutionException;
+import com.github.grishberg.tests.commands.DeviceRunnerCommand;
+import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
+import com.github.grishberg.tests.commands.SetAnimationSpeedCommand;
+import com.github.grishberg.tests.commands.SingleInstrumentalTestCommand;
 import com.github.grishberg.tests.common.RunnerLogger;
-import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import com.github.grishberg.tests.planner.TestPlanElement;
 
 import java.util.ArrayList;
@@ -27,19 +30,19 @@ public class DefaultCommandProvider implements DeviceRunnerCommandProvider {
     }
 
     @Override
-    public List<DeviceRunnerCommand> provideCommandsForDevice(ConnectedDeviceWrapper device,
-                                                              InstrumentalTestPlanProvider testPlanProvider,
-                                                              Environment environment) throws CommandExecutionException {
+    public List<DeviceRunnerCommand> provideCommandsForDevice(
+            ConnectedDeviceWrapper device,
+            List<TestPlanElement> tests,
+            Environment environment) throws CommandExecutionException {
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         commands.add(new SetAnimationSpeedCommand(0, 0, 0));
         RunnerLogger logger = device.getLogger();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
         logger.i(TAG, "provideCommandsForDevice: args = {}", instrumentalArgs);
-        List<TestPlanElement> planSet = testPlanProvider.provideTestPlan(device, instrumentalArgs);
 
         List<TestPlanElement> planList = new ArrayList<>();
         int testIndex = 0;
-        for (TestPlanElement currentPlan : planSet) {
+        for (TestPlanElement currentPlan : tests) {
             List<DeviceRunnerCommand> commandsForAnnotations = commandsForAnnotationProvider
                     .provideCommand(currentPlan.getAnnotations());
             if (!commandsForAnnotations.isEmpty()) {

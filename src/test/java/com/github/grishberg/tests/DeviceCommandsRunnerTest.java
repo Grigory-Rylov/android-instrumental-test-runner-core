@@ -1,11 +1,5 @@
 package com.github.grishberg.tests;
 
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.github.grishberg.tests.commands.CommandExecutionException;
 import com.github.grishberg.tests.commands.DeviceCommandResult;
 import com.github.grishberg.tests.commands.DeviceRunnerCommand;
@@ -13,8 +7,8 @@ import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.common.TestingSimpleLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
-import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
-
+import com.github.grishberg.tests.planner.TestListProvider;
+import com.github.grishberg.tests.planner.TestPlanElement;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +20,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 /**
  * Tests for {@link DeviceCommandsRunner}.
  * Created by grishberg on 27.03.18.
@@ -33,7 +35,7 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class DeviceCommandsRunnerTest {
     @Mock
-    InstrumentalTestPlanProvider planProvider;
+    TestListProvider testListProvider;
     @Mock
     DeviceRunnerCommandProvider commandProvider;
     @Mock
@@ -50,6 +52,7 @@ public class DeviceCommandsRunnerTest {
     private List<DeviceRunnerCommand> commands;
     private List<ConnectedDeviceWrapper> devices;
     private DeviceCommandsRunner runner;
+    private List<TestPlanElement> testList;
 
     @Before
     public void setUp() throws Exception {
@@ -59,7 +62,9 @@ public class DeviceCommandsRunnerTest {
         mockDeviceBehavior(deviceWrapper,"emulator-5554", logger, result);
         when(context.getEnvironment()).thenReturn(environment);
         devices = Arrays.asList(deviceWrapper);
-        runner = new SimpleCommandsRunner(planProvider, commandProvider);
+        runner = new SimpleCommandsRunner(testListProvider, commandProvider);
+        testList = new ArrayList<>();
+        when(testListProvider.provideTestList()).thenReturn(testList);
     }
 
     private void mockDeviceBehavior(ConnectedDeviceWrapper deviceWrapper,
@@ -69,7 +74,7 @@ public class DeviceCommandsRunnerTest {
             throws CommandExecutionException {
         when(deviceWrapper.getLogger()).thenReturn(logger);
         when(deviceWrapper.getName()).thenReturn(deviceName);
-        when(commandProvider.provideCommandsForDevice(deviceWrapper, planProvider, environment))
+        when(commandProvider.provideCommandsForDevice(eq(deviceWrapper), any(), eq(environment)))
                 .thenReturn(commands);
         when(command.execute(deviceWrapper, context)).thenReturn(result);
     }
@@ -168,7 +173,7 @@ public class DeviceCommandsRunnerTest {
     }
 
     @Test
-    public void manyChildsFailed() throws Exception {
+    public void manyChildrenFailed() throws Exception {
         ConnectedDeviceWrapper deviceWrapper2 = mock(ConnectedDeviceWrapper.class);
         RunnerLogger logger2 = spy(new TestingSimpleLogger());
         mockDeviceBehavior(deviceWrapper2, "emulator-5555", logger2,

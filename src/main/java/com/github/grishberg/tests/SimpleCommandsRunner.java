@@ -5,7 +5,8 @@ import com.github.grishberg.tests.commands.DeviceCommandResult;
 import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.common.RunnerLogger;
-import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
+import com.github.grishberg.tests.planner.TestListProvider;
+import com.github.grishberg.tests.planner.TestPlanElement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -16,14 +17,14 @@ import java.util.concurrent.CountDownLatch;
  */
 class SimpleCommandsRunner implements DeviceCommandsRunner {
     private static final String TAG = "DCR";
-    private final InstrumentalTestPlanProvider testPlanProvider;
+    private final TestListProvider testPlanProvider;
     private final DeviceRunnerCommandProvider commandProvider;
     private boolean hasFailedTests;
     // Exception from failed child thread (should be rethrown to parent)
     private volatile Throwable commandException;
     private volatile String failedDeviceName;
 
-    SimpleCommandsRunner(InstrumentalTestPlanProvider testPlanProvider,
+    SimpleCommandsRunner(TestListProvider testPlanProvider,
                          DeviceRunnerCommandProvider commandProvider) {
         this.testPlanProvider = testPlanProvider;
         this.commandProvider = commandProvider;
@@ -33,6 +34,9 @@ class SimpleCommandsRunner implements DeviceCommandsRunner {
     public boolean runCommands(
             @NotNull List<? extends ConnectedDeviceWrapper> devices,
             @NotNull TestRunnerContext context) throws InterruptedException, CommandExecutionException {
+
+        final List<TestPlanElement> testsList = testPlanProvider.provideTestList();
+
         final CountDownLatch deviceCounter = new CountDownLatch(devices.size());
         final Environment environment = context.getEnvironment();
         for (ConnectedDeviceWrapper device : devices) {
@@ -40,8 +44,10 @@ class SimpleCommandsRunner implements DeviceCommandsRunner {
                 final RunnerLogger logger = device.getLogger();
                 try {
                     logger.i(TAG, "New command execution task started to run commands");
-                    List<DeviceRunnerCommand> commands = commandProvider.provideCommandsForDevice(device,
-                            testPlanProvider, environment);
+                    List<DeviceRunnerCommand> commands = commandProvider.provideCommandsForDevice(
+                            device,
+                            testsList,
+                            environment);
                     for (DeviceRunnerCommand command : commands) {
                         logger.i(TAG, "Before executing command = {}", command.toString());
                         DeviceCommandResult result = command.execute(device, context);

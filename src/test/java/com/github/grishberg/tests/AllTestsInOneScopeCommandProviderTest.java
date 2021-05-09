@@ -2,7 +2,6 @@ package com.github.grishberg.tests;
 
 import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.common.RunnerLogger;
-import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,8 +34,6 @@ public class AllTestsInOneScopeCommandProviderTest {
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
-    InstrumentalTestPlanProvider planProvider;
-    @Mock
     Environment environment;
 
     @Before
@@ -48,7 +46,7 @@ public class AllTestsInOneScopeCommandProviderTest {
     @Test
     public void provideCommandsForDevice() throws Exception {
         List<DeviceRunnerCommand> commandList = provider.provideCommandsForDevice(deviceWrapper,
-                planProvider, environment);
+                Collections.emptyList(), environment);
         Assert.assertEquals(1, commandList.size());
         DeviceRunnerCommand command = commandList.get(0);
         Assert.assertNotNull(command);

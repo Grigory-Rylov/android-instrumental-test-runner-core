@@ -19,7 +19,13 @@ plugins {
 }
 
 group 'io.github.grigory-rylov'
-version '1.6.15'
+def versionValue = '2.0.0'
+
+if (project.hasProperty('release')) {
+    version versionValue
+} else {
+    version "$versionValue-SNAPSHOT"
+}
 
 apply plugin: 'kotlin'
 
@@ -27,9 +33,6 @@ ext {
     PUBLISH_GROUP_ID = group
     PUBLISH_ARTIFACT_ID = 'android-instrumental-test-runner-core'
     PUBLISH_VERSION = version
-    GROUP = group
-    VERSION_NAME = version
-    POM_ARTIFACT_ID='android-instrumental-test-runner-core'
 }
 
 apply plugin: 'signing'
@@ -44,7 +47,7 @@ repositories {
 }
 
 dependencies {
-    def kotlin_version = '1.2.61'
+    def kotlin_version = '1.4.30'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'org.apache.logging.log4j:log4j-api:2.6.1'
     compile 'org.apache.logging.log4j:log4j-core:2.6.1'
@@ -58,6 +61,8 @@ dependencies {
     compile group: 'com.android.tools.ddms', name: 'ddmlib', version: '26.5.0'
     // https://mvnrepository.com/artifact/commons-io/commons-io
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
+
+    compile 'com.linkedin.dextestparser:parser:2.3.1'
 }
 
 compileGroovy {
