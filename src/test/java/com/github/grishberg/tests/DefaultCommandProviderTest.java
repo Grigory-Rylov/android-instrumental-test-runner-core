@@ -6,7 +6,6 @@ import com.github.grishberg.tests.commands.SetAnimationSpeedCommand;
 import com.github.grishberg.tests.commands.SingleInstrumentalTestCommand;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.planner.AnnotationInfo;
-import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
 import com.github.grishberg.tests.planner.TestPlanElement;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,7 +14,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,15 +31,11 @@ public class DefaultCommandProviderTest {
     private static final AnnotationInfo ANNOTATION = new AnnotationInfo("TestAnnotation");
     private static final String PROJECT_NAME = "test_project";
     @Mock
-    InstrumentalExtension extension;
-    @Mock
     InstrumentationArgsProvider argsProvider;
     @Mock
     RunnerLogger logger;
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
-    @Mock
-    InstrumentalTestPlanProvider planProvider;
     @Mock
     Environment environment;
     @Mock
@@ -46,10 +44,9 @@ public class DefaultCommandProviderTest {
     TestPlanElement element;
     @Mock
     TestPlanElement elementWithAnnotation;
-    @Mock
-    TestRunnerContext context;
     private DefaultCommandProvider provider;
     private List<DeviceRunnerCommand> clearCommand = Arrays.asList(new ClearCommand());
+    private List<TestPlanElement> tests;
 
     @Before
     public void setUp() throws Exception {
@@ -64,8 +61,7 @@ public class DefaultCommandProviderTest {
         when(commandsForAnnotationProvider.provideCommand(emptyAnnotations))
                 .thenReturn(new ArrayList<>());
 
-        List<TestPlanElement> testPlanElements = Arrays.asList(element);
-        when(planProvider.provideTestPlan(deviceWrapper, ARGS)).thenReturn(testPlanElements);
+        tests = Arrays.asList(element);
         when(argsProvider.provideInstrumentationArgs(deviceWrapper)).thenReturn(ARGS);
         provider = new DefaultCommandProvider(PROJECT_NAME, argsProvider,
                 commandsForAnnotationProvider);
@@ -74,7 +70,7 @@ public class DefaultCommandProviderTest {
     @Test
     public void provideCommandsForDevice() throws Exception {
         List<DeviceRunnerCommand> commandList = provider.provideCommandsForDevice(deviceWrapper,
-                planProvider, environment);
+                tests, environment);
         Assert.assertEquals(3, commandList.size());
         Assert.assertTrue(commandList.get(0) instanceof SetAnimationSpeedCommand);
 
@@ -93,7 +89,7 @@ public class DefaultCommandProviderTest {
         when(commandsForAnnotationProvider.provideCommand(annotations))
                 .thenReturn(clearCommand);
         List<DeviceRunnerCommand> commandList = provider.provideCommandsForDevice(deviceWrapper,
-                planProvider, environment);
+                tests, environment);
         Assert.assertEquals(4, commandList.size());
         Assert.assertTrue(commandList.get(0) instanceof SetAnimationSpeedCommand);
 
@@ -108,11 +104,10 @@ public class DefaultCommandProviderTest {
 
     @Test
     public void provideCommandsWhenHasAnnotations() throws Exception {
-        when(planProvider.provideTestPlan(deviceWrapper, ARGS)).thenReturn(
-                Arrays.asList(element, elementWithAnnotation));
+        List<TestPlanElement> testList = Arrays.asList(element, elementWithAnnotation);
 
         List<DeviceRunnerCommand> commandList = provider.provideCommandsForDevice(deviceWrapper,
-                planProvider, environment);
+                testList, environment);
         Assert.assertEquals(5, commandList.size());
         Assert.assertTrue(commandList.get(0) instanceof SetAnimationSpeedCommand);
 

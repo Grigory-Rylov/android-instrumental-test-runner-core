@@ -3,7 +3,7 @@ package com.github.grishberg.tests;
 import com.github.grishberg.tests.commands.DeviceRunnerCommand;
 import com.github.grishberg.tests.commands.DeviceRunnerCommandProvider;
 import com.github.grishberg.tests.commands.InstrumentalTestCommand;
-import com.github.grishberg.tests.planner.InstrumentalTestPlanProvider;
+import com.github.grishberg.tests.planner.TestPlanElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +24,10 @@ public class AllTestsInOneScopeCommandProvider implements DeviceRunnerCommandPro
     }
 
     @Override
-    public List<DeviceRunnerCommand> provideCommandsForDevice(ConnectedDeviceWrapper device,
-                                                              InstrumentalTestPlanProvider testPlanProvider,
-                                                              Environment environment) {
+    public List<DeviceRunnerCommand> provideCommandsForDevice(
+            ConnectedDeviceWrapper device,
+            List<TestPlanElement> tests,
+            Environment environment) {
         List<DeviceRunnerCommand> commands = new ArrayList<>();
         Map<String, String> instrumentalArgs = argsProvider.provideInstrumentationArgs(device);
         device.getLogger().i(TAG, "args = \"{}\"", instrumentalArgs);

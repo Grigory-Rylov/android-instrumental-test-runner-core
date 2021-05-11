@@ -9,7 +9,9 @@ public class InstrumentalExtension {
     String applicationId;
     String instrumentalPackage;
     String instrumentalRunner;
+    @Deprecated
     String instrumentListener = "com.github.grishberg.annotationprinter.AnnotationsTestPrinter";
+    String testApkPath;
     boolean coverageEnabled;
     boolean makeScreenshotsWhenFail;
     boolean saveLogcat;
@@ -28,7 +30,7 @@ public class InstrumentalExtension {
         this.applicationId = src.applicationId;
         this.instrumentalPackage = src.instrumentalPackage;
         this.instrumentalRunner = src.instrumentalRunner;
-        this.instrumentListener = src.instrumentListener;
+        this.testApkPath = src.testApkPath;
         this.coverageEnabled = src.coverageEnabled;
         this.makeScreenshotsWhenFail = src.makeScreenshotsWhenFail;
         this.saveLogcat = src.saveLogcat;
@@ -145,5 +147,13 @@ public class InstrumentalExtension {
      */
     public void setMaxTimeToOutputResponseInSeconds(long maxTimeToOutputResponseInSeconds) {
         this.maxTimeToOutputResponseInSeconds = maxTimeToOutputResponseInSeconds;
+    }
+
+    public String getTestApkPath() {
+        return testApkPath;
+    }
+
+    public void setTestApkPath(String testApkPath) {
+        this.testApkPath = testApkPath;
     }
 }
