@@ -27,21 +27,31 @@ public class ClearCommandTest {
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
     TestRunnerContext context;
-    private ClearCommand clearCommand;
 
     @Before
     public void setUp() throws Exception {
         when(context.getInstrumentalInfo()).thenReturn(ext);
         when(deviceWrapper.getLogger()).thenReturn(logger);
         when(ext.getApplicationId()).thenReturn("appId");
-        clearCommand = new ClearCommand();
     }
 
     @Test
-    public void execute() throws Exception {
-        clearCommand.execute(deviceWrapper, context);
+    public void clearDefaultCommand() throws Exception {
+        ClearCommand command = new ClearCommand();
+        command.execute(deviceWrapper, context);
 
         Mockito.verify(deviceWrapper).executeShellCommand("pm clear appId");
-        verify(logger).i(ClearCommand.class.getSimpleName(), "ClearCommand for package {}", "appId");
+        verify(logger).d(ClearCommand.class.getSimpleName(), "ClearCommand for package {}",
+                "appId");
+    }
+
+    @Test
+    public void clearCustomCommand() throws Exception {
+        ClearCommand command = new ClearCommand("com.yandex.test");
+        command.execute(deviceWrapper, context);
+
+        Mockito.verify(deviceWrapper).executeShellCommand("pm clear com.yandex.test");
+        verify(logger).d(ClearCommand.class.getSimpleName(), "ClearCommand for package {}",
+                "com.yandex.test");
     }
 }
