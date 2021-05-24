@@ -12,5 +12,7 @@ public interface DeviceShellExecuter {
 
     void pullFile(String temporaryCoverageCopy, String path) throws CommandExecutionException;
 
+    void pushFile(String localPath, String remotePath) throws CommandExecutionException;
+
     String getName();
 }
