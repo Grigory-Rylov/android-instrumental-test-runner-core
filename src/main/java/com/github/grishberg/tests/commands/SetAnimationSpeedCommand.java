@@ -29,4 +29,13 @@ public class SetAnimationSpeedCommand implements DeviceRunnerCommand {
                 animatorDurationScale));
         return new DeviceCommandResult();
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{" +
+                "window_animation_scale: $windowAnimationScale, " +
+                "transition_animation_scale: $transitionAnimationScale, " +
+                "animator_duration_scale: $animatorDurationScale" +
+                "}";
+    }
 }
