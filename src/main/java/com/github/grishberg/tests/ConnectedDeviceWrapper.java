@@ -6,9 +6,12 @@ import com.github.grishberg.tests.common.DeviceSpecificLogger;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.common.ScreenSizeParser;
 import com.github.grishberg.tests.exceptions.PullCoverageException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -43,8 +46,20 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
                                                  long maxTimeToOutputResponse,
                                                  TimeUnit maxTimeUnits) throws TimeoutException,
             AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        logUnsecureShellCommandWarning(command, logger);
         logger.d(TAG, "Execute shell command \"{}\"", command);
         device.executeShellCommand(command, receiver, maxTimeToOutputResponse, maxTimeUnits);
+    }
+
+    private void logUnsecureShellCommandWarning(String command, RunnerLogger logger) {
+        List<String> secureWords = DefaultShellCommand.Companion.getSECURE_WORDS();
+        secureWords.forEach( word -> {
+            if (StringUtils.containsIgnoreCase(command, word)) {
+                logger.w(TAG, "Your ADB shell command contains secure word \"{}\" and likely has " +
+                        "secure information which can appear in logs if you use DEBUG logging level. " +
+                        "Consider using another executeShellCommand() method with sanitized logging strings", word);
+            }
+        });
     }
 
     @Override
@@ -201,7 +216,21 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
                                                  long maxTimeout, long maxTimeToOutputResponse,
                                                  TimeUnit maxTimeUnits) throws TimeoutException,
             AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        logger.d(TAG, "Execute shell command \"{}\"", command);
+        logUnsecureShellCommandWarning(command, logger);
+        executeShellCommand(command, command, receiver, maxTimeout, maxTimeToOutputResponse, maxTimeUnits);
+    }
+
+    /**
+     * The same as {@link #executeShellCommand(String, IShellOutputReceiver, long, long, TimeUnit)} but with customized
+     * command string for logging.
+     *
+     * @param loggedCommand logged command string (erase tokens, passwords and other secure information here).
+     */
+    public synchronized void executeShellCommand(String command, String loggedCommand, IShellOutputReceiver receiver,
+                                                 long maxTimeout, long maxTimeToOutputResponse,
+                                                 TimeUnit maxTimeUnits) throws TimeoutException,
+            AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        logger.d(TAG, "Execute shell command \"{}\"", loggedCommand);
         device.executeShellCommand(command, receiver, maxTimeout, maxTimeToOutputResponse, maxTimeUnits);
     }
 
@@ -225,6 +254,19 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
             CollectingOutputReceiver receiver = new CollectingOutputReceiver();
             executeShellCommand(command, receiver, 5L, TimeUnit.MINUTES);
             return receiver.getOutput();
+        } catch (Throwable e) {
+            throw new CommandExecutionException("executeShellCommand exception:", e);
+        }
+    }
+
+    /**
+     * Execute shell command configured with {@link ShellCommand} interface.
+     */
+    public void executeShellCommand(ShellCommand command) throws CommandExecutionException {
+        try {
+            executeShellCommand(command.getCommand(), command.getLoggedCommand(),
+                    command.getReceiver(), command.getMaxTimeout(), command.getMaxTimeToOutputResponse(),
+                    command.getMaxTimeUnits());
         } catch (Throwable e) {
             throw new CommandExecutionException("executeShellCommand exception:", e);
         }
