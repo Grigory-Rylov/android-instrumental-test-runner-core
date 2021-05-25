@@ -138,6 +138,17 @@ public class ConnectedDeviceWrapper implements IShellEnabledDevice, DeviceShellE
         }
     }
 
+    @Override
+    public synchronized void pushFile(String localPath, String remotePath)
+            throws CommandExecutionException {
+        logger.d(TAG, "Push file \"{}\" -> \"{}\"", localPath, remotePath);
+        try {
+            device.pushFile(localPath, remotePath);
+        } catch (Throwable e) {
+            throw new CommandExecutionException("pushFile exception:", e);
+        }
+    }
+
     public synchronized boolean isEmulator() {
         return device.isEmulator();
     }
