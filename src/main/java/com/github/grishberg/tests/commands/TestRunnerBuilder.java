@@ -1,11 +1,13 @@
 package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.utils.ILogger;
 import com.github.grishberg.tests.*;
 import com.github.grishberg.tests.commands.reports.*;
 import com.github.grishberg.tests.common.RunnerLogger;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -19,6 +21,8 @@ public class TestRunnerBuilder {
 
     public TestRunnerBuilder(String projectName,
                              String testGroupPrefix,
+                             @Nullable
+                             TestIdentifier fallbackTest,
                              Map<String, String> instrumentationArgs,
                              ConnectedDeviceWrapper targetDevice,
                              TestRunnerContext context,
@@ -51,6 +55,7 @@ public class TestRunnerBuilder {
                 projectName,
                 instrumentationInfo.getFlavorName(),
                 testGroupPrefix,
+                fallbackTest,
                 runTestLogger,
                 screenShotMaker,
                 logcatSaver,

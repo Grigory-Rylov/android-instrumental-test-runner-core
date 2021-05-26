@@ -121,11 +121,26 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
 
     private TestsCommandResult executeImpl(ConnectedDeviceWrapper targetDevice,
                                            TestRunnerContext context) throws CommandExecutionException {
+        assert allPlannedTests.size() > 0;
         InstrumentalExtension instrumentationInfo = context.getInstrumentalInfo();
         Environment environment = context.getEnvironment();
 
+        // NOTE: If process crashed too early the testRunListener may not receive testStarted()
+        // notification. As a result we get NullPointerException from failLastTest() method
+        // (see TestXmlReportsGenerator) because we don't know what to fail.
+        // But in this case we know what tests we are now running
+        // and we can guess it and make failLastTest() more reliable.
+        // Current implementation is based on DDMS InstrumentationResultParser behavior
+        // which calls `listener.testStarted(testId)` callback when test started.
+        // But this is not the case when we get native crash early.
+        // fallbackTest should be the first test to run in this plan.
+        // This test will be marked as FAILED if native crash happens early.
+        TestIdentifier fallbackTest = new TestIdentifier(
+                allPlannedTests.get(0).getClassName(), allPlannedTests.get(0).getMethodName());
+
         TestRunnerBuilder testRunnerBuilder = context.createTestRunnerBuilder(projectName,
                 testName,
+                fallbackTest,
                 instrumentationArgs,
                 targetDevice,
                 xmlReportGeneratorDelegate);

@@ -87,9 +87,9 @@ public class SingleInstrumentalTestCommandTest {
         when(deviceWrapper.getLogger()).thenReturn(mock(RunnerLogger.class));
         when(environment.getCoverageDir()).thenReturn(coverageDir);
         doAnswer((Answer<TestRunnerBuilder>) invocation -> {
-            instrumentationArgs = invocation.getArgument(2);
+            instrumentationArgs = invocation.getArgument(3);
             return testRunnerBuilder;
-        }).when(context).createTestRunnerBuilder(any(), any(), any(), any(), any());
+        }).when(context).createTestRunnerBuilder(any(), any(), any(), any(), any(), any());
 
         when(testRunnerBuilder.getTestRunListener()).thenReturn(reportsGenerator);
         when(testRunnerBuilder.getTestRunner()).thenReturn(testRunner);

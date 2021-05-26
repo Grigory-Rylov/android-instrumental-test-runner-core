@@ -11,4 +11,8 @@ public class CommandExecutionException extends Exception {
     public CommandExecutionException(Throwable e) {
         super(e);
     }
+
+    public CommandExecutionException(String message) {
+        super(message);
+    }
 }

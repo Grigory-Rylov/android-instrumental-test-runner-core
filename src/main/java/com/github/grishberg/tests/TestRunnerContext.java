@@ -1,5 +1,6 @@
 package com.github.grishberg.tests;
 
+import com.android.ddmlib.testrunner.TestIdentifier;
 import com.github.grishberg.tests.commands.TestRunnerBuilder;
 import com.github.grishberg.tests.common.RunnerLogger;
 
@@ -43,11 +44,13 @@ public class TestRunnerContext {
 
     public TestRunnerBuilder createTestRunnerBuilder(String projectName,
                                                      String testName,
+                                                     TestIdentifier fallbackTest,
                                                      Map<String, String> instrumentationArgs,
                                                      ConnectedDeviceWrapper targetDevice,
                                                      XmlReportGeneratorDelegate xmlDelegate) {
         return new TestRunnerBuilder(projectName,
                 testName,
+                fallbackTest,
                 instrumentationArgs,
                 targetDevice,
                 this,

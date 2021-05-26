@@ -45,8 +45,8 @@ public class TestRunnerBuilderTest {
         extension.setApplicationId("com.test.packageId");
         extension.setInstrumentalPackage(TEST_PACKAGE);
         extension.setInstrumentalRunner(RUNNER_NAME);
-        builder = new TestRunnerBuilder(PROJECT_NAME, TEST_NAME, args, deviceWrapper, context,
-                mock(XmlReportGeneratorDelegate.class));
+        builder = new TestRunnerBuilder(PROJECT_NAME, TEST_NAME, null, args, deviceWrapper,
+                context, mock(XmlReportGeneratorDelegate.class));
     }
 
     @Test

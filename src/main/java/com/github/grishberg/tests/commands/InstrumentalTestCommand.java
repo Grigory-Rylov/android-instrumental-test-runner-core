@@ -42,6 +42,7 @@ public class InstrumentalTestCommand implements DeviceRunnerCommand {
 
         TestRunnerBuilder testRunnerBuilder = new TestRunnerBuilder(projectName,
                 "",
+                null,
                 instrumentationArgs,
                 targetDevice,
                 context,
