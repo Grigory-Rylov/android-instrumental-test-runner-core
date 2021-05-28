@@ -3,6 +3,7 @@ package com.github.grishberg.tests.commands.reports;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.utils.ILogger;
 import com.github.grishberg.tests.XmlReportGeneratorDelegate;
+import com.github.grishberg.tests.commands.NoStartedTestException;
 import com.github.grishberg.tests.commands.reports.xml.CustomTestRunListener;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -24,12 +25,15 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
     private final ScreenShotMaker screenShotMaker;
     private final LogcatSaver logcatSaver;
     private XmlReportGeneratorDelegate xmlReportDelegate;
+    @Nullable
     private TestIdentifier currentTest;
 
     public TestXmlReportsGenerator(String deviceName,
                                    String projectName,
                                    String flavorName,
                                    String testPrefix,
+                                   @Nullable
+                                   TestIdentifier fallbackTest,
                                    ILogger logger,
                                    ScreenShotMaker screenShotMaker,
                                    LogcatSaver logcatSaver,
@@ -41,6 +45,7 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
         this.screenShotMaker = screenShotMaker;
         this.logcatSaver = logcatSaver;
         this.xmlReportDelegate = xmlReportDelegate;
+        this.currentTest = fallbackTest;
     }
 
     @Override
@@ -73,7 +78,14 @@ public class TestXmlReportsGenerator extends CustomTestRunListener {
         logcatSaver.saveLogcat("logcat");
     }
 
-    public void failLastTest(String trace) {
+    public void failLastTest(String trace) throws NoStartedTestException {
+        if (currentTest == null) {
+            throw new NoStartedTestException("Sorry, can't handle this. " +
+                    "We don't know what test to fail. This state can happen if tested app " +
+                    "crashed too early and Instrumentation command didn't get any reasonable " +
+                    "response and DDMS lib didn't call testStarted() callback. " +
+                    "Check your logcat for app crashes.");
+        }
         testFailed(currentTest, trace);
         super.testEnded(currentTest, 0, new HashMap<>());
     }

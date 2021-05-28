@@ -2,11 +2,16 @@ package com.github.grishberg.tests.commands.reports;
 
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.utils.ILogger;
+import com.github.grishberg.tests.RunTestLogger;
 import com.github.grishberg.tests.XmlReportGeneratorDelegate;
+import com.github.grishberg.tests.commands.NoStartedTestException;
+import com.yandex.tests.VerboseLogger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -24,26 +29,27 @@ import static org.mockito.Mockito.*;
 public class TestXmlReportsGeneratorTest {
     private static final String TEST_NAME = "test1";
     private static final String TEST_CLASS = "com.test.TestClass";
-    @Mock
-    ILogger logger;
+
+    private final ILogger logger = spy(new RunTestLogger(new VerboseLogger()));
+
     @Mock
     ScreenShotMaker screenShotMaker;
     @Mock
     LogcatSaver logcatSaver;
-    @Mock
-    TestIdentifier testIdentifier;
+
+    TestIdentifier testIdentifier = new TestIdentifier(TEST_CLASS, TEST_NAME);
+
     @Mock
     XmlReportGeneratorDelegate xmlReportDelegate;
     private TestXmlReportsGenerator generator;
 
     @Before
     public void setUp() throws Exception {
-        when(testIdentifier.getTestName()).thenReturn(TEST_NAME);
-        when(testIdentifier.getClassName()).thenReturn(TEST_CLASS);
         generator = new TestXmlReportsGenerator("DevName",
                 "ProjectName",
                 "FlavorName",
                 "TestPrefix",
+                null,
                 logger, screenShotMaker, logcatSaver, xmlReportDelegate);
     }
 
@@ -67,5 +73,43 @@ public class TestXmlReportsGeneratorTest {
         generator.testRunEnded(100, new HashMap<>());
 
         verify(logcatSaver).saveLogcat("logcat");
+    }
+
+    @Test
+    public void failLastTestAfterCrash() throws Exception {
+        generator.testStarted(testIdentifier);
+        generator.failLastTest("TRACE_LOG");
+
+        verify(logger).warning(
+                argThat(argument -> argument.contains("FAILED")),
+                eq("com.test.TestClass"),
+                eq("test1"));
+        verify(logger).warning(eq("TRACE_LOG"));
+
+        verify(screenShotMaker).makeScreenshot(TEST_CLASS, TEST_NAME);
+    }
+
+    @Test(expected = NoStartedTestException.class)
+    public void failLastTestAfterEarlyCrashBadCase() throws Exception {
+        generator.failLastTest("TRACE_LOG");
+    }
+
+    @Test
+    public void failLastTestAfterEarlyCrash() throws Exception {
+        generator = new TestXmlReportsGenerator("DevName",
+                "ProjectName",
+                "FlavorName",
+                "TestPrefix",
+                testIdentifier,
+                logger, screenShotMaker, logcatSaver, xmlReportDelegate);
+        generator.failLastTest("TRACE_LOG");
+
+        verify(logger).warning(
+                argThat(argument -> argument.contains("FAILED")),
+                eq("com.test.TestClass"),
+                eq("test1"));
+        verify(logger).warning(eq("TRACE_LOG"));
+
+        verify(screenShotMaker).makeScreenshot(TEST_CLASS, TEST_NAME);
     }
 }
