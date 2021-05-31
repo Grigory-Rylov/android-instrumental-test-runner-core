@@ -19,7 +19,7 @@ plugins {
 }
 
 group 'io.github.grigory-rylov'
-version '1.6.15'
+version '1.6.16'
 
 apply plugin: 'kotlin'
 
