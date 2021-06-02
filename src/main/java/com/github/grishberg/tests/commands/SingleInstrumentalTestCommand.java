@@ -61,7 +61,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
      * @param projectName Test project name. A string included in XML result file name.
      * @param testReportSuffix Test report suffix. A string included in XML result file name.
      * @param instrumentalArgs Custom arguments for "am instrument" command passed with
-     *                         "-e <key> <value>" syntax.
+     *                         "-e [key] [value]" syntax.
      * @param testForExecution List of tests to run.
      */
     public SingleInstrumentalTestCommand(String projectName,
@@ -79,7 +79,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
      * @param projectName Test project name. A string included in XML result file name.
      * @param testReportSuffix Test report suffix. A string included in XML result file name.
      * @param instrumentalArgs Custom arguments for "am instrument" command passed with
-     *                         "-e <key> <value>" syntax.
+     *                         "-e [key] [value]" syntax.
      * @param testForExecution List of tests to run.
      * @param retryHandler Retry handler.
      */
