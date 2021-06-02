@@ -2,6 +2,7 @@ package com.github.grishberg.tests.commands;
 
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.TestIdentifier;
+import com.android.ddmlib.testrunner.TestRunResult;
 import com.github.grishberg.tests.ConnectedDeviceWrapper;
 import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalExtension;
@@ -31,7 +32,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Executes instrumentation test for single test method.
+ * Executes "am instrument" command to run predefined set of tests and with custom instrumentation
+ * arguments.
+ *
+ * Usually only one "am instrument" command called. If native crash occurs which interrupts tests
+ * execution the second "am instrument" command will be spawned to run unrun tests. And it
+ * continues to spawn commands recursively until all tests are run.
+ *
+ * With a RetryHandler it is possible to add additional "retry" commands. Retry commands can be
+ * the similar SingleInstrumentalTestCommand instances but ensure they have no their own retry
+ * handler to prevent loop.
  */
 public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     private static final String TAG = "SITestCommand";
@@ -45,6 +55,15 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
     private final XmlReportGeneratorDelegate xmlReportGeneratorDelegate;
     private final RetryHandler retryHandler;
 
+    /**
+     * Constructs test command.
+     *
+     * @param projectName Test project name. A string included in XML result file name.
+     * @param testReportSuffix Test report suffix. A string included in XML result file name.
+     * @param instrumentalArgs Custom arguments for "am instrument" command passed with
+     *                         "-e <key> <value>" syntax.
+     * @param testForExecution List of tests to run.
+     */
     public SingleInstrumentalTestCommand(String projectName,
                                          String testReportSuffix,
                                          Map<String, String> instrumentalArgs,
@@ -54,6 +73,16 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
                 RetryHandler.NOOP);
     }
 
+    /**
+     * Constructs test command with retry handler.
+     *
+     * @param projectName Test project name. A string included in XML result file name.
+     * @param testReportSuffix Test report suffix. A string included in XML result file name.
+     * @param instrumentalArgs Custom arguments for "am instrument" command passed with
+     *                         "-e <key> <value>" syntax.
+     * @param testForExecution List of tests to run.
+     * @param retryHandler Retry handler.
+     */
     public SingleInstrumentalTestCommand(String projectName,
                                          String testReportSuffix,
                                          Map<String, String> instrumentalArgs,
@@ -148,7 +177,7 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         String singleTestMethodPrefix = String.format("%s#%s", targetDevice.getName(), testName);
         TestXmlReportsGenerator testRunListener = testRunnerBuilder.getTestRunListener();
 
-        TestTracker testTracker = new TestTracker(targetDevice.getLogger());
+        TestTracker testTracker = new TestTracker(targetDevice.getLogger(), fallbackTest);
         ProcessCrashedException processCrashedException = null;
         try {
             RemoteAndroidTestRunner testRunner = testRunnerBuilder.getTestRunner();
@@ -280,6 +309,11 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         return "SingleInstrumentalTestCommand{ " + instrumentationArgs + " }";
     }
 
+    /**
+     * Helper {@link com.android.ddmlib.testrunner.ITestRunListener} instance used to control
+     * failed, run and unrun tests used to restore test run after interruption caused by a native
+     * crash.
+     */
     private class TestTracker extends EmptyTestRunListener {
         private final RunnerLogger logger;
         final List<TestPlanElement> failedTests = new ArrayList<>();
@@ -287,8 +321,9 @@ public class SingleInstrumentalTestCommand implements DeviceRunnerCommand {
         private TestIdentifier currentTest;
         private boolean isCurrentTestFailed;
 
-        TestTracker(RunnerLogger logger) {
+        TestTracker(RunnerLogger logger, @CheckForNull TestIdentifier fallbackTest) {
             this.logger = logger;
+            this.currentTest = fallbackTest;
         }
 
         @Override

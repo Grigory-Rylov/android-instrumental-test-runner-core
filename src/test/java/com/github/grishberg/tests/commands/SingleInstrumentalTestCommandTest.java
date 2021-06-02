@@ -9,52 +9,79 @@ import com.github.grishberg.tests.Environment;
 import com.github.grishberg.tests.InstrumentalExtension;
 import com.github.grishberg.tests.ProcessCrashHandler;
 import com.github.grishberg.tests.TestRunnerContext;
+import com.github.grishberg.tests.XmlReportGeneratorDelegate;
 import com.github.grishberg.tests.commands.reports.TestXmlReportsGenerator;
 import com.github.grishberg.tests.common.RunnerLogger;
 import com.github.grishberg.tests.exceptions.ProcessCrashedException;
 import com.github.grishberg.tests.planner.TestPlanElement;
 
+import com.yandex.tests.VerboseLogger;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
- * Created by grishberg on 22.03.18.
+ * Unit tests for {@link SingleInstrumentalTestCommand}.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class SingleInstrumentalTestCommandTest {
     private static final String PROJECT_NAME = "test_project";
     private static final String TEST_CLASS = "com.test.TestClass";
     private static final String TEST_NAME = "test1";
+    private static final String TEST_NAME_2 = "test2";
+    private static final String TEST_NAME_3 = "test3";
     private static final String TEST_NAME_WITH_DEVICE = "test1[phone-1]";
+    private static final String TEST_NAME_2_WITH_DEVICE = "test2[phone-1]";
+    private static final String TEST_NAME_3_WITH_DEVICE = "test3[phone-1]";
     private static final long MAX_TIME_TO_OUTPUT = 300;
+
+    private static final List<TestPlanElement> ONE_TEST =
+            Arrays.asList(new TestPlanElement("", TEST_NAME, TEST_CLASS));
+
+    private static final List<TestPlanElement> TWO_TESTS =
+            Arrays.asList(new TestPlanElement("", TEST_NAME, TEST_CLASS),
+                    new TestPlanElement("", TEST_NAME_2, TEST_CLASS));
+
+    private static final List<TestPlanElement> THREE_TESTS =
+            Arrays.asList(new TestPlanElement("", TEST_NAME, TEST_CLASS),
+                    new TestPlanElement("", TEST_NAME_2, TEST_CLASS),
+                    new TestPlanElement("", TEST_NAME_3, TEST_CLASS));
+
+    private static final Answer TEST_RUN_CRASH = invocation -> {
+        for (Object listener : invocation.getArguments()) {
+            ((ITestRunListener) listener).testStarted(
+                    new TestIdentifier(TEST_CLASS, TEST_NAME_WITH_DEVICE));
+        }
+        throw new ProcessCrashedException("Process crashed");
+    };
+
     @Mock
     ConnectedDeviceWrapper deviceWrapper;
     @Mock
     Environment environment;
-    @Mock
-    RunnerLogger logger;
     @Mock
     TestRunnerContext context;
     @Mock
@@ -70,11 +97,13 @@ public class SingleInstrumentalTestCommandTest {
 
     @Mock
     ProcessCrashHandler processCrashedHandler;
-    private SingleInstrumentalTestCommand testCommand;
+
+    RunnerLogger logger = spy(new VerboseLogger());
+
     private HashMap<String, String> args = new HashMap<>();
     private InstrumentalExtension ext = new InstrumentalExtension();
-    private ArrayList<TestPlanElement> testElements = new ArrayList<>();
-    private Map<String, String> instrumentationArgs;
+
+    private Map<String, String> capturedInstrumentationArgs;
     private TestIdentifier currentTest = new TestIdentifier(TEST_CLASS, TEST_NAME);
 
     @Before
@@ -84,10 +113,10 @@ public class SingleInstrumentalTestCommandTest {
         when(context.getInstrumentalInfo()).thenReturn(ext);
         when(context.getEnvironment()).thenReturn(environment);
         when(context.getProcessCrashedHandler()).thenReturn(processCrashedHandler);
-        when(deviceWrapper.getLogger()).thenReturn(mock(RunnerLogger.class));
+        when(deviceWrapper.getLogger()).thenReturn(logger);
         when(environment.getCoverageDir()).thenReturn(coverageDir);
         doAnswer((Answer<TestRunnerBuilder>) invocation -> {
-            instrumentationArgs = invocation.getArgument(3);
+            capturedInstrumentationArgs = invocation.getArgument(3);
             return testRunnerBuilder;
         }).when(context).createTestRunnerBuilder(any(), any(), any(), any(), any(), any());
 
@@ -98,22 +127,24 @@ public class SingleInstrumentalTestCommandTest {
         when(reportsGenerator.getRunResult()).thenReturn(testRunResult);
         when(reportsGenerator.getCurrentTest()).thenReturn(currentTest);
 
+        when(testRunResult.getNumAllFailedTests()).thenReturn(0);
+
         when(deviceWrapper.getName()).thenReturn("test_device");
+
+        ext.setApplicationId("application_id");
         ext.setMaxTimeToOutputResponseInSeconds(MAX_TIME_TO_OUTPUT);
-        testElements.add(new TestPlanElement("", TEST_NAME, TEST_CLASS));
-        testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME, "test_prefix", args, testElements);
     }
 
     @Test
     public void initWithClass() throws Exception {
-        testCommand.execute(deviceWrapper, context);
+        runCommand(ONE_TEST);
 
-        assertEquals("com.test.TestClass#test1", instrumentationArgs.get("class"));
+        assertEquals("com.test.TestClass#test1", capturedInstrumentationArgs.get("class"));
     }
 
     @Test
     public void setMaxTimeToOutputFromInstrumentalExtension() throws Exception {
-        testCommand.execute(deviceWrapper, context);
+        runCommand(ONE_TEST);
 
         verify(testRunner).setMaxTimeToOutputResponse(MAX_TIME_TO_OUTPUT, TimeUnit.SECONDS);
     }
@@ -122,7 +153,7 @@ public class SingleInstrumentalTestCommandTest {
     public void testWhenCoverageEnabled() throws Exception {
         ext.setCoverageEnabled(true);
 
-        testCommand.execute(deviceWrapper, context);
+        runCommand(ONE_TEST);
 
         verify(deviceWrapper).pullCoverageFile(ext,
                 "test_device#test_prefix",
@@ -135,7 +166,7 @@ public class SingleInstrumentalTestCommandTest {
         ext.setCoverageEnabled(true);
         when(environment.getCoverageDir()).thenReturn(new File("/coverage"));
 
-        testCommand.execute(deviceWrapper, context);
+        runCommand(ONE_TEST);
 
         verify(deviceWrapper).pullCoverageFile(
                 any(InstrumentalExtension.class),
@@ -149,52 +180,87 @@ public class SingleInstrumentalTestCommandTest {
         Mockito.doThrow(new IOException(new Throwable())).when(testRunner)
                 .run((ITestRunListener[]) any());
 
-        testCommand.execute(deviceWrapper, context);
+        runCommand(ONE_TEST);
     }
 
     @Test
-    public void failTestWhenProcessCrashed() throws Exception {
-        doAnswer(invocation -> {
-            for (Object listener : invocation.getArguments()) {
-                ((ITestRunListener) listener).testStarted(
-                        new TestIdentifier(TEST_CLASS, TEST_NAME_WITH_DEVICE));
-            }
-            throw new ProcessCrashedException("Process crashed");
-        }).when(testRunner).run((ITestRunListener[]) any());
+    public void handleProcessCrashed() throws Exception {
+        withTestCrashed();
 
-        DeviceCommandResult result = testCommand.execute(deviceWrapper, context);
+        DeviceCommandResult result = runCommand(ONE_TEST);
 
         assertTrue(result.isFailed());
+
         verify(reportsGenerator).failLastTest("Process was crashed. See logcat to details.");
-    }
-
-    @Test
-    public void callTestRunEndedFromReporterWhenProcessCrashed() throws Exception {
-        doAnswer(invocation -> {
-            for (Object listener : invocation.getArguments()) {
-                ((ITestRunListener) listener).testStarted(
-                        new TestIdentifier(TEST_CLASS, TEST_NAME_WITH_DEVICE));
-            }
-            throw new ProcessCrashedException("Process crashed");
-        }).when(testRunner).run((ITestRunListener[]) any());
-
-        testCommand.execute(deviceWrapper, context);
-
         verify(reportsGenerator).testRunEnded(anyLong(), any());
+        verify(processCrashedHandler).provideFailMessageOnProcessCrashed(deviceWrapper,
+                currentTest);
+        verify(processCrashedHandler).onAfterProcessCrashed(any(), any());
     }
 
     @Test
-    public void handleProcessCrashedWhenProcessCrashed() throws Exception {
-        doAnswer(invocation -> {
-            for (Object listener : invocation.getArguments()) {
-                ((ITestRunListener) listener).testStarted(
-                        new TestIdentifier(TEST_CLASS, TEST_NAME_WITH_DEVICE));
-            }
-            throw new ProcessCrashedException("Process crashed");
-        }).when(testRunner).run((ITestRunListener[]) any());
+    public void handleProcessCrashedWhenProcessCrashedEarly() throws Exception {
+        withTestCrashedEarly();
 
-        testCommand.execute(deviceWrapper, context);
-        verify(processCrashedHandler).provideFailMessageOnProcessCrashed(deviceWrapper, currentTest);
+        DeviceCommandResult result = runCommand(ONE_TEST);
+
+        assertTrue(result.isFailed());
+
+        verify(reportsGenerator).failLastTest("Process was crashed. See logcat to details.");
+        verify(reportsGenerator).testRunEnded(anyLong(), any());
+        verify(processCrashedHandler).provideFailMessageOnProcessCrashed(deviceWrapper,
+                currentTest);
+        verify(processCrashedHandler).onAfterProcessCrashed(any(), any());
+    }
+
+    @Test
+    public void okTestAfterProcessCrashed() throws Exception {
+        with1TestCrashedAnd1TestOk();
+
+        DeviceCommandResult result = runCommand(TWO_TESTS);
+
+        assertTrue(result.isFailed());
+
+        verify(testRunner, times(2)).run((ITestRunListener[]) any());
+        verify(reportsGenerator, times(2)).testRunEnded(anyLong(), any());
+
+        verify(reportsGenerator, times(1))
+                .failLastTest("Process was crashed. See logcat to details.");
+        verify(processCrashedHandler, times(1)).provideFailMessageOnProcessCrashed(deviceWrapper,
+                currentTest);
+        verify(processCrashedHandler, times(1)).onAfterProcessCrashed(any(), any());
+    }
+
+    @Test
+    public void continueRunIfAllCrashes() throws Exception {
+        with3TestsCrashed();
+
+        DeviceCommandResult result = runCommand(THREE_TESTS);
+
+        assertTrue(result.isFailed());
+
+        verify(testRunner, times(3)).run((ITestRunListener[]) any());
+        verify(reportsGenerator, times(3))
+                .failLastTest("Process was crashed. See logcat to details.");
+        verify(reportsGenerator, times(3)).testRunEnded(anyLong(), any());
+        verify(processCrashedHandler, times(3)).provideFailMessageOnProcessCrashed(deviceWrapper,
+                currentTest);
+        verify(processCrashedHandler, times(3)).onAfterProcessCrashed(any(), any());
+
+        ArgumentCaptor<Map<String, String>> instrumentationArgsCaptor =
+                ArgumentCaptor.forClass(Map.class);
+        verify(context, times(3)).createTestRunnerBuilder(anyString(), anyString(),
+                any(TestIdentifier.class), instrumentationArgsCaptor.capture(),
+                any(ConnectedDeviceWrapper.class), any(XmlReportGeneratorDelegate.class));
+
+        List<Map<String, String>> instrumentationArgs =
+                instrumentationArgsCaptor.getAllValues();
+        Assert.assertEquals(instrumentationArgs.get(0).get("class"),
+                "com.test.TestClass#test1,com.test.TestClass#test2,com.test.TestClass#test3");
+        Assert.assertEquals(instrumentationArgs.get(1).get("class"),
+                "com.test.TestClass#test2,com.test.TestClass#test3");
+        Assert.assertEquals(instrumentationArgs.get(2).get("class"),
+                "com.test.TestClass#test3");
     }
 
     @Test
@@ -207,37 +273,74 @@ public class SingleInstrumentalTestCommandTest {
             throw new ProcessCrashedException("Process crashed");
         }).when(testRunner).run((ITestRunListener[]) any());
 
-        testCommand.execute(deviceWrapper, context);
+        runCommand(ONE_TEST);
         verify(processCrashedHandler).provideFailMessageOnProcessCrashed(deviceWrapper, currentTest);
-    }
-
-    @Test
-    public void clearDataWhenProcessCrashedDuringTest() throws Exception {
-        InstrumentalExtension instrumentalExtension = new InstrumentalExtension();
-        instrumentalExtension.setApplicationId("application_id");
-        when(context.getInstrumentalInfo()).thenReturn(instrumentalExtension);
-
-        doAnswer(invocation -> new ClearCommand().execute(invocation.getArgument(0),
-                invocation.getArgument(1)))
-                .when(processCrashedHandler).onAfterProcessCrashed(any(), any());
-
-        doAnswer(invocation -> {
-            for (Object listener : invocation.getArguments()) {
-                ((ITestRunListener) listener).testStarted(
-                        new TestIdentifier(TEST_CLASS, TEST_NAME_WITH_DEVICE));
-            }
-            throw new ProcessCrashedException("Process crashed");
-        }).when(testRunner).run((ITestRunListener[]) any());
-
-        testCommand.execute(deviceWrapper, context);
-
-        verify(deviceWrapper).executeShellCommand("pm clear application_id");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void throwExceptionWhenGivenEmptyTestList() throws Exception {
-        testCommand = new SingleInstrumentalTestCommand(PROJECT_NAME, "test_prefix", args, new ArrayList<>());
+        runCommand(Collections.emptyList());
+    }
 
-        testCommand.execute(deviceWrapper, context);
+    private void withTestCrashed() throws Exception {
+        doAnswer(mockTestRunCrash(TEST_CLASS, TEST_NAME_WITH_DEVICE))
+                .when(testRunner).run((ITestRunListener[]) any());
+    }
+
+    private void with3TestsCrashed() throws Exception {
+        doAnswer(mockTestRunCrash(TEST_CLASS, TEST_NAME_WITH_DEVICE)
+        ).doAnswer(mockTestRunCrash(TEST_CLASS, TEST_NAME_2_WITH_DEVICE)
+        ).doAnswer(mockTestRunCrash(TEST_CLASS, TEST_NAME_3_WITH_DEVICE)
+        ).when(testRunner).run((ITestRunListener[]) any());
+    }
+
+    private void with1TestCrashedAnd1TestOk() throws Exception {
+        doAnswer(mockTestRunCrash(TEST_CLASS, TEST_NAME_WITH_DEVICE)
+        ).doAnswer(mockTestRunOk(TEST_CLASS, TEST_NAME_2_WITH_DEVICE)
+        ).when(testRunner).run((ITestRunListener[]) any());
+    }
+
+    private Answer mockTestRunOk(String testClass, String testName) {
+        // See javadoc to ITestRunListener class for correct commands sequence
+        return (InvocationOnMock invocation) -> {
+            // Is there a simple way to convert Object [] -> List<ITestRunListener> ?
+            List<ITestRunListener> listeners =
+                    Arrays.asList(invocation.getArguments()).stream()
+                            .map(arg -> (ITestRunListener) arg).collect(Collectors.toList());
+            listeners.forEach(listener ->
+                    listener.testRunStarted("", 1));
+            listeners.forEach(listener ->
+                    listener.testStarted(new TestIdentifier(testClass, testName)));
+            listeners.forEach(listener ->
+                    listener.testEnded(new TestIdentifier(testClass, testName),
+                            Collections.emptyMap()));
+            listeners.forEach(listener ->
+                    listener.testRunEnded(100, Collections.emptyMap()));
+            return null;
+        };
+    }
+
+    private Answer mockTestRunCrash(String testClass, String testName) {
+        return (InvocationOnMock invocation) -> {
+            for (Object listener : invocation.getArguments()) {
+                ((ITestRunListener) listener).testStarted(
+                        new TestIdentifier(testClass, testName));
+            }
+            throw new ProcessCrashedException("Process crashed");
+        };
+    }
+
+    private void withTestCrashedEarly() throws Exception {
+        doAnswer(invocation -> {
+            // With early native crash DDMS doesn't produce testStarted() callback.
+            throw new ProcessCrashedException("Process crashed");
+        }).when(testRunner).run((ITestRunListener[]) any());
+    }
+
+    private DeviceCommandResult runCommand(List<TestPlanElement> tests)
+            throws CommandExecutionException {
+        SingleInstrumentalTestCommand testCommand =
+                new SingleInstrumentalTestCommand(PROJECT_NAME, "test_prefix", args, tests);
+        return testCommand.execute(deviceWrapper, context);
     }
 }
