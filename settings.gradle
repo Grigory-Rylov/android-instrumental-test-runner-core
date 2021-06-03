@@ -1,2 +1,10 @@
-rootProject.name = 'android-instrumental-test-runner-core'
+pluginManagement {
+    plugins {
+        id 'org.jetbrains.kotlin.jvm' version "1.4.30"
+    }
+    repositories {
+        gradlePluginPortal()
+    }
+}
 
+rootProject.name = 'android-instrumental-test-runner-core'
