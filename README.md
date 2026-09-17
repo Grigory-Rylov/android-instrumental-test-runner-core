@@ -14,7 +14,7 @@ Sample project https://github.com/Grigory-Rylov/Android-Intsrumentation-Test-Exa
 
 To use with single test use command line parameter -PtestClass=com.test.SomeClassWithTests
 
-# Dependecies
+# Dependencies
 ## Gradle
 ```
 dependencies {
