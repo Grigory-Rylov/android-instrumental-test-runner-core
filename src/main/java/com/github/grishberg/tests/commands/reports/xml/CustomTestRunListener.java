@@ -91,6 +91,10 @@ public class CustomTestRunListener extends XmlTestRunListener {
 
     @Override
     public void testFailed(TestIdentifier test, String trace) {
+        if (test == null) {
+            return;
+        }
+
         if (mLogger != null) {
             mLogger.warning("\n%1$s#%2$s \033[31mFAILED \033[0m",
                     test.getClassName(), test.getTestName());
@@ -141,6 +145,9 @@ public class CustomTestRunListener extends XmlTestRunListener {
     }
 
     private String getModifiedTrace(String trace) {
+        if (trace == null) {
+            return "";
+        }
         // split lines
         String[] lines = trace.split("\n");
 
